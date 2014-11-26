@@ -1,0 +1,60 @@
+= Readme
+
+== Prerequisites
+
+* Inkscape
+** Used to export DXF files to SVG.
+
+* OpenSCAD
+** The currently newest version (2014.03) has trouble with 2D shapes containing holes. The current development version solves these problems.
+** It is assumed that the 'openscad' binary is on $PATH.
+
+If any of the required binaries ('inkscape' for Inkscape and 'openscad' for OpenSCAD) is not available on $PATH, paths to these binaries can be configured by creating a file called 'config.mk' in the same directory as the makefile. There, the variables 'OPENSCAD' and 'INKSCAPE' can be set to the appropriate paths like this:
+
+{{{
+OPENSCAD := /Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD
+}}}
+
+
+== Supported file types
+
+=== SVG files
+
+Any file whose name ends in `.svg` may be used from an OpenSCAD file like this:
+
+{{{
+import("file.dxf");
+}}}
+
+The makefile will automatically convert the SVG file to a DXF file.
+
+
+=== OpenSCAD files
+
+Any file whose name ends in `.scad` but does not start with `_` will be compiled to STL file using OpenSCAD. OpenSCAD files whose names start with `_` can be used as "library" files and can be used from other OpenSCAD files using one of the following commands:
+
+{{{
+include <filename>
+use <filename>
+}}}
+
+Please see the [http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Print_version|manual] for details.
+
+
+== Compiling
+
+To compile the whole project, run `make` from the directory in which this readme is. This will process all necessary SVG files and produce an STL file for each OpenSCAD source file. Individual files may be created or updated by passing their names to the make command, as ussual.
+
+To remove all generated files, run `make clean`.
+
+
+=== Dependency tracking
+
+OpenSCAD actually does have the ability to produce dependency files which can be read by `make` but does this in a way that makes using them in a project with multiple directories near-impossible. Because of this, dependencies between files are generated from a few assumptions based on simple naming-conventions:
+
+* Only files in the `src` directory are compiled.
+* Each generated STL file solely depends on the OpenSCAD file with the same name.
+* Each generated DXF files solely depends on the SVG files with the same name.
+* Each OpenSCAD file depends whose name does not begin with `_` depends on two sets of files:
+** All OpenSCAD files in the same directory whose names do begin with `_`.
+** All DXF files in the same directory.
