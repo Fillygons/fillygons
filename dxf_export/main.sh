@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 
+set -e -o pipefail
+
 in_file=$1
 out_file=$2
 
