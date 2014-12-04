@@ -44,4 +44,4 @@ $(foreach i,$(COMPILED_SCAD_FILES),$(eval $(i): $(filter $(dir $(i))%,$(LIBRARY_
 
 # Rule for automaticlaly generated OpenSCAD files.
 $(GENERATED_FILES): generate_sources.sh
-	./generate_sources.sh $@ > $@
+	./generate_sources.sh $@

@@ -13,7 +13,7 @@ function generate_file() {
 	if ! [ "$current_file_name" ]; then
 		echo "$file_name"
 	elif [ "$current_file_name" == "$file_name" ]; then
-		"${generate_command[@]}"
+		"${generate_command[@]}" > "$file_name"
 	fi
 }
 
