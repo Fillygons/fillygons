@@ -21,12 +21,12 @@ COMPILED_SCAD_FILES := $(filter-out $(LIBRARY_SCAD_FILES),$(SCAD_FILES))
 STL_FILES := $(patsubst %.scad,%.stl,$(COMPILED_SCAD_FILES))
 DXF_FILES := $(patsubst %.svg,%.dxf,$(SVG_FILES))
 
-# Everything.
-all: $(STL_FILES)
+# Everything. Also generates files which aren't compiled to anything else.
+all: $(STL_FILES) $(GENERATED_FILES)
 
 # Everything^-1.
 clean:
-	rm -rf $(DXF_FILES) $(STL_FILES) $(GENERATED_SCAD_FILES)
+	rm -rf $(DXF_FILES) $(STL_FILES) $(GENERATED_FILES)
 
 # Needs to be included after target all has been defined.
 -include config.mk
