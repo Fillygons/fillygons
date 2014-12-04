@@ -19,7 +19,5 @@ function generate_file() {
 }
 
 # Call generate_file for each file to be generated.
-for i in {1..5}; do
-	size=$[ $i * 10 ]
-	generate_file "src/generated/cube_$size.scad" echo "cube($size);"
-done
+# E.g.:
+# generate_file src/test.scad echo "cube();"

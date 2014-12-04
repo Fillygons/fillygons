@@ -2,6 +2,3 @@
 *.pyc
 *.dxf
 *.stl
-
-# Generated files
-/src/generated/
