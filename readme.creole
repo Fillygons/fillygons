@@ -41,6 +41,13 @@ use <filename>
 Please see the [http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Print_version|manual] for details.
 
 
+== Generating Source files
+
+This template allows files to be generated automatically. Currently supported for inclusion in the build proess are OpenSCAD and SVG files. This works by editing the `generate_sources.sh` script, which is run by the Makefile was changed.
+
+The script should call the function `generate_file()` once for each file which should be generated. The first argument to the function should be the name of the file to be generated, the remaining arguments a command, which when run should output the file's content to standard output. How this function is called is up to the scrtip and may e.g. be done from a `for` loop or while iterating over a set of other source files.
+
+
 == Compiling
 
 To compile the whole project, run `make` from the directory in which this readme is. This will process all necessary SVG files and produce an STL file for each OpenSCAD source file. Individual files may be created or updated by passing their names to the make command, as ussual.

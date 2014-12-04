@@ -1,9 +1,25 @@
 #! /usr/bin/env bash
 
-if [ "$1" ]; then
-	# Print the content of the generated source named $1 here.
-	true
-else
-	# Print a list of names of the files that should be generated using this script here.
-	true
-fi
+set -e -o pipefail
+
+current_file_name=$1
+
+# This function should be called for each generated file with the file's name as the first argument and the command to call to produce the file's content as the remaining arguments.
+function generate_file() {
+	file_name=$1
+	shift
+	generate_command=("$@")
+	
+	if ! [ "$current_file_name" ]; then
+		echo "$file_name"
+	elif [ "$current_file_name" == "$file_name" ]; then
+		mkdir -p "$(dirname "$file_name")"
+		"${generate_command[@]}" > "$file_name"
+	fi
+}
+
+# Call generate_file for each file to be generated.
+for i in {1..5}; do
+	size=$[ $i * 10 ]
+	generate_file "src/generated/cube_$size.scad" echo "cube($size);"
+done
