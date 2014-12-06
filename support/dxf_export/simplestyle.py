@@ -141,6 +141,7 @@ svgcolors={
     'plum':'#dda0dd',
     'powderblue':'#b0e0e6',
     'purple':'#800080',
+    'rebeccapurple':'#663399',
     'red':'#ff0000',
     'rosybrown':'#bc8f8f',
     'royalblue':'#4169e1',
@@ -241,4 +242,4 @@ def formatColor3f(r,g,b):
     return '#%02x%02x%02x' % (int(round(r*255)),int(round(g*255)),int(round(b*255)))
 
 
-# vim: expandtab shiftwidth=4 tabstop=8 softtabstop=4 encoding=utf-8 textwidth=99
+# vim: expandtab shiftwidth=4 tabstop=8 softtabstop=4 fileencoding=utf-8 textwidth=99
