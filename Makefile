@@ -36,7 +36,7 @@ $(foreach i,$(COMPILED_SCAD_FILES),$(eval $(i): $(filter $(dir $(i))%,$(LIBRARY_
 
 # Rule to convert an SVG file to a DXF file.
 %.dxf: %.svg
-	dxf_export/main.sh $< $@
+	python2 dxf_export $< $@
 
 # Rule to compile an OpenSCAD file to an STL file.
 %.stl: %.scad

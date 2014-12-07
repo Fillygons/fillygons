@@ -121,7 +121,3 @@ class MyEffect(inkex.Effect):
                 self.dxf_path_to_point(layer,p)
                     
         self.dxf_add( dxf_templates.r14_footer )
-
-e = MyEffect()
-e.affect()
-
