@@ -1,5 +1,6 @@
 INKSCAPE ?= inkscape
 OPENSCAD ?= openscad
+PYTHON ?= python2
 
 # Used by dxf_export/main.sh
 export INKSCAPE
@@ -36,7 +37,7 @@ $(foreach i,$(COMPILED_SCAD_FILES),$(eval $(i): $(filter $(dir $(i))%,$(LIBRARY_
 
 # Rule to convert an SVG file to a DXF file.
 %.dxf: %.svg
-	python2 dxf_export $< $@
+	PYTHONPATH="support:$$PYTHONPATH" $(PYTHON) -m dxf_export $< $@
 
 # Rule to compile an OpenSCAD file to an STL file.
 %.stl: %.scad
