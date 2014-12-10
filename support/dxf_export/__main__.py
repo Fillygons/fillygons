@@ -1,15 +1,6 @@
-import sys, os, xml.etree.ElementTree, subprocess, tempfile, contextlib, shutil
-import better_dxf_outlines
-
-
-@contextlib.contextmanager
-def TemporaryDirectory():
-	dir = tempfile.mkdtemp()
-	
-	try:
-		yield dir
-	finally:
-		shutil.rmtree(dir)
+import sys, os, xml.etree.ElementTree, shutil
+from lib import util
+from . import better_dxf_outlines
 
 
 def _export_dxf(in_path, out_path):
@@ -28,13 +19,6 @@ def _get_inkscape_layer_count(svg_path):
 	return len(layers)
 
 
-def _command(args):
-	process = subprocess.Popen(args)
-	process.wait()
-	
-	assert not process.returncode
-
-
 def _inkscape(svg_path, verbs):
 	def iter_args():
 		yield os.environ['INKSCAPE']
@@ -45,7 +29,7 @@ def _inkscape(svg_path, verbs):
 		
 		yield svg_path
 	
-	_command(list(iter_args()))
+	util.command(list(iter_args()))
 
 
 def _unfuck_svg_document(temp_svg_path):
@@ -82,7 +66,7 @@ def _unfuck_svg_document(temp_svg_path):
 
 
 def main(in_path, out_path):
-	with TemporaryDirectory() as temp_dir:
+	with util.TemporaryDirectory() as temp_dir:
 		temp_svg_path = os.path.join(temp_dir, 'temp.svg')
 		
 		shutil.copyfile(in_path, temp_svg_path)
