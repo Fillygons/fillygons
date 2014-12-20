@@ -243,7 +243,6 @@ def beziertatlength(((bx0,by0),(bx1,by1),(bx2,by2),(bx3,by3)), l = 0.5, toleranc
 bezierlength = bezierlengthSimpson
 
 if __name__ == '__main__':
-    import timing
     #print linebezierintersect(((,),(,)),((,),(,),(,),(,)))
     #print linebezierintersect(((0,1),(0,-1)),((-1,0),(-.5,0),(.5,0),(1,0)))
     tol = 0.00000001
