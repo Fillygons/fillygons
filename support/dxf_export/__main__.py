@@ -1,14 +1,14 @@
 import sys, os, xml.etree.ElementTree, shutil
 from lib import util
-from . import better_dxf_outlines
+from . import effect
 
 
 def _export_dxf(in_path, out_path):
-	dxf_export = better_dxf_outlines.MyEffect()
+	dxf_export = effect.DXFExportEffect()
 	dxf_export.affect(args = [in_path], output = False)
 	
 	with open(out_path, 'w') as file:
-		file.write(dxf_export.dxf)
+		dxf_export.write(file)
 
 
 def _get_inkscape_layer_count(svg_path):
