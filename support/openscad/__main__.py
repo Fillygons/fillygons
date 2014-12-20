@@ -34,4 +34,10 @@ def main(in_path, out_path, deps_path):
 		_write_dependencies(deps_path, relpath(out_path), deps - ignored_files)
 
 
-main(*sys.argv[1:])
+try:
+	main(*sys.argv[1:])
+except util.UserError as e:
+	print 'Error:', e
+	sys.exit(1)
+except KeyboardInterrupt:
+	sys.exit(2)

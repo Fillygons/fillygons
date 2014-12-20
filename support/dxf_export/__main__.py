@@ -76,4 +76,10 @@ def main(in_path, out_path):
 		_export_dxf(temp_svg_path, out_path)
 
 
-main(*sys.argv[1:])
+try:
+	main(*sys.argv[1:])
+except util.UserError as e:
+	print 'Error:', e
+	sys.exit(1)
+except KeyboardInterrupt:
+	sys.exit(2)
