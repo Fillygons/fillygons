@@ -21,17 +21,26 @@ def main(in_path, out_path, deps_path):
 		temp_mk_path = os.path.join(temp_dir, 'mk')
 		temp_files_path = os.path.join(temp_dir, 'files')
 		
-		_openscad(in_path, out_path, temp_deps_path)
+		# OpenSCAD requires the output file name to end in .stl
+		temp_stl_path = os.path.join(temp_dir, 'out.stl')
+		
+		_openscad(in_path, temp_stl_path, temp_deps_path)
 		
 		mk_content = '%:; echo "$@" >> {}'.format(util.bash_escape_string(temp_files_path))
 		
+		# Use make to parse the dependency makefile written by OpenSCAD
 		util.write_file(temp_mk_path, mk_content.encode())
 		util.command(['make', '-s', '-B', '-f', temp_mk_path, '-f', temp_deps_path])
 		
+		# All dependencies as paths relative to the project root.
 		deps = set(map(relpath, util.read_file(temp_files_path).decode().splitlines()))
-		ignored_files = set(map(relpath, [temp_deps_path, temp_mk_path, in_path, out_path]))
 		
+		# Relative paths to all files that should not appear in the dependency makefile.
+		ignored_files = set(map(relpath, [in_path, temp_deps_path, temp_mk_path, temp_stl_path]))
+		
+		# Write output files.
 		_write_dependencies(deps_path, relpath(out_path), deps - ignored_files)
+		os.rename(temp_stl_path, out_path)
 
 
 try:
