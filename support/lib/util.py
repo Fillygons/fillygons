@@ -1,6 +1,10 @@
 import contextlib, subprocess, tempfile, shutil, re, os
 
 
+class UserError(Exception):
+	pass
+
+
 @contextlib.contextmanager
 def TemporaryDirectory():
 	dir = tempfile.mkdtemp()
@@ -15,7 +19,8 @@ def command(args):
 	process = subprocess.Popen(args)
 	process.wait()
 	
-	assert not process.returncode
+	if process.returncode:
+		raise UserError('Command failed: {}'.format(' '.join(args)))
 
 
 def bash_escape_string(string):
