@@ -1,5 +1,12 @@
 = Readme
 
+== Repository structure
+
+This repository, as it is maintained on [http://github.com/Feuermurmel/openscad-template|GitHub], contains two important branches, Branch `master` and `examples`. `master` contains an empty project which is ready to be clones and used for new project.
+
+Branch `examples` additionally contains a few example source files which are ready to be compiled. The root directory on that branch also contains a second text document `examples.creole`, describing the example project in more detail.
+
+
 == Prerequisites
 
 * OpenSCAD snapshot > 2014.11.05
