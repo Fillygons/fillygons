@@ -14,8 +14,9 @@ Branch `examples` additionally contains a few example source files which are rea
 ** It is recommended to a recent development snapshot, e.g. version 2014.11.05 or later.
 	** The current release version (2014.03) generates invalid dependency information if the path to the project contains spaces or other characters that need to be treated specially in a makefile and also has trouble with 2D shapes containing holes. The current development version solves these problems.
 
-* Inkscape
+* Inkscape > 0.91
 ** Used to export DXF files to SVG.
+** At least version 0.91 (or maybe some earlier development snapshot) is necessary because some recently added command line verbs are used to transform and massage an SVG prior to export.
 ** Recommended to be used to edit SVG files, especially if its necessary to create multiple layers and import them separately in OpenSCAD.
 
 * Python 2.7
