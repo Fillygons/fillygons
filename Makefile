@@ -7,6 +7,10 @@ PYTHON_CMD := PYTHONPATH="support:$$PYTHONPATH" $(PYTHON)
 # Used by dxf_export/main.sh
 export INKSCAPE OPENSCAD
 
+ifneq ($(shell find src -name '* *'),)
+  $(error Error: The src directory contains files with spaces in their names, this is not supported by make)
+endif
+
 # Run generate_scad.sh to get the names of all OpenSCAD files that should be generated using that same script.
 GENERATED_FILES := $(addsuffix .scad,$(basename $(shell ./generate_sources.sh)))
 GENERATED_SVG_FILES := $(filter %.svg, $(GENERATED_FILES))
