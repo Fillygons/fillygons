@@ -1,11 +1,14 @@
-# Used by dxf_export/main.sh
-INKSCAPE ?= inkscape
-OPENSCAD ?= openscad
-PYTHON ?= python2
+# Installation-dependent settings. You can overwrite these in a file called config.mk in the same directory as this makefile. See readme.creole.
+INKSCAPE := inkscape
+OPENSCAD := openscad
+PYTHON := python2
+
+# Settings affecting the compiled results. You can overwrite these in a file called settings.mk in the same directory as this makefile. See readme.creole.
+DXF_FLATNESS := 0.1
+
+export INKSCAPE OPENSCAD DXF_FLATNESS
 
 PYTHON_CMD := PYTHONPATH="support:$$PYTHONPATH" $(PYTHON)
-
-export INKSCAPE OPENSCAD
 
 # All visible files in the src directory. Ignore files whose names contain spaces.
 SRC_FILES := $(shell find src -not \( \( -name '.*' -or -name '* *' \) -prune \))
@@ -38,7 +41,7 @@ clean:
 	rm -rf $(GENERATED_FILES) $(DXF_FILES) $(STL_FILES) $(DEPENDENCY_FILES)
 
 # Include the local configuration file and the dependency files. Needs to be included after the `all' target has been defined.
--include config.mk $(DEPENDENCY_FILES)
+-include config.mk settings.mk $(DEPENDENCY_FILES)
 
 # Rule to convert an SVG file to a DXF file.
 %.dxf: %.svg

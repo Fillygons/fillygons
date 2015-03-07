@@ -2,7 +2,7 @@
 Based on code from Aaron Spike. See http://www.bobcookdev.com/inkscape/inkscape-dxf.html
 """
 
-import pkgutil, re
+import pkgutil, os, re
 from . import inkex, simpletransform, cubicsuperpath, cspsubdiv
 
 
@@ -32,7 +32,7 @@ class DXFExportEffect(inkex.Effect):
 		
 		self._dxf_instructions = []
 		self._handle = 255
-		self._flatness = 0.1
+		self._flatness = float(os.environ['DXF_FLATNESS'])
 	
 	def _get_user_unit(self):
 		"""

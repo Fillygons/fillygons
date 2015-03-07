@@ -26,7 +26,7 @@ Branch `examples` additionally contains a few example source files which are rea
 
 === Explicitly specifying paths to binaries
 
-If any of the required binaries is not available on `$PATH` or different versions should be used, the paths to these binaries can be configured by creating a file called 'config.mk' in the same directory as the makefile. There, variables can be set to the paths to these binaries (or to a different binary name which can be found on `$PATH`), like shown in the following example:
+If any of the required binaries is not available on `$PATH` or different versions should be used, the paths to these binaries can be configured by creating a file called `config.mk` in the same directory as the makefile. There, variables can be set to the paths to these binaries (or to a different binary name which can be found on `$PATH`), like shown in the following example:
 
 {{{
 # Path to the OpenSCAD binary
@@ -56,14 +56,13 @@ The makefile will automatically convert the SVG file to a DXF file when building
 import("file.dxf", "background");
 }}}
 
-The DXF export supports all shapes supported by Inkscape (e.g. rectangles, circles, paths, spiro lines, text, ...). Before the object are exported, all objects are converted to paths and combined using the union operation. Then, the resulting paths are converted to line segments which closely follow the curved parts of the path [0]. The resulting line segments are exported to DXF and combined to the original shapes when imported in OpenSCAD. For these transformations to work, the objects need to be placed in Inkscape layers.
+The DXF export supports all shapes supported by Inkscape (e.g. rectangles, circles, paths, spiro lines, text, ...). Before the object are exported, all objects are converted to paths and combined using the union operation. Then, the resulting paths are converted to line segments which closely follow the curved parts of the path. The resulting line segments are exported to DXF and combined to the original shapes when imported in OpenSCAD. For these transformations to work, the objects need to be placed in Inkscape layers.
 
-OpenSCAD itself does not defined in which unit any numbers are interpreted [1]. Inkscape OTOH allows the used to defined a document wide unit as well as using different units when specifying the size and position of shapes. When exporting the SVG document using Inkscape, all numbers are converted to the unit specified under ''General'' in Inkscape's ''Document Properties'' dialog. These numbers are then used when writing the DXF document and these are the numeric sizes and positions that OpenSCAD will see.
+OpenSCAD itself does not defined in which unit any numbers are interpreted [0]. Inkscape OTOH allows the used to defined a document wide unit as well as using different units when specifying the size and position of shapes. When exporting the SVG document using Inkscape, all numbers are converted to the unit specified under ''General'' in Inkscape's ''Document Properties'' dialog. These numbers are then used when writing the DXF document and these are the numeric sizes and positions that OpenSCAD will see.
 
-DXF and OpenSCAD both use a right-handed coordinate system (the Y axis runs up when the X-axis runs to the right). While SVG uses a left-handed coordinate system (the Y axis runs down if the same orientation is used). Inkscape, surprisingly also uses a right-handed coordinate system. The DXF export script honors that and places assumes the origin of the document in the lower left corner when exporting the document.
+DXF and OpenSCAD both use a right-handed coordinate system (the Y axis runs up when the X-axis runs to the right). While SVG uses a left-handed coordinate system (the Y axis runs down if the same orientation is used). Inkscape, surprisingly also uses a right-handed coordinate system. The DXF export script honors that and places the origin of the document in the lower left corner when exporting the document.
 
-[0]: Controlling how fine curved parts are subdivided currently cannot controlled without editing the DXF export scripts. This is a pending issue.
-[1]: Although millimeters seems to be the predominant unit.
+[0]: Although millimeters seems to be the predominant unit.
 
 
 === OpenSCAD files
@@ -76,6 +75,16 @@ use <filename>
 }}}
 
 OpenSCAD files may be compiled to STL and used from other OpenSCAD files at the same time. Please see the [http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Print_version|manual] for details and on how to use OpenSCAD in general.
+
+
+=== Settings used for compilation
+
+The quality of the DXF export can be specified by creating a file called `settings.mk` in the same directory as the makefile. Setting `DXF_FLATNESS` to a smaller value (which defaults to `0.1`) creates a shape that more closely follows curved parts of the exported shapes.
+
+{{{
+# Specify how far the exported approximation may deviate from the actual shape. The default is 0.1.
+DXF_FLATNESS := 0.02
+}}}
 
 
 == Generating Source files
