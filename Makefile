@@ -33,6 +33,9 @@ DEPENDENCY_FILES := $(patsubst %.scad,%.d,$(COMPILED_SCAD_FILES))
 STL_FILES := $(patsubst %.scad,%.stl,$(COMPILED_SCAD_FILES))
 DXF_FILES := $(patsubst %.svg,%.dxf,$(SVG_FILES))
 
+# Dependencies which may affect the result of all build products.
+GLOBAL_DEPS := Makefile config.mk settings.mk
+
 # Everything. Also generates files which aren't compiled to anything else.
 all: $(GENERATED_FILES) $(DXF_FILES) $(STL_FILES)
 
@@ -44,13 +47,13 @@ clean:
 -include config.mk settings.mk $(DEPENDENCY_FILES)
 
 # Rule to convert an SVG file to a DXF file.
-%.dxf: %.svg
+%.dxf: %.svg $(GLOBAL_DEPS)
 	$(PYTHON_CMD) -m dxf_export $< $@
 
 # Rule to compile an OpenSCAD file to an STL file. We require all DXF files to exist before an OpenSCAD file can be used to generate an STL file. Additional dependencies are read from the included makefiles generated during compiling.
-%.stl: %.scad  | $(DXF_FILES)
+%.stl: %.scad $(GLOBAL_DEPS) | $(DXF_FILES)
 	$(PYTHON_CMD) -m openscad $< $@ $*.d
 
-# Rule for automaticlaly generated OpenSCAD files.
-$(GENERATED_FILES): generate_sources.sh
+# Rule for automaticaly generated OpenSCAD files.
+$(GENERATED_FILES): generate_sources.sh $(GLOBAL_DEPS)
 	./generate_sources.sh $@
