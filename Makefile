@@ -1,15 +1,16 @@
+# Used by dxf_export/main.sh
 INKSCAPE ?= inkscape
 OPENSCAD ?= openscad
 PYTHON ?= python2
 
 PYTHON_CMD := PYTHONPATH="support:$$PYTHONPATH" $(PYTHON)
 
-# Used by dxf_export/main.sh
 export INKSCAPE OPENSCAD
 
-ifneq ($(shell find src -name '* *'),)
-  $(error Error: The src directory contains files with spaces in their names, this is not supported by make)
-endif
+# All visible files in the src directory. Ignore files whose names contain spaces.
+SRC_FILES := $(shell find src -not \( \( -name '.*' -or -name '* *' \) -prune \))
+SRC_SCAD_FILES := $(filter %.scad,$(SRC_FILES))
+SRC_SVG_FILES := $(filter %.svg,$(SRC_FILES))
 
 # Run generate_scad.sh to get the names of all OpenSCAD files that should be generated using that same script.
 GENERATED_FILES := $(addsuffix .scad,$(basename $(shell ./generate_sources.sh)))
@@ -17,10 +18,10 @@ GENERATED_SVG_FILES := $(filter %.svg, $(GENERATED_FILES))
 GENERATED_SCAD_FILES := $(filter %.scad, $(GENERATED_FILES))
 
 # Source SVG files.
-SVG_FILES := $(shell find src -name '*.svg') $(GENERATED_SVG_FILES)
+SVG_FILES := $(SRC_SVG_FILES) $(GENERATED_SVG_FILES)
 
 # Only OpenSCAD files whose names do not start with `_' are compiled to STL.
-COMPILED_SCAD_FILES := $(foreach i,$(shell find src -name '*.scad') $(GENERATED_SCAD_FILES),$(if $(filter-out _%,$(notdir $(i))),$(i)))
+COMPILED_SCAD_FILES := $(foreach i, $(SRC_SCAD_FILES) $(GENERATED_SCAD_FILES),$(if $(filter-out _%,$(notdir $(i))),$(i)))
 
 # Makefiles which are generated while compiling to record dependencies.
 DEPENDENCY_FILES := $(patsubst %.scad,%.d,$(COMPILED_SCAD_FILES))
