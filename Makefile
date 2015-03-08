@@ -34,7 +34,7 @@ STL_FILES := $(patsubst %.scad,%.stl,$(COMPILED_SCAD_FILES))
 DXF_FILES := $(patsubst %.svg,%.dxf,$(SVG_FILES))
 
 # Dependencies which may affect the result of all build products.
-GLOBAL_DEPS := Makefile config.mk settings.mk
+GLOBAL_DEPS := Makefile $(wildcard config.mk settings.mk)
 
 # Everything. Also generates files which aren't compiled to anything else.
 all: $(GENERATED_FILES) $(DXF_FILES) $(STL_FILES)
