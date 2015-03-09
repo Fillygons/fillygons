@@ -36,12 +36,19 @@ DXF_FILES := $(patsubst %.svg,%.dxf,$(SVG_FILES))
 # Dependencies which may affect the result of all build products.
 GLOBAL_DEPS := Makefile $(wildcard config.mk settings.mk)
 
+.PHONY: all clean generated dxf stl
+
 # Everything. Also generates files which aren't compiled to anything else.
-all: $(GENERATED_FILES) $(DXF_FILES) $(STL_FILES)
+all: generated dxf stl
 
 # Everything^-1.
 clean:
 	rm -rf $(GENERATED_FILES) $(DXF_FILES) $(STL_FILES) $(DEPENDENCY_FILES)
+
+# Targets to build the project up to a specific step.
+generated: $(GENERATED_FILES)
+dxf: $(DXF_FILES)
+stl: $(STL_FILES)
 
 # Include the local configuration file and the dependency files. Needs to be included after the `all' target has been defined.
 -include config.mk settings.mk $(DEPENDENCY_FILES)
