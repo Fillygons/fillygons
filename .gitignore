@@ -1,2 +1,6 @@
 /config.mk
-*.pyc
+/support/**/*.pyc
+
+/src/**/*.dxf
+/src/**/*.stl
+/src/**/*.d
