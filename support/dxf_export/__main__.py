@@ -38,16 +38,18 @@ def _unfuck_svg_document(temp_svg_path):
 	"""
 	
 	layers_count = _get_inkscape_layer_count(temp_svg_path)
-
+	
 	def iter_inkscape_verbs():
 		yield 'LayerUnlockAll'
 		yield 'LayerShowAll'
 
-		# Go to the first layer
+		# Go to the first layer.
 		for _ in range(layers_count):
 			yield 'LayerPrev'
-
+		
+		# Copy each layer and flatten it to a single path object.
 		for _ in range(layers_count):
+			yield 'LayerDuplicate'
 			yield 'EditSelectAll'
 			yield 'ObjectToPath'
 			yield 'EditSelectAll'
@@ -57,11 +59,26 @@ def _unfuck_svg_document(temp_svg_path):
 			yield 'EditSelectAll'
 			yield 'SelectionUnion'
 			yield 'LayerNext'
-
+		
+		# Go to the first layer again.
+		for _ in range(2 * layers_count):
+			yield 'LayerPrev'
+		
+		# Move the flattened shapes to the original layers.
+		for _ in range(layers_count):
+			yield 'EditSelectAll'
+			yield 'EditDelete'
+			yield 'LayerNext'
+			
+			yield 'EditSelectAll'
+			yield 'LayerMoveToPrev'
+			yield 'LayerNext'
+			yield 'LayerDelete'
+		
 		yield 'FileSave'
 		yield 'FileClose'
 		yield 'FileQuit'
-
+	
 	_inkscape(temp_svg_path, list(iter_inkscape_verbs()))
 
 
@@ -70,7 +87,7 @@ def main(in_path, out_path):
 		temp_svg_path = os.path.join(temp_dir, 'temp.svg')
 		
 		shutil.copyfile(in_path, temp_svg_path)
-
+		
 		_unfuck_svg_document(temp_svg_path)
 		
 		_export_dxf(temp_svg_path, out_path)
