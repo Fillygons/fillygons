@@ -32,7 +32,7 @@ def main(in_path, out_path, deps_path):
 		
 		# Use make to parse the dependency makefile written by OpenSCAD.
 		util.write_file(temp_mk_path, mk_content.encode())
-		util.command(['make', '-s', '-B', '-f', temp_mk_path, '-f', temp_deps_path])
+		util.command(['make', '-s', '-B', '-f', temp_mk_path, '-f', temp_deps_path], remove_env = ['MAKELEVEL', 'MAKEFLAGS'])
 		
 		# All dependencies as paths relative to the project root.
 		deps = set(map(relpath, util.read_file(temp_files_path).decode().splitlines()))
