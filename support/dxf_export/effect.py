@@ -32,6 +32,7 @@ class DXFExportEffect(inkex.Effect):
 		
 		self._dxf_instructions = []
 		self._handle = 255
+		self._layer_indices = { }
 		self._flatness = float(os.environ['DXF_FLATNESS'])
 	
 	def _get_user_unit(self):
@@ -66,13 +67,22 @@ class DXFExportEffect(inkex.Effect):
 	def _get_document_height_attr(self):
 		return self.document.getroot().xpath('@height', namespaces = inkex.NSS)[0]
 	
+	def _get_layer_index(self, layer_name):
+		index = self._layer_indices.get(layer_name)
+		
+		if index is None:
+			index = len(self._layer_indices)
+			self._layer_indices[layer_name] = index
+		
+		return index
+	
 	def _add_instruction(self, code, value):
 		self._dxf_instructions.append((code, str(value)))
 	
-	def _add_dxf_line(self, layer, csp):
+	def _add_dxf_line(self, layer_name, csp):
 		self._add_instruction(0, 'LINE')
-		self._add_instruction(8, layer)
-		self._add_instruction(62, 4)
+		self._add_instruction(8, layer_name)
+		self._add_instruction(62, self._get_layer_index(layer_name))
 		self._add_instruction(5, '{:x}'.format(self._handle))
 		self._add_instruction(100, 'AcDbEntity')
 		self._add_instruction(100, 'AcDbLine')
@@ -83,7 +93,7 @@ class DXFExportEffect(inkex.Effect):
 		self._add_instruction(21, repr(csp[1][1]))
 		self._add_instruction(31, 0.0)
 	
-	def _add_dxf_path(self, layer, path):
+	def _add_dxf_path(self, layer_name, path):
 		cspsubdiv.cspsubdiv(path, self._flatness)
 		
 		for sub in path:
@@ -91,10 +101,10 @@ class DXFExportEffect(inkex.Effect):
 				self._handle += 1
 				s = sub[i]
 				e = sub[i + 1]
-				self._add_dxf_line(layer, [s[1], e[1]])
+				self._add_dxf_line(layer_name, [s[1], e[1]])
 	
 	def _add_dxf_shape(self, node, document_transform, element_transform):
-		layer = self._get_inkscape_layer(node)
+		layer_name = self._get_inkscape_layer_name(node)
 		path = cubicsuperpath.parsePath(node.get('d'))
 		
 		transform = simpletransform.composeTransform(
@@ -103,7 +113,7 @@ class DXFExportEffect(inkex.Effect):
 		
 		simpletransform.applyTransformToPath(transform, path)
 		
-		self._add_dxf_path(layer, path)
+		self._add_dxf_path(layer_name, path)
 	
 	def effect(self):
 		user_unit = self._get_user_unit()
@@ -153,7 +163,7 @@ class DXFExportEffect(inkex.Effect):
 		return value * cls._get_unit_factor(unit, default_unit_factor)
 	
 	@classmethod
-	def _get_inkscape_layer(cls, node):
+	def _get_inkscape_layer_name(cls, node):
 		while node is not None:
 			layer = node.get(inkex.addNS('label', 'inkscape'))
 			
