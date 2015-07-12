@@ -5,9 +5,21 @@ class UserError(Exception):
 	pass
 
 
+def _temp_dir_is_on_same_mount_point():
+	tempdir_stat = os.stat(tempfile.gettempdir())
+	working_dir_stat = os.stat('.')
+	
+	return tempdir_stat.st_dev == working_dir_stat.st_dev
+
+
 @contextlib.contextmanager
 def TemporaryDirectory():
-	dir = tempfile.mkdtemp()
+	if _temp_dir_is_on_same_mount_point():
+		dir = None
+	else:
+		dir = '.'
+	
+	dir = tempfile.mkdtemp(dir = dir, prefix = '.tmp_')
 	
 	try:
 		yield dir
