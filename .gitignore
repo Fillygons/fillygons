@@ -3,4 +3,5 @@
 
 /src/**/*.dxf
 /src/**/*.stl
+/src/**/*.pdf
 /src/**/*.d
