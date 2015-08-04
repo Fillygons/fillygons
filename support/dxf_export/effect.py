@@ -24,12 +24,20 @@ def _get_unit_factors_map():
       'yd': pixels_per_inch * 36 }
 
 
+class Layer(object):
+	def __init__(self, inkscape_name, dxf_name, use_paths):
+		self.inkscape_name = inkscape_name
+		self.dxf_name = dxf_name
+		self.use_paths = use_paths
+
+
 class DXFExportEffect(inkex.Effect):
 	_unit_factors = _get_unit_factors_map()
 	
-	def __init__(self):
+	def __init__(self, layers):
 		inkex.Effect.__init__(self)
 		
+		self._layers_by_inkscape_name = { i.inkscape_name: i for i in layers }
 		self._dxf_instructions = []
 		self._handle = 255
 		self._layer_indices = { }
@@ -104,8 +112,13 @@ class DXFExportEffect(inkex.Effect):
 				self._add_dxf_line(layer_name, [s[1], e[1]])
 	
 	def _add_dxf_shape(self, node, document_transform, element_transform):
-		layer_name = self._get_inkscape_layer_name(node)
 		path = cubicsuperpath.parsePath(node.get('d'))
+		layer = self._layers_by_inkscape_name.get(self._get_inkscape_layer_name(node))
+		
+		if layer is None:
+			layer_name = ''
+		else:
+			layer_name = layer.dxf_name
 		
 		transform = simpletransform.composeTransform(
 			document_transform,
@@ -149,7 +162,7 @@ class DXFExportEffect(inkex.Effect):
 			unit = string[unit_match.start():unit_match.end()]
 		else:
 			unit = None
-
+		
 		return value, unit
 	
 	@classmethod
@@ -172,7 +185,7 @@ class DXFExportEffect(inkex.Effect):
 			
 			node = node.getparent()
 		
-		return ''
+		return None
 	
 	@classmethod
 	def _get_unit_factor(cls, unit, default = None):
