@@ -4,11 +4,11 @@ from . import effect
 
 
 def _export_dxf(in_path, out_path, layers):
-	dxf_export = effect.DXFExportEffect(layers)
-	dxf_export.affect(args = [in_path], output = False)
+	dxf_effect = effect.ExportEffect(layers)
+	dxf_effect.affect(args = [in_path], output = False)
 	
 	with open(out_path, 'w') as file:
-		dxf_export.write(file)
+		dxf_effect.write_dxf(file)
 
 
 def _get_inkscape_layers(svg_path):

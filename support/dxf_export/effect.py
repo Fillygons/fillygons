@@ -25,20 +25,20 @@ def _get_unit_factors_map():
 
 
 class Layer(object):
-	def __init__(self, inkscape_name, dxf_name, use_paths):
+	def __init__(self, inkscape_name, export_name, use_paths):
 		self.inkscape_name = inkscape_name
-		self.dxf_name = dxf_name
+		self.export_name = export_name
 		self.use_paths = use_paths
 
 
-class DXFExportEffect(inkex.Effect):
+class ExportEffect(inkex.Effect):
 	_unit_factors = _get_unit_factors_map()
 	
 	def __init__(self, layers):
 		inkex.Effect.__init__(self)
 		
 		self._layers_by_inkscape_name = { i.inkscape_name: i for i in layers }
-		self._dxf_instructions = []
+		self._lines = []
 		self._handle = 255
 		self._layer_indices = { }
 		self._flatness = float(os.environ['DXF_FLATNESS'])
@@ -84,24 +84,13 @@ class DXFExportEffect(inkex.Effect):
 		
 		return index
 	
-	def _add_instruction(self, code, value):
-		self._dxf_instructions.append((code, str(value)))
+	def _add_line(self, layer_name, csp):
+		(x1, y1), (x2, y2) = csp
+		line = layer_name, x1, y1, x2, y2
+		
+		self._lines.append(line)
 	
-	def _add_dxf_line(self, layer_name, csp):
-		self._add_instruction(0, 'LINE')
-		self._add_instruction(8, layer_name)
-		self._add_instruction(62, self._get_layer_index(layer_name))
-		self._add_instruction(5, '{:x}'.format(self._handle))
-		self._add_instruction(100, 'AcDbEntity')
-		self._add_instruction(100, 'AcDbLine')
-		self._add_instruction(10, repr(csp[0][0]))
-		self._add_instruction(20, repr(csp[0][1]))
-		self._add_instruction(30, 0.0)
-		self._add_instruction(11, repr(csp[1][0]))
-		self._add_instruction(21, repr(csp[1][1]))
-		self._add_instruction(31, 0.0)
-	
-	def _add_dxf_path(self, layer_name, path):
+	def _add_path(self, layer_name, path):
 		cspsubdiv.cspsubdiv(path, self._flatness)
 		
 		for sub in path:
@@ -109,16 +98,16 @@ class DXFExportEffect(inkex.Effect):
 				self._handle += 1
 				s = sub[i]
 				e = sub[i + 1]
-				self._add_dxf_line(layer_name, [s[1], e[1]])
+				self._add_line(layer_name, [s[1], e[1]])
 	
-	def _add_dxf_shape(self, node, document_transform, element_transform):
+	def _add_shape(self, node, document_transform, element_transform):
 		path = cubicsuperpath.parsePath(node.get('d'))
 		layer = self._layers_by_inkscape_name.get(self._get_inkscape_layer_name(node))
 		
 		if layer is None:
 			layer_name = ''
 		else:
-			layer_name = layer.dxf_name
+			layer_name = layer.export_name
 		
 		transform = simpletransform.composeTransform(
 			document_transform,
@@ -126,7 +115,7 @@ class DXFExportEffect(inkex.Effect):
 		
 		simpletransform.applyTransformToPath(transform, path)
 		
-		self._add_dxf_path(layer_name, path)
+		self._add_path(layer_name, path)
 	
 	def effect(self):
 		user_unit = self._get_user_unit()
@@ -140,14 +129,28 @@ class DXFExportEffect(inkex.Effect):
 		element_transform = [[user_unit, 0, 0], [0, user_unit, 0]]
 		
 		for node in self.document.getroot().xpath('//svg:path', namespaces = inkex.NSS):
-			self._add_dxf_shape(node, document_transform, element_transform)
+			self._add_shape(node, document_transform, element_transform)
 	
-	def write(self, file):
+	def write_dxf(self, file):
 		file.write(pkgutil.get_data(__name__, 'dxf_header.txt'))
 		
-		for code, value in self._dxf_instructions:
+		def _write_instruction(code, value):
 			print >> file, code
 			print >> file, value
+		
+		for layer_name, x1, y1, x2, y2 in self._lines:
+			_write_instruction(0, 'LINE')
+			_write_instruction(8, layer_name)
+			_write_instruction(62, self._get_layer_index(layer_name))
+			_write_instruction(5, '{:x}'.format(self._handle))
+			_write_instruction(100, 'AcDbEntity')
+			_write_instruction(100, 'AcDbLine')
+			_write_instruction(10, repr(x1))
+			_write_instruction(20, repr(y1))
+			_write_instruction(30, 0.0)
+			_write_instruction(11, repr(x2))
+			_write_instruction(21, repr(y2))
+			_write_instruction(31, 0.0)
 		
 		file.write(pkgutil.get_data(__name__, 'dxf_footer.txt'))
 	
