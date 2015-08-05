@@ -60,7 +60,7 @@ stl: $(SCAD_STL_FILES)
 
 # Rule to convert an SVG file to a DXF file.
 $(SVG_DXF_FILES): %.dxf: %.svg $(GLOBAL_DEPS)
-	$(PYTHON_CMD) -m dxf_export $< $@
+	$(PYTHON_CMD) -m inkscape $< $@
 
 # Rule to compile an OpenSCAD file to a DXF file.
 $(SCAD_DXF_FILES): %.dxf: %.scad $(GLOBAL_DEPS) | $(SCAD_ORDER_DEPS)
