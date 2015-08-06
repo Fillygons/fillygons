@@ -97,19 +97,16 @@ class ExportEffect(inkex.Effect):
 		self._layers_by_inkscape_name = { i.inkscape_name: i for i in self._layers }
 		
 		user_unit = self._get_user_unit()
-		document_unit = self._get_document_unit()
-		height = self._measure_to_pixels(self._get_document_height_attr())
+		document_height = self._measure_to_pixels(self._get_document_height_attr())
 		
-		document_transform = simpletransform.composeTransform(
-			[[1 / document_unit, 0, 0], [0, 1 / document_unit, 0]],
-			[[1, 0, 0], [0, -1, height]])
-		
+		document_transform = [[1, 0, 0], [0, -1, document_height]]
 		element_transform = [[user_unit, 0, 0], [0, user_unit, 0]]
 		
 		for node in self.document.getroot().xpath('//svg:path', namespaces = inkex.NSS):
 			self._add_shape(node, document_transform, element_transform)
 	
 	def write_dxf(self, file):
+		document_unit = self._get_document_unit()
 		layer_indices = { l: i for i, l in enumerate(self._layers) }
 		
 		file.write(pkgutil.get_data(__name__, 'dxf_header.txt'))
@@ -120,19 +117,19 @@ class ExportEffect(inkex.Effect):
 		
 		handle = 256
 		
-		for layer, points in self._paths:
-			for (x1, y1), (x2, y2) in zip(points, points[1:]):
+		for layer, path in self._paths:
+			for (x1, y1), (x2, y2) in zip(path, path[1:]):
 				write_instruction(0, 'LINE')
 				write_instruction(8, layer.export_name)
 				write_instruction(62, layer_indices.get(layer, 0))
 				write_instruction(5, '{:x}'.format(handle))
 				write_instruction(100, 'AcDbEntity')
 				write_instruction(100, 'AcDbLine')
-				write_instruction(10, repr(x1))
-				write_instruction(20, repr(y1))
+				write_instruction(10, repr(x1 / document_unit))
+				write_instruction(20, repr(y1 / document_unit))
 				write_instruction(30, 0.0)
-				write_instruction(11, repr(x2))
-				write_instruction(21, repr(y2))
+				write_instruction(11, repr(x2 / document_unit))
+				write_instruction(21, repr(y2 / document_unit))
 				write_instruction(31, 0.0)
 				
 				handle += 1
@@ -143,6 +140,8 @@ class ExportEffect(inkex.Effect):
 		def write_line(format, *args):
 			print >> file, format.format(*args) + ';'
 		
+		# Scales pixels to points.
+		unit_factor = self._unit_factors['pt']
 		lines_by_layer_name = collections.defaultdict(list)
 		
 		for layer, path in self._paths:
@@ -152,7 +151,7 @@ class ExportEffect(inkex.Effect):
 			write_line('path[] {}', layer_name)
 			
 			for path in paths:
-				point_strs = ['({}, {})'.format(x, y) for x, y in path]
+				point_strs = ['({}, {})'.format(x / unit_factor, y / unit_factor) for x, y in path]
 				
 				# Hack. We should determine from whether Z or z was used to close the path in the SVG document.
 				if path[0] == path[-1]:

@@ -14,17 +14,17 @@ def get_inkscape_layers(svg_path):
 			inkscape_name = i.get('{http://www.inkscape.org/namespaces/inkscape}label').strip()
 			
 			if inkscape_name.endswith(']'):
-				dxf_name, args = inkscape_name[:-1].rsplit('[', 1)
+				export_name, args = inkscape_name[:-1].rsplit('[', 1)
 				
-				dxf_name = dxf_name.strip()
+				export_name = export_name.strip()
 				args = args.strip()
 				
 				use_paths = 'p' in args
 			else:
 				use_paths = False
-				dxf_name = inkscape_name
+				export_name = inkscape_name
 			
-			yield Layer(inkscape_name, dxf_name, use_paths = use_paths)
+			yield Layer(inkscape_name, export_name, use_paths)
 	
 	return list(iter_layers())
 
