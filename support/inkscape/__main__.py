@@ -40,7 +40,7 @@ def main(in_path, out_path):
 	_, out_suffix = os.path.splitext(out_path)
 	
 	with util.TemporaryDirectory() as temp_dir:
-		temp_svg_path = os.path.join(temp_dir, 'temp.svg')
+		temp_svg_path = os.path.join(temp_dir, os.path.basename(in_path))
 		
 		shutil.copyfile(in_path, temp_svg_path)
 		
