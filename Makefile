@@ -83,7 +83,7 @@ $(SCAD_STL_FILES): %.stl: %.scad $(GLOBAL_DEPS) | $(SCAD_ORDER_DEPS)
 	$(PYTHON_CMD) -m openscad $< $@ $*.d
 
 # Rule to export an SVG file to an Asymptote file.
-$(ASY_PDF_FILES): %.pdf: %.asy $(GLOBAL_DEPS) $(COMPILED_SRC_FILES) $(SVG_ASY_FILES)
+$(ASY_PDF_FILES): %.pdf: $(ASY_DEPS) $(GLOBAL_DEPS)
 	$(ASYMPTOTE_CMD) $*.asy $@
 
 # Rule for automaticaly generated OpenSCAD files.
