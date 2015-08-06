@@ -2,8 +2,8 @@
 Based on code from Aaron Spike. See http://www.bobcookdev.com/inkscape/inkscape-dxf.html
 """
 
-import pkgutil, os, re
-from . import inkex, simpletransform, cubicsuperpath, cspsubdiv
+import pkgutil, os, re, collections
+from . import inkex, simpletransform, cubicsuperpath, cspsubdiv, inkscape
 
 
 def _get_unit_factors_map():
@@ -24,24 +24,18 @@ def _get_unit_factors_map():
       'yd': pixels_per_inch * 36 }
 
 
-class Layer(object):
-	def __init__(self, inkscape_name, export_name, use_paths):
-		self.inkscape_name = inkscape_name
-		self.export_name = export_name
-		self.use_paths = use_paths
-
-
 class ExportEffect(inkex.Effect):
 	_unit_factors = _get_unit_factors_map()
+	_asymptote_all_paths_name = 'paths'
 	
-	def __init__(self, layers):
+	def __init__(self):
 		inkex.Effect.__init__(self)
 		
-		self._layers_by_inkscape_name = { i.inkscape_name: i for i in layers }
-		self._lines = []
-		self._handle = 255
-		self._layer_indices = { }
 		self._flatness = float(os.environ['DXF_FLATNESS'])
+		self._layers = None
+		self._layers_by_inkscape_name = None
+		
+		self._paths = [] # Contains (layer : Layer | None, points : List[(float, float)])
 	
 	def _get_user_unit(self):
 		"""
@@ -75,49 +69,33 @@ class ExportEffect(inkex.Effect):
 	def _get_document_height_attr(self):
 		return self.document.getroot().xpath('@height', namespaces = inkex.NSS)[0]
 	
-	def _get_layer_index(self, layer_name):
-		index = self._layer_indices.get(layer_name)
+	def _add_path(self, layer, path):
+		"""
+		Warning: Fucks up path.
+		"""
 		
-		if index is None:
-			index = len(self._layer_indices)
-			self._layer_indices[layer_name] = index
+		cspsubdiv.subdiv(path, self._flatness)
 		
-		return index
-	
-	def _add_line(self, layer_name, csp):
-		(x1, y1), (x2, y2) = csp
-		line = layer_name, x1, y1, x2, y2
-		
-		self._lines.append(line)
-	
-	def _add_path(self, layer_name, path):
-		cspsubdiv.cspsubdiv(path, self._flatness)
-		
-		for sub in path:
-			for i in range(len(sub) - 1):
-				self._handle += 1
-				s = sub[i]
-				e = sub[i + 1]
-				self._add_line(layer_name, [s[1], e[1]])
+		# path contains two control point coordinates and the actual coordinates per point.
+		self._paths.append((layer, [i for _, i, _ in path]))
 	
 	def _add_shape(self, node, document_transform, element_transform):
-		path = cubicsuperpath.parsePath(node.get('d'))
+		shape = cubicsuperpath.parsePath(node.get('d'))
 		layer = self._layers_by_inkscape_name.get(self._get_inkscape_layer_name(node))
-		
-		if layer is None:
-			layer_name = ''
-		else:
-			layer_name = layer.export_name
 		
 		transform = simpletransform.composeTransform(
 			document_transform,
 			simpletransform.composeParents(node, element_transform))
 		
-		simpletransform.applyTransformToPath(transform, path)
+		simpletransform.applyTransformToPath(transform, shape)
 		
-		self._add_path(layer_name, path)
+		for path in shape:
+			self._add_path(layer, path)
 	
 	def effect(self):
+		self._layers = inkscape.get_inkscape_layers(self.svg_file)
+		self._layers_by_inkscape_name = { i.inkscape_name: i for i in self._layers }
+		
 		user_unit = self._get_user_unit()
 		document_unit = self._get_document_unit()
 		height = self._measure_to_pixels(self._get_document_height_attr())
@@ -132,27 +110,61 @@ class ExportEffect(inkex.Effect):
 			self._add_shape(node, document_transform, element_transform)
 	
 	def write_dxf(self, file):
+		layer_indices = { l: i for i, l in enumerate(self._layers) }
+		
 		file.write(pkgutil.get_data(__name__, 'dxf_header.txt'))
 		
-		def _write_instruction(code, value):
+		def write_instruction(code, value):
 			print >> file, code
 			print >> file, value
 		
-		for layer_name, x1, y1, x2, y2 in self._lines:
-			_write_instruction(0, 'LINE')
-			_write_instruction(8, layer_name)
-			_write_instruction(62, self._get_layer_index(layer_name))
-			_write_instruction(5, '{:x}'.format(self._handle))
-			_write_instruction(100, 'AcDbEntity')
-			_write_instruction(100, 'AcDbLine')
-			_write_instruction(10, repr(x1))
-			_write_instruction(20, repr(y1))
-			_write_instruction(30, 0.0)
-			_write_instruction(11, repr(x2))
-			_write_instruction(21, repr(y2))
-			_write_instruction(31, 0.0)
+		handle = 256
+		
+		for layer, points in self._paths:
+			for (x1, y1), (x2, y2) in zip(points, points[1:]):
+				write_instruction(0, 'LINE')
+				write_instruction(8, layer.export_name)
+				write_instruction(62, layer_indices.get(layer, 0))
+				write_instruction(5, '{:x}'.format(handle))
+				write_instruction(100, 'AcDbEntity')
+				write_instruction(100, 'AcDbLine')
+				write_instruction(10, repr(x1))
+				write_instruction(20, repr(y1))
+				write_instruction(30, 0.0)
+				write_instruction(11, repr(x2))
+				write_instruction(21, repr(y2))
+				write_instruction(31, 0.0)
+				
+				handle += 1
 		
 		file.write(pkgutil.get_data(__name__, 'dxf_footer.txt'))
+	
+	def write_asy(self, file):
+		def write_line(format, *args):
+			print >> file, format.format(*args) + ';'
+		
+		lines_by_layer_name = collections.defaultdict(list)
+		
+		for layer, path in self._paths:
+			lines_by_layer_name[self._asymptote_identifier_from_layer(layer)].append(path)
+		
+		for layer_name, paths in sorted(lines_by_layer_name.items()):
+			write_line('path[] {}', layer_name)
+			
+			for path in paths:
+				point_strs = ['({}, {})'.format(x, y) for x, y in path]
+				
+				# Hack. We should determine from whether Z or z was used to close the path in the SVG document.
+				if path[0] == path[-1]:
+					point_strs[-1] = 'cycle'
+				
+				write_line('{}.push({})', layer_name, ' -- '.join(point_strs))
+		
+		if self._asymptote_all_paths_name not in lines_by_layer_name:
+			write_line('path[] {};', self._asymptote_all_paths_name)
+			
+			for layer_name in sorted(lines_by_layer_name):
+				write_line('{}.append({})', self._asymptote_all_paths_name, layer_name)
 	
 	@classmethod
 	def _parse_measure(cls, string):
@@ -199,3 +211,10 @@ class ExportEffect(inkex.Effect):
 			return default
 		else:
 			return cls._unit_factors[unit]
+	
+	@classmethod
+	def _asymptote_identifier_from_layer(cls, layer):
+		if layer is None:
+			return '_'
+		else:
+			return re.sub('[^a-zA-Z0-9]', '_', layer.export_name)

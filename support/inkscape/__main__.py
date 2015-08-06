@@ -46,7 +46,16 @@ def main(in_path, out_path):
 		
 		_unfuck_svg_document(temp_svg_path)
 		
-		_export_dxf(temp_svg_path, out_path, layers)
+		export_effect = effect.ExportEffect()
+		export_effect.affect(args = [temp_svg_path], output = False)
+		
+	with open(out_path, 'w') as file:
+		if out_suffix == '.dxf':
+			export_effect.write_dxf(file)
+		elif out_suffix == '.asy':
+			export_effect.write_asy(file)
+		else:
+			raise Exception('Unknown file type: {}'.format(out_suffix))
 
 
 try:
