@@ -84,7 +84,7 @@ $(SCAD_STL_FILES): %.stl: %.scad $(GLOBAL_DEPS) | $(SCAD_ORDER_DEPS)
 
 # Rule to export an SVG file to an Asymptote file.
 $(ASY_PDF_FILES): %.pdf: %.asy $(GLOBAL_DEPS) $(COMPILED_SRC_FILES) $(SVG_ASY_FILES)
-	ASYMPTOTE_DIR=$$(dirname $@) $(ASYMPTOTE) -f pdf -o $@ $<
+	$(ASYMPTOTE_CMD) $*.asy $@
 
 # Rule for automaticaly generated OpenSCAD files.
 $(GENERATED_FILES): generate_sources.sh $(GLOBAL_DEPS)

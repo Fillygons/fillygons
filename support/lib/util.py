@@ -27,15 +27,14 @@ def TemporaryDirectory():
 		shutil.rmtree(dir)
 
 
-def command(args, remove_env = None):
-	if remove_env is None:
-		env = None
-	else:
-		env = dict(os.environ)
-		
-		for i in remove_env:
-			if i in env:
-				del env[i]
+def command(args, remove_env = [], set_env = { }):
+	env = dict(os.environ)
+	
+	for i in remove_env:
+		del env[i]
+	
+	for k, v in set_env.items():
+		env[k] = v
 	
 	process = subprocess.Popen(args, env = env)
 	process.wait()
