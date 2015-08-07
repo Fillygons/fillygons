@@ -87,15 +87,20 @@ def ArcToPath(p1,params):
         pt=[O[0]+cos(angle)                ,O[1]+sin(angle)                ]
         v2=[O[0]+cos(angle)-  v *sin(angle),O[1]+sin(angle)+  v *cos(angle)]
         p.append([v1,pt,v2])
-    p[ 0][0]=p[ 0][1][:]
-    p[-1][2]=p[-1][1][:]
 
     mat=matprod((rotmat(teta),[[rx,0],[0,ry]],rotmat(-teta)))
     for pts in p:
         applymat(mat, pts[0])
         applymat(mat, pts[1])
         applymat(mat, pts[2])
-    return(p)
+    
+    # Use exact coordinates for the endpoints. This prevents small drifts when relative coordinates are used and guarantees that a path ending with a z command closes perfectly.
+    p[0][0] = p1[:]
+    p[0][1] = p1[:]
+    p[-1][1] = [x2, y2]
+    p[-1][2] = [x2, y2]
+    
+    return p
     
 def CubicSuperPath(simplepath):
     csp = []
