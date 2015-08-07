@@ -160,7 +160,7 @@ class ExportEffect(inkex.Effect):
 				write_line('{}.push({})', layer_name, ' -- '.join(point_strs))
 		
 		if self._asymptote_all_paths_name not in lines_by_layer_name:
-			write_line('path[] {};', self._asymptote_all_paths_name)
+			write_line('path[] {}', self._asymptote_all_paths_name)
 			
 			for layer_name in sorted(lines_by_layer_name):
 				write_line('{}.append({})', self._asymptote_all_paths_name, layer_name)
