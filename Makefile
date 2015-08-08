@@ -53,10 +53,10 @@ ASY_PDF_FILES := $(call filter_compiled,.asy,.pdf,$(filter-out $(SVG_ASY_FILES),
 DEPENDENCY_FILES := $(foreach i,.scad,$(call filter_compiled,$i,.d,$(filter-out $(SVG_ASY_FILES),$(SRC_FILES))))
 
 # Files that may be used from OpenSCAD files and thus must exist before OpenSCAD is called.
-SCAD_ORDER_DEPS := $(filter %.scad %.dxf,$(GENERATED_FILES)) $(SVG_DXF_FILES)
+SCAD_ORDER_DEPS := $(filter %.scad %.dxf,$(SRC_FILES)) $(SVG_DXF_FILES)
 
 # Files that may be used from Asymptote files.
-ASY_DEPS := $(filter %.asy,$(GENERATED_FILES)) $(SVG_ASY_FILES)
+ASY_DEPS := $(filter %.asy,$(SRC_FILES)) $(SVG_ASY_FILES)
 
 # Dependencies which may affect the result of all build products.
 GLOBAL_DEPS := Makefile $(wildcard config.mk settings.mk)
