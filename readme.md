@@ -23,6 +23,12 @@ Branch `examples` additionally contains a few example source files which are rea
 	- Used for to run the plugin that exports DXF to SVG and to run scripts that wrap the OpenSCAD command line tool and work around problems with generation of dependency information in OpenSCAD.
 	- Should already be installed as a dependency to Inkscape. The most recent version of Python 2.7 is recommended.
 
+- Asymptote [0]
+	- Used to compile Asymptote files to PDF.
+	- Recommended when creating Vector cutting projects for Epilog laser cutters.
+
+[0]: This project was tested with Asymptote Version 2.35. Earlier Versions will probably also work.
+
 
 ### Explicitly specifying paths to binaries
 
@@ -36,11 +42,14 @@ If any of the required binaries is not available on `$PATH` or a different versi
 	
 	# Path to the Python 2.7 binary
 	PYTHON := /opt/local/bin/python2.7
+	
+	# Path to the Asymptote binary
+	ASYMPTOTE := /opt/local/bin/asy
 
 
 ## Supported file types
 
-### SVG files
+### Using SVG files from OpenSCAD
 
 Any file whose name ends in `.svg` may be used from an OpenSCAD file like this:
 
@@ -52,16 +61,35 @@ The makefile will automatically convert the SVG file to a DXF file when building
 
 The DXF export supports all shapes supported by Inkscape (e.g. rectangles, circles, paths, spiro lines, text, …). Before the objects are exported, all objects are converted to paths and combined using the union operation. For objects which have a stroke style, the stroke instead of the filled area is converted to a path. Then, the resulting path is converted to a set of line segments which closely follow the curved parts of the path. The resulting line segments are exported to DXF and combined to the original shapes when imported in OpenSCAD. For these transformations to work, the objects need to be placed in Inkscape layers.
 
-OpenSCAD itself does not define which unit is used to measure lengths [0]. Inkscape OTOH allows the user to define a document wide unit as well as using different units when specifying the size and position of shapes. When exporting the SVG document using Inkscape, all numbers are converted to the unit specified under _General_ in Inkscape's _Document Properties_ dialog. These numbers are the written to the DXF document and used OpenSCAD directly.
+OpenSCAD itself does not define which unit is used to measure lengths [1]. Inkscape OTOH allows the user to define a document wide unit as well as using different units when specifying the size and position of shapes. When exporting the SVG document using Inkscape, all numbers are converted to the unit specified under _General_ in Inkscape's _Document Properties_ dialog. These numbers are the written to the DXF document and used OpenSCAD directly.
 
 DXF and OpenSCAD both use a right-handed coordinate system (the Y axis runs up while the X-axis runs to the right). While SVG uses a left-handed coordinate system (the Y axis runs down instead). But Inkscape, surprisingly, also uses a right-handed coordinate system. The DXF export script honors this and places the origin of the document in the lower left corner when exporting the document.
 
-[0]: Although millimeters seems to be the predominant unit.
+[1]: Although millimeters seems to be the predominant unit.
+
+
+### Using SVG files from Asymptote
+
+SVG files may instead be used from Asymptote files. To do this, the makefile must be instructed to convert an SVG to Asymptote paths and write them to a `.asy` file instead of a DXF file. This can be done by setting the variable ASYMPTOTE_EXPORTED_SVG_FILES in a file called `settings.mk` in the same directory as the makefile. The variable should be set to the names of the SVG files that should be converted to Asymptote files in instead of DXF files:
+
+	ASYMPTOTE_EXPORTED_SVG_FILES := src/example.svg
+
+If you want to have all SVG files converted to Asymptote, you can use this shortcut instead:
+
+	ASYMPTOTE_EXPORTED_SVG_FILES := $(info $(shell find src -name '*.svg'))
+
+For each specified SVG file, an Asymptote file of the same name is generated. These files can be imported as modules from other Asymptote files. These modules will contain a member of type `path[]` for each layer in the original SVG file:
+
+	import test;
+	
+	draw(test.Layer_1, red + 0.001mm);
+
+The module also contains a member `all`, which just contains all paths in one array.
 
 
 ### OpenSCAD files
 
-Files whose name ends in `.scad` are compiled to STL files using OpenSCAD. OpenSCAD files whose name start with `_` are treated as "library" files which will not be compiled to STL files. These files can still be used from other OpenSCAD files using one of the following commands:
+Files whose names end in `.scad` are compiled to STL files using OpenSCAD. OpenSCAD files whose name start with `_` are treated as "library" files which will not be compiled to STL files. These files can still be used from other OpenSCAD files using one of the following commands:
 
 	include <filename>
 	use <filename>
@@ -90,12 +118,14 @@ To compile the whole project, run `make` from the directory in which this readme
 These are the special makefile targets which can be used in addition to the names of individual files to update:
 
 - `all`: Builds all files that can be built from any source files. This is the default target when running `make` without arguments.
-- `clean`: Removes all built files [1].
+- `clean`: Removes all built files [2].
 - `generated`: Generates all files generated by `generate_sources.sh`.
-- `dxf`: Converts all SVG files to DXF files.
+- `dxf`: Exports all SVG files to DXF files.
 - `stl`: Compiles all OpenSCAD files to STL files.
+- `asy`: Exports all configured SVG files to Asymptote files.
+- `pdf`: Compiles all Asymptote files to PDF files.
 
-[1]: This will not remove files for which the source file was removed. There is no simple way to detect whether a file was previously built from a source file or if it placed in the `src` directory manually.
+[2]: This will not remove files for which the source file was removed. There is no simple way to detect whether a file was previously built from a source file or if it placed in the `src` directory manually.
 
 
 ### Settings used for compilation
@@ -104,6 +134,9 @@ The quality of the DXF export can be specified by creating a file called `settin
 
 	# Specify how far the exported approximation may deviate from the actual shape. The default is 0.1.
 	DXF_FLATNESS := 0.02
+	
+	# Specify which SVG files should be exported to Asymptote files instead of DXF files. By default, this list is empty.
+	ASYMPTOTE_EXPORTED_SVG_FILES := src/example.svg
 
 
 ### Dependency tracking
@@ -111,3 +144,5 @@ The quality of the DXF export can be specified by creating a file called `settin
 OpenSCAD has the ability to write dependency files which record all files used while producing an STL file. These dependency files can be read by `make`. This ability is used to only recompile necessary files when running make.
 
 This same mechanism is currently not used for converting SVG files referring to other files or for the script used to generate source files. Therefore, if other file used in the process are changed, the corresponding source files tracked by the makefile (the main SVG files or the files `generate_sources.sh` in case of generated sources) needs to be manually marked as changes by calling `touch` on the file before calling `make`.
+
+For Asymptote files, a safer approach is currently taken. If any of the Asymptote source files in the `src` directory are changed, all Asymptote source files are recompiled.
