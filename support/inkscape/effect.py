@@ -26,7 +26,7 @@ def _get_unit_factors_map():
 
 class ExportEffect(inkex.Effect):
 	_unit_factors = _get_unit_factors_map()
-	_asymptote_all_paths_name = 'paths'
+	_asymptote_all_paths_name = 'all'
 	
 	def __init__(self):
 		inkex.Effect.__init__(self)
