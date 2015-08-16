@@ -32,7 +32,7 @@ filter_compiled = $(foreach i,$(patsubst %$1,%$2,$(filter %$1,$3)),$(if $(filter
 GENERATED_FILES := $(addsuffix .scad,$(basename $(shell ./generate_sources.sh)))
 
 # All visible files in the src directory that either exist or can be generated. Ignore files whose names contain spaces.
-SRC_FILES := $(GENERATED_FILES) $(shell find src -type f -not \( \( -name '.*' -or -name '* *' \) -prune \))
+SRC_FILES := $(GENERATED_FILES) $(shell find src -not \( \( -name '.*' -or -name '* *' \) -prune \) -type f)
 
 # STL files produced from OpenSCAD files.
 SCAD_STL_FILES := $(call filter_compiled,.scad,.stl,$(filter-out $(FLAT_SCAD_FILES),$(SRC_FILES)))
