@@ -29,7 +29,7 @@ ASYMPTOTE_CMD := ASYMPTOTE=$(ASYMPTOTE) $(PYTHON_CMD) -m asymptote
 filter_compiled = $(foreach i,$(patsubst %$1,%$2,$(filter %$1,$3)),$(if $(filter-out _%,$(notdir $i)),$i))
 
 # Run generate_scad.sh to get the names of all files that should be generated using that same script.
-GENERATED_FILES := $(addsuffix .scad,$(basename $(shell ./generate_sources.sh)))
+GENERATED_FILES := $(shell ./generate_sources.sh)
 
 # All visible files in the src directory that either exist or can be generated. Ignore files whose names contain spaces.
 SRC_FILES := $(sort $(GENERATED_FILES) $(shell find src -not \( \( -name '.*' -or -name '* *' \) -prune \) -type f))
