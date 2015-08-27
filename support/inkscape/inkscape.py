@@ -72,8 +72,8 @@ class InkscapeCommandLine(object):
 	
 	def _go_to_layer(self, layer, with_selection = False):
 		if self._current_layer_index is None:
-			# Initialize to a known state.
-			self._current_layer_index = len(self._layers) - 1
+			# Initialize to a known state. We cannot assume that any layer is selected and thus we need as many LayerPrev as we have layers.
+			self._current_layer_index = len(self._layers)
 			self._go_to_layer(self._layers[0])
 		
 		target_index = self._layers.index(layer)
