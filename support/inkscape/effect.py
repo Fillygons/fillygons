@@ -2,7 +2,7 @@
 Based on code from Aaron Spike. See http://www.bobcookdev.com/inkscape/inkscape-dxf.html
 """
 
-import pkgutil, os, re, collections
+import pkgutil, os, re, collections, itertools
 from . import inkex, simpletransform, cubicsuperpath, cspsubdiv, inkscape
 
 
@@ -32,10 +32,9 @@ class ExportEffect(inkex.Effect):
 		inkex.Effect.__init__(self)
 		
 		self._flatness = float(os.environ['DXF_FLATNESS'])
-		self._layers = None
-		self._layers_by_inkscape_name = None
 		
-		self._paths = [] # Contains (layer : Layer | None, points : List[(float, float)])
+		self._layers = None
+		self._paths = None
 	
 	def _get_user_unit(self):
 		"""
@@ -69,19 +68,8 @@ class ExportEffect(inkex.Effect):
 	def _get_document_height_attr(self):
 		return self.document.getroot().xpath('@height', namespaces = inkex.NSS)[0]
 	
-	def _add_path(self, layer, path):
-		"""
-		Warning: Fucks up path.
-		"""
-		
-		cspsubdiv.subdiv(path, self._flatness)
-		
-		# path contains two control point coordinates and the actual coordinates per point.
-		self._paths.append((layer, [i for _, i, _ in path]))
-	
-	def _add_shape(self, node, document_transform, element_transform):
+	def _get_shape_paths(self, node, document_transform, element_transform):
 		shape = cubicsuperpath.parsePath(node.get('d'))
-		layer = self._layers_by_inkscape_name.get(self._get_inkscape_layer_name(node))
 		
 		transform = simpletransform.composeTransform(
 			document_transform,
@@ -89,21 +77,34 @@ class ExportEffect(inkex.Effect):
 		
 		simpletransform.applyTransformToPath(transform, shape)
 		
-		for path in shape:
-			self._add_path(layer, path)
+		def iter_paths():
+			for path in shape:
+				cspsubdiv.subdiv(path, self._flatness)
+				
+				# path contains two control point coordinates and the actual coordinates per point.
+				yield [i for _, i, _ in path]
+		
+		return list(iter_paths())
 	
 	def effect(self):
-		self._layers = inkscape.get_inkscape_layers(self.svg_file)
-		self._layers_by_inkscape_name = { i.inkscape_name: i for i in self._layers }
-		
 		user_unit = self._get_user_unit()
 		document_height = self._measure_to_pixels(self._get_document_height_attr())
 		
 		document_transform = [[1, 0, 0], [0, -1, document_height]]
 		element_transform = [[user_unit, 0, 0], [0, user_unit, 0]]
 		
-		for node in self.document.getroot().xpath('//svg:path', namespaces = inkex.NSS):
-			self._add_shape(node, document_transform, element_transform)
+		layers = inkscape.get_inkscape_layers(self.svg_file)
+		layers_by_inkscape_name = { i.inkscape_name: i for i in layers }
+		
+		def iter_paths():
+			for node in self.document.getroot().xpath('//svg:path', namespaces = inkex.NSS):
+				layer = layers_by_inkscape_name.get(self._get_inkscape_layer_name(node))
+				
+				for path in self._get_shape_paths(node, document_transform, element_transform):
+					yield layer, path
+		
+		self._layers = layers
+		self._paths = list(iter_paths())
 	
 	def write_dxf(self, file):
 		document_unit = self._get_document_unit()
@@ -115,14 +116,17 @@ class ExportEffect(inkex.Effect):
 			print >> file, code
 			print >> file, value
 		
-		handle = 256
+		handle_iter = itertools.count(256)
 		
 		for layer, path in self._paths:
 			for (x1, y1), (x2, y2) in zip(path, path[1:]):
 				write_instruction(0, 'LINE')
-				write_instruction(8, layer.export_name)
-				write_instruction(62, layer_indices.get(layer, 0))
-				write_instruction(5, '{:x}'.format(handle))
+				
+				if layer is not None:
+					write_instruction(8, layer.export_name)
+					write_instruction(62, layer_indices.get(layer, 0))
+				
+				write_instruction(5, '{:x}'.format(next(handle_iter)))
 				write_instruction(100, 'AcDbEntity')
 				write_instruction(100, 'AcDbLine')
 				write_instruction(10, repr(x1 / document_unit))
@@ -131,8 +135,6 @@ class ExportEffect(inkex.Effect):
 				write_instruction(11, repr(x2 / document_unit))
 				write_instruction(21, repr(y2 / document_unit))
 				write_instruction(31, 0.0)
-				
-				handle += 1
 		
 		file.write(pkgutil.get_data(__name__, 'dxf_footer.txt'))
 	
@@ -142,28 +144,34 @@ class ExportEffect(inkex.Effect):
 		
 		# Scales pixels to points.
 		unit_factor = self._unit_factors['pt']
-		lines_by_layer_name = collections.defaultdict(list)
+		
+		paths_by_layer = collections.defaultdict(list)
+		variable_names = []
 		
 		for layer, path in self._paths:
-			lines_by_layer_name[self._asymptote_identifier_from_layer(layer)].append(path)
+			paths_by_layer[layer].append(path)
 		
-		for layer_name, paths in sorted(lines_by_layer_name.items()):
-			write_line('path[] {}', layer_name)
+		for layer in self._layers + [None]:
+			paths = paths_by_layer[layer]
+			variable_name = self._asymptote_identifier_from_layer(layer)
+			write_line('path[] {}', variable_name)
+			
+			variable_names.append(variable_name)
 			
 			for path in paths:
 				point_strs = ['({}, {})'.format(x / unit_factor, y / unit_factor) for x, y in path]
 				
-				# Hack. We should determine from whether Z or z was used to close the path in the SVG document.
+				# Hack. We should determine this from whether Z or z was used to close the path in the SVG document.
 				if path[0] == path[-1]:
 					point_strs[-1] = 'cycle'
 				
-				write_line('{}.push({})', layer_name, ' -- '.join(point_strs))
+				write_line('{}.push({})', variable_name, ' -- '.join(point_strs))
 		
-		if self._asymptote_all_paths_name not in lines_by_layer_name:
+		if self._asymptote_all_paths_name not in variable_names:
 			write_line('path[] {}', self._asymptote_all_paths_name)
 			
-			for layer_name in sorted(lines_by_layer_name):
-				write_line('{}.append({})', self._asymptote_all_paths_name, layer_name)
+			for i in variable_names:
+				write_line('{}.append({})', self._asymptote_all_paths_name, i)
 	
 	@classmethod
 	def _parse_measure(cls, string):
