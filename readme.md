@@ -70,15 +70,7 @@ DXF and OpenSCAD both use a right-handed coordinate system (the Y axis runs up w
 
 ### Using SVG files from Asymptote
 
-SVG files may instead be used from Asymptote files. To do this, the makefile must be instructed to convert an SVG to Asymptote paths and write them to a `.asy` file instead of a DXF file. This can be done by setting the variable ASYMPTOTE_EXPORTED_SVG_FILES in a file called `settings.mk` in the same directory as the makefile. The variable should be set to the names of the SVG files that should be converted to Asymptote files in instead of DXF files:
-
-	ASYMPTOTE_EXPORTED_SVG_FILES := src/example.svg
-
-If you want to have all SVG files converted to Asymptote, you can use this shortcut instead:
-
-	ASYMPTOTE_EXPORTED_SVG_FILES := $(info $(shell find src -name '*.svg'))
-
-For each specified SVG file, an Asymptote file of the same name is generated. These files can be imported as modules from other Asymptote files. These modules will contain a member of type `path[]` for each layer in the original SVG file:
+SVG files may instead be used from Asymptote files. For each SVG file, an Asymptote file of the same name is generated. These files can be imported as modules from other Asymptote files. These modules will contain a member of type `path[]` for each layer in the original SVG file:
 
 	import test;
 	

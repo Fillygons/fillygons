@@ -7,7 +7,6 @@ ASYMPTOTE := asy
 # Settings affecting the compiled results. You can overwrite these in a file called settings.mk in the same directory as this makefile. See readme.creole.
 DXF_FLATNESS := 0.1
 FLAT_SCAD_FILES :=
-ASYMPTOTE_EXPORTED_SVG_FILES :=
 
 # Non-file goals.
 .PHONY: all clean generated dxf stl asy pdf
@@ -47,10 +46,10 @@ SCAD_STL_FILES := $(call filter_compiled,.scad,.stl,$(filter-out $(FLAT_SCAD_FIL
 SCAD_DXF_FILES := $(call filter_compiled,.scad,.dxf,$(filter $(FLAT_SCAD_FILES),$(SRC_FILES)))
 
 # DXF files produced from SVG files. This excludes SVG files that are exported to Asymptote Files. Also, ignores an SVG file, if the same DXF file can also be produced from an OpenSCAD file. This is just to get reproducable builds without aborting it.
-SVG_DXF_FILES := $(filter-out $(SCAD_DXF_FILES),$(call filter_compiled,.svg,.dxf,$(filter-out $(ASYMPTOTE_EXPORTED_SVG_FILES),$(SRC_FILES))))
+SVG_DXF_FILES := $(filter-out $(SCAD_DXF_FILES),$(call filter_compiled,.svg,.dxf,$(SRC_FILES)))
 
 # Asymptote files produced from SVG files.
-SVG_ASY_FILES := $(call filter_compiled,.svg,.asy,$(filter $(ASYMPTOTE_EXPORTED_SVG_FILES),$(SRC_FILES)))
+SVG_ASY_FILES := $(call filter_compiled,.svg,.asy,$(SRC_FILES))
 
 # PDF files which can be generated from Asymptote files. We exclude SVG_ASY_FILES because they don't contain any drawing primitives and thus won't produce a PDF.
 ASY_PDF_FILES := $(call filter_compiled,.asy,.pdf,$(filter-out $(SVG_ASY_FILES),$(SRC_FILES)))
