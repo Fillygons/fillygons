@@ -2,7 +2,8 @@ import contextlib, subprocess, tempfile, shutil, re, os
 
 
 class UserError(Exception):
-	pass
+	def __init__(self, message, *args):
+		super(UserError, self).__init__(message.format(*args))
 
 
 def rename_atomic(source_path, target_path):
@@ -43,11 +44,14 @@ def command(args, remove_env = [], set_env = { }):
 	for k, v in set_env.items():
 		env[k] = v
 	
-	process = subprocess.Popen(args, env = env)
-	process.wait()
+	try:
+		process = subprocess.Popen(args, env = env)
+		process.wait()
+	except OSError as e:
+		raise UserError('Error running {}: {}', args[0], e)
 	
 	if process.returncode:
-		raise UserError('Command failed: {}'.format(' '.join(args)))
+		raise UserError('Command failed: {}', ' '.join(args))
 
 
 def bash_escape_string(string):
