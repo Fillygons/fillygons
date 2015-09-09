@@ -12,6 +12,9 @@ ASYMPTOTE_EXPORTED_SVG_FILES :=
 # Non-file goals.
 .PHONY: all clean generated dxf stl asy pdf
 
+# Remove targets whose command failed.
+.DELETE_ON_ERROR:
+
 # Goal to build Everything. Also generates files which aren't compiled to anything else. Deined here to make it the default goal.
 all: generated dxf stl asy pdf
 
