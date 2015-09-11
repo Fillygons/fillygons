@@ -1,4 +1,4 @@
-import os, sys
+import os
 from lib import util
 
 
@@ -10,6 +10,7 @@ def _write_dependencies(path, target, dependencies):
 	util.write_file(path, '{}: {}\n'.format(target, ' '.join(dependencies)).encode())
 
 
+@util.main
 def main(in_path, out_path, deps_path):
 	cwd = os.getcwd()
 	
@@ -43,12 +44,3 @@ def main(in_path, out_path, deps_path):
 		# Write output files.
 		_write_dependencies(deps_path, relpath(out_path), deps - ignored_files)
 		util.rename_atomic(temp_out_path, out_path)
-
-
-try:
-	main(*sys.argv[1:])
-except util.UserError as e:
-	print 'Error:', e
-	sys.exit(1)
-except KeyboardInterrupt:
-	sys.exit(2)

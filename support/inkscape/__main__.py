@@ -1,4 +1,4 @@
-import sys, os, shutil
+import os, shutil
 from lib import util
 from . import effect, inkscape
 
@@ -36,6 +36,7 @@ def _unfuck_svg_document(temp_svg_path):
 	command_line.run()
 
 
+@util.main
 def main(in_path, out_path):
 	_, out_suffix = os.path.splitext(out_path)
 	
@@ -56,12 +57,3 @@ def main(in_path, out_path):
 			export_effect.write_asy(file)
 		else:
 			raise Exception('Unknown file type: {}'.format(out_suffix))
-
-
-try:
-	main(*sys.argv[1:])
-except util.UserError as e:
-	print 'Error:', e
-	sys.exit(1)
-except KeyboardInterrupt:
-	sys.exit(2)

@@ -1,4 +1,4 @@
-import os, sys, shutil
+import os, shutil
 from lib import util
 
 
@@ -6,6 +6,7 @@ def _asymptote(in_path, out_path, asymptote_dir, working_dir):
 	util.command([os.environ['ASYMPTOTE'], '-f', 'pdf', '-o', out_path, in_path], set_env = { 'ASYMPTOTE_DIR': asymptote_dir }, working_dir = working_dir)
 
 
+@util.main
 def main(in_path, out_path):
 	_, out_suffix = os.path.splitext(out_path)
 	
@@ -23,12 +24,3 @@ def main(in_path, out_path):
 			shutil.copyfile(temp_out_path, out_path)
 	else:
 		raise Exception('Unknown file type: {}'.format(out_suffix))
-
-
-try:
-	main(*sys.argv[1:])
-except util.UserError as e:
-	print 'Error:', e
-	sys.exit(1)
-except KeyboardInterrupt:
-	sys.exit(2)

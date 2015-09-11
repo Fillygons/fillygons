@@ -1,9 +1,30 @@
-import contextlib, subprocess, tempfile, shutil, re, os
+import sys, contextlib, subprocess, tempfile, shutil, re, os, inspect
 
 
 class UserError(Exception):
 	def __init__(self, message, *args):
 		super(UserError, self).__init__(message.format(*args))
+
+
+def main(fn):
+	"""Decorator for "main" functions. Decorates a function that should be called when the containing module is run as a script (e.g. via python -m <module>)."""
+	
+	frame = inspect.currentframe().f_back
+	
+	def wrapped_fn(*args, **kwargs):
+		try:
+			fn(*args, **kwargs)
+		except UserError as e:
+			print >> sys.stderr, 'Error:', e
+			sys.exit(1)
+		except KeyboardInterrupt:
+			sys.exit(2)
+	
+	if frame.f_globals['__name__'] == '__main__':
+		wrapped_fn(*sys.argv[1:])
+	
+	# Allow the main function also to be called explicitly
+	return wrapped_fn
 
 
 def rename_atomic(source_path, target_path):
