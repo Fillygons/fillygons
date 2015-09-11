@@ -14,8 +14,10 @@ FLAT_SCAD_FILES :=
 # Remove targets whose command failed.
 .DELETE_ON_ERROR:
 
+# Do not print commands as they are executed. They do not show the actual invocation of the respective tools anyways but just the Pyton wrappers.
 .SILENT:
 
+# Set the default goal. Prevents it from being overwritten accidentially from config.mk or settings.mk.
 .DEFAULT_GOAL := all
 
 # Include the configuration files.
@@ -31,6 +33,7 @@ ASYMPTOTE_CMD := ASYMPTOTE=$(ASYMPTOTE) $(PYTHON_CMD) -m asymptote
 # Takes a list of file names and returns all elements whose basename do not start with a `_' and which have extension ext. The returned names will have their extension replaced by subst_ext.
 filter_compiled = $(foreach i,$(patsubst %$1,%$2,$(filter %$1,$3)),$(if $(filter-out _%,$(notdir $i)),$i))
 
+# All considered source and target files currently existing.
 EXISTING_FILES := $(shell find src -not \( \( -name '.*' -or -name '* *' \) -prune \) -type f)
 
 # Run generate_scad.sh to get the names of all files that should be generated using that same script.
@@ -66,15 +69,16 @@ ASY_DEPS := $(filter %.asy,$(SRC_FILES)) $(SVG_ASY_FILES)
 # Dependencies which may affect the result of all build products.
 GLOBAL_DEPS := Makefile $(wildcard config.mk settings.mk)
 
+# All existing target files.
 EXISTING_TARGETS := $(filter $(SVG_DXF_FILES) $(SCAD_DXF_FILES) $(SCAD_STL_FILES) $(SVG_ASY_FILES) $(ASY_PDF_FILES) $(GENERATED_FILES) $(DEPENDENCY_FILES),$(EXISTING_FILES))
+
+# Goal to build Everything. Also generates files which aren't compiled to anything else. Deined here to make it the default goal.
+all: generated dxf stl asy pdf
 
 # Everything^-1.
 clean:
 	echo [clean] $(EXISTING_TARGETS)
 	rm -rf $(EXISTING_TARGETS)
-
-# Goal to build Everything. Also generates files which aren't compiled to anything else. Deined here to make it the default goal.
-all: generated dxf stl asy pdf
 
 # Goals to build the project up to a specific step.
 generated: $(GENERATED_FILES)
