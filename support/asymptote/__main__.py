@@ -17,6 +17,9 @@ def main(in_path, out_path):
 			# Asymptote creates A LOT of temp files (presumably when invoking LaTeX) and leaves some of them behind. Thus we run asymptote in a temporary directory.
 			_asymptote(absolute_in_path, 'out', os.path.dirname(absolute_in_path), temp_dir)
 			
+			if not os.path.exists(temp_out_path):
+				raise util.UserError('Asymptote did not generate a PDF file for input file {}.', in_path)
+			
 			shutil.copyfile(temp_out_path, out_path)
 	else:
 		raise Exception('Unknown file type: {}'.format(out_suffix))

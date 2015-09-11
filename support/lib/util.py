@@ -35,7 +35,7 @@ def TemporaryDirectory():
 		shutil.rmtree(dir)
 
 
-def command(args, remove_env = [], set_env = { }):
+def command(args, remove_env = [], set_env = { }, working_dir = None):
 	env = dict(os.environ)
 	
 	for i in remove_env:
@@ -45,7 +45,7 @@ def command(args, remove_env = [], set_env = { }):
 		env[k] = v
 	
 	try:
-		process = subprocess.Popen(args, env = env)
+		process = subprocess.Popen(args, env = env, cwd = working_dir)
 		process.wait()
 	except OSError as e:
 		raise UserError('Error running {}: {}', args[0], e)
