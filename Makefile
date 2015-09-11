@@ -23,7 +23,7 @@ ASYMPTOTE_EXPORTED_SVG_FILES :=
 -include config.mk settings.mk
 
 # Command to run the Python scripts.
-PYTHON_CMD := PYTHONPATH="support:$$PYTHONPATH" $(PYTHON)
+PYTHON_CMD := PYTHONPATH="support" $(PYTHON)
 INKSCAPE_CMD := INKSCAPE=$(INKSCAPE) DXF_FLATNESS=$(DXF_FLATNESS) $(PYTHON_CMD) -m inkscape  
 OPENSCAD_CMD := OPENSCAD=$(OPENSCAD) $(PYTHON_CMD) -m openscad
 ASYMPTOTE_CMD := ASYMPTOTE=$(ASYMPTOTE) $(PYTHON_CMD) -m asymptote
