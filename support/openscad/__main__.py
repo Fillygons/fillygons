@@ -42,7 +42,7 @@ def main(in_path, out_path, deps_path):
 		
 		# Write output files.
 		_write_dependencies(deps_path, relpath(out_path), deps - ignored_files)
-		os.rename(temp_out_path, out_path)
+		util.rename_atomic(temp_out_path, out_path)
 
 
 try:

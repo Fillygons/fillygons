@@ -5,6 +5,25 @@ class UserError(Exception):
 	pass
 
 
+def rename_atomic(source_path, target_path):
+	"""
+	Move the file at source_path to target_path.
+	
+	If both paths reside on the same device, os.rename() is used, otherwise the file is copied to a temporary name next to target_path and moved from there using os.rename().
+	"""
+	
+	source_dir_stat = os.stat(os.path.dirname(source_path))
+	target_dir_stat = os.stat(os.path.dirname(target_path))
+	
+	if source_dir_stat.st_dev == target_dir_stat.st_dev:
+		os.rename(source_path, target_path)
+	else:
+		temp_path = target_path + '~'
+		
+		shutil.copyfile(source_path, temp_path)
+		os.rename(temp_path, target_path)
+
+
 @contextlib.contextmanager
 def TemporaryDirectory():
 	dir = tempfile.mkdtemp()
@@ -32,7 +51,7 @@ def command(args, remove_env = [], set_env = { }):
 
 
 def bash_escape_string(string):
-	return "'{}'".format(re.sub("'", "'\"'\"'", string))	
+	return "'{}'".format(re.sub("'", "'\"'\"'", string))
 
 
 def write_file(path, data):
