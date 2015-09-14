@@ -56,7 +56,8 @@ def TemporaryDirectory():
 		shutil.rmtree(dir)
 
 
-def command(args, remove_env = [], set_env = { }, working_dir = None):
+@contextlib.contextmanager
+def command_context(args, remove_env = [], set_env = { }, working_dir = None, use_stderr = False):
 	env = dict(os.environ)
 	
 	for i in remove_env:
@@ -71,8 +72,22 @@ def command(args, remove_env = [], set_env = { }, working_dir = None):
 	except OSError as e:
 		raise UserError('Error running {}: {}', args[0], e)
 	
+	try:
+		yield process
+	except:
+		process.kill()
+		
+		raise
+	finally:
+		process.wait()
+	
 	if process.returncode:
 		raise UserError('Command failed: {}', ' '.join(args))
+
+
+def command(args, remove_env = [], set_env = { }, working_dir = None):
+	with command_context(args, remove_env, set_env, working_dir) as process:
+		process.wait()
 
 
 def bash_escape_string(string):
