@@ -55,7 +55,7 @@ SVG_ASY_FILES := $(call filter_compiled,.svg,.asy,$(SRC_FILES))
 ASY_PDF_FILES := $(call filter_compiled,.asy,.pdf,$(filter-out $(SVG_ASY_FILES),$(SRC_FILES)))
 
 # Makefiles which are generated while compiling to record dependencies.
-DEPENDENCY_FILES := $(foreach i,.scad,$(call filter_compiled,$i,.d,$(filter-out $(SVG_ASY_FILES),$(SRC_FILES))))
+DEPENDENCY_FILES := $(patsubst %,%.d,$(SCAD_STL_FILES) $(SCAD_DXF_FILES) $(ASY_PDF_FILES))
 
 # Files that may be used from OpenSCAD files and thus must exist before OpenSCAD is called.
 SCAD_ORDER_DEPS := $(filter %.scad %.dxf,$(SRC_FILES)) $(SVG_DXF_FILES)
@@ -95,17 +95,17 @@ $(SVG_ASY_FILES): %.asy: %.svg $(GLOBAL_DEPS)
 # Rule to compile an OpenSCAD file to a DXF file.
 $(SCAD_DXF_FILES): %.dxf: %.scad $(GLOBAL_DEPS) | $(SCAD_ORDER_DEPS)
 	echo [openscad] $@
-	$(OPENSCAD_CMD) $< $@ $*.d
+	$(OPENSCAD_CMD) $< $@
 
 # Rule to compile an OpenSCAD file to an STL file.
 $(SCAD_STL_FILES): %.stl: %.scad $(GLOBAL_DEPS) | $(SCAD_ORDER_DEPS)
 	echo [openscad] $@
-	$(OPENSCAD_CMD) $< $@ $*.d
+	$(OPENSCAD_CMD) $< $@
 
 # Rule to export an SVG file to an Asymptote file.
-$(ASY_PDF_FILES): %.pdf: $(ASY_DEPS) $(GLOBAL_DEPS)
+$(ASY_PDF_FILES): %.pdf: %.asy $(GLOBAL_DEPS) | $(ASY_DEPS)
 	echo [asymptote] $@
-	$(ASYMPTOTE_CMD) $*.asy $@
+	$(ASYMPTOTE_CMD) $< $@
 
 # Rule for automaticaly generated OpenSCAD files.
 $(GENERATED_FILES): generate_sources.sh $(GLOBAL_DEPS)
