@@ -66,8 +66,13 @@ def command_context(args, remove_env = [], set_env = { }, working_dir = None, us
 	for k, v in set_env.items():
 		env[k] = v
 	
+	if use_stderr:
+		stderr = subprocess.PIPE
+	else:
+		stderr = None
+	
 	try:
-		process = subprocess.Popen(args, env = env, cwd = working_dir)
+		process = subprocess.Popen(args, env = env, cwd = working_dir, stderr = stderr)
 		process.wait()
 	except OSError as e:
 		raise UserError('Error running {}: {}', args[0], e)
