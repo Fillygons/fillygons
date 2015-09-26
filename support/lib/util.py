@@ -80,7 +80,11 @@ def command_context(args, remove_env = [], set_env = { }, working_dir = None, us
 	try:
 		yield process
 	except:
-		process.kill()
+		try:
+			process.kill()
+		except OSError:
+			# Ignore exceptions here so we don't mask the already-being-thrown exception.
+			pass
 		
 		raise
 	finally:
