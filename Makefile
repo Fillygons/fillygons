@@ -73,7 +73,7 @@ GLOBAL_DEPS := Makefile $(wildcard config.mk settings.mk)
 EXISTING_TARGETS := $(filter $(SVG_DXF_FILES) $(SCAD_DXF_FILES) $(SCAD_STL_FILES) $(SVG_ASY_FILES) $(ASY_PDF_FILES) $(GENERATED_FILES) $(DEPENDENCY_FILES),$(EXISTING_FILES))
 
 # Goal to build Everything. Also generates files which aren't compiled to anything else. Deined here to make it the default goal.
-all: generated dxf stl asy pdf
+all: generated $(SCAD_DXF_FILES) $(SCAD_STL_FILES) $(ASY_PDF_FILES)
 
 # Everything^-1.
 clean:
@@ -84,14 +84,15 @@ clean:
 generated: $(GENERATED_FILES)
 dxf: $(SVG_DXF_FILES) $(SCAD_DXF_FILES)
 stl: $(SCAD_STL_FILES)
-pdf: $(ASY_PDF_FILES)
 asy: $(SVG_ASY_FILES)
+pdf: $(ASY_PDF_FILES)
 
 # Rule to convert an SVG file to a DXF file.
 $(SVG_DXF_FILES): %.dxf: %.svg $(GLOBAL_DEPS)
 	echo [inkscape] $@
 	$(INKSCAPE_CMD) $< $@
 
+# Rule to export an SVG file to an Asymptote file.
 $(SVG_ASY_FILES): %.asy: %.svg $(GLOBAL_DEPS)
 	echo [inkscape] $@
 	$(INKSCAPE_CMD) $< $@
@@ -106,7 +107,7 @@ $(SCAD_STL_FILES): %.stl: %.scad $(GLOBAL_DEPS) | $(SCAD_ORDER_DEPS)
 	echo [openscad] $@
 	$(OPENSCAD_CMD) $< $@
 
-# Rule to export an SVG file to an Asymptote file.
+# Rule to compile an Asymptote file to a PDF file.
 $(ASY_PDF_FILES): %.pdf: %.asy $(GLOBAL_DEPS) | $(ASY_DEPS)
 	echo [asymptote] $@
 	$(ASYMPTOTE_CMD) $< $@
