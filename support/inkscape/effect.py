@@ -7,7 +7,7 @@ from . import inkex, simpletransform, cubicsuperpath, cspsubdiv, inkscape
 
 
 def _get_unit_factors_map():
-	# Fluctuates somewhat between Inkscape releases.
+	# Fluctuates somewhat between Inkscape releases _and_ between SVG version.
 	pixels_per_inch = 96.
 	pixels_per_mm = pixels_per_inch / 25.4
 	
@@ -36,44 +36,60 @@ class ExportEffect(inkex.Effect):
 		self._layers = None
 		self._paths = None
 	
-	def _get_user_unit(self):
+	def _get_document_scale(self):
 		"""
-		Return the size in pixels of the unit used for measures without an explicit unit.
+		Return scaling factor applied to the document because of a viewBox setting. This currently ignores any setting of a preserveAspectRatio attribute (like Inkscape).
 		"""
 		
-		document_height = self._measure_to_pixels(self._get_document_height_attr())
+		document_height = self._get_height()
+		view_box = self._get_view_box()
+		
+		if view_box is None or document_height is None:
+			return 1
+		else:
+			_, _, _, view_box_height = view_box
+			
+			return document_height / view_box_height
+	
+	def _get_document_height(self):
+		"""
+		Get the height of the document in pixels in the document coordinate system as it is interpreted by Inkscape.
+		"""
+		
+		view_box = self._get_view_box()
+		document_height = self._get_height()
+		
+		if view_box is not None:
+			_, _, _, view_box_height = view_box
+			
+			return view_box_height
+		elif document_height is not None:
+			return document_height
+		else:
+			return 0
+	
+	def _get_height(self):
+		height_attr = self.document.getroot().get('height')
+		
+		if height_attr is None:
+			return None
+		else:
+			return self._measure_to_pixels(height_attr)
+	
+	def _get_view_box(self):
 		view_box_attr = self.document.getroot().get('viewBox')
 		
-		if view_box_attr:
-			_, _, _, view_box_height = map(float, view_box_attr.split())
+		if view_box_attr is None:
+			return None
 		else:
-			view_box_height = document_height
-		
-		return document_height / view_box_height
+			return [float(i) for i in view_box_attr.split()]
 	
-	def _get_document_unit(self):
-		"""
-		Return the size in pixels that the user is working with in Inkscape.
-		"""
-		
-		inkscape_unit_attrs = self.document.getroot().xpath('./sodipodi:namedview/@inkscape:document-units', namespaces = inkex.NSS)
-		
-		if inkscape_unit_attrs:
-			unit = inkscape_unit_attrs[0]
-		else:
-			_, unit = self._parse_measure(self._get_document_height_attr())
-		
-		return self._get_unit_factor(unit)
-	
-	def _get_document_height_attr(self):
-		return self.document.getroot().xpath('@height', namespaces = inkex.NSS)[0]
-	
-	def _get_shape_paths(self, node, document_transform, element_transform):
+	def _get_shape_paths(self, node, transform):
 		shape = cubicsuperpath.parsePath(node.get('d'))
 		
 		transform = simpletransform.composeTransform(
-			document_transform,
-			simpletransform.composeParents(node, element_transform))
+			transform,
+			simpletransform.composeParents(node, [[1, 0, 0], [0, 1, 0]]))
 		
 		simpletransform.applyTransformToPath(transform, shape)
 		
@@ -87,11 +103,12 @@ class ExportEffect(inkex.Effect):
 		return list(iter_paths())
 	
 	def effect(self):
-		user_unit = self._get_user_unit()
-		document_height = self._measure_to_pixels(self._get_document_height_attr())
+		document_height = self._get_document_height()
+		document_scale = self._get_document_scale()
 		
-		document_transform = [[1, 0, 0], [0, -1, document_height]]
-		element_transform = [[user_unit, 0, 0], [0, user_unit, 0]]
+		transform = simpletransform.composeTransform(
+			[[document_scale, 0, 0], [0, document_scale, 0]],
+			[[1, 0, 0], [0, -1, document_height]])
 		
 		layers = inkscape.get_inkscape_layers(self.svg_file)
 		layers_by_inkscape_name = { i.inkscape_name: i for i in layers }
@@ -100,14 +117,16 @@ class ExportEffect(inkex.Effect):
 			for node in self.document.getroot().xpath('//svg:path', namespaces = inkex.NSS):
 				layer = layers_by_inkscape_name.get(self._get_inkscape_layer_name(node))
 				
-				for path in self._get_shape_paths(node, document_transform, element_transform):
+				for path in self._get_shape_paths(node, transform):
 					yield layer, path
 		
 		self._layers = layers
 		self._paths = list(iter_paths())
 	
 	def write_dxf(self, file):
-		document_unit = self._get_document_unit()
+		# Scales pixels to millimeters. This is the predominant unit in CAD.
+		unit_factor = self._unit_factors['mm']
+		
 		layer_indices = { l: i for i, l in enumerate(self._layers) }
 		
 		file.write(pkgutil.get_data(__name__, 'dxf_header.txt'))
@@ -129,11 +148,11 @@ class ExportEffect(inkex.Effect):
 				write_instruction(5, '{:x}'.format(next(handle_iter)))
 				write_instruction(100, 'AcDbEntity')
 				write_instruction(100, 'AcDbLine')
-				write_instruction(10, repr(x1 / document_unit))
-				write_instruction(20, repr(y1 / document_unit))
+				write_instruction(10, repr(x1 / unit_factor))
+				write_instruction(20, repr(y1 / unit_factor))
 				write_instruction(30, 0.0)
-				write_instruction(11, repr(x2 / document_unit))
-				write_instruction(21, repr(y2 / document_unit))
+				write_instruction(11, repr(x2 / unit_factor))
+				write_instruction(21, repr(y2 / unit_factor))
 				write_instruction(31, 0.0)
 		
 		file.write(pkgutil.get_data(__name__, 'dxf_footer.txt'))
@@ -142,7 +161,7 @@ class ExportEffect(inkex.Effect):
 		def write_line(format, *args):
 			print >> file, format.format(*args) + ';'
 		
-		# Scales pixels to points.
+		# Scales pixels to points. Asymptote uses points by default.
 		unit_factor = self._unit_factors['pt']
 		
 		paths_by_layer = collections.defaultdict(list)
@@ -188,14 +207,14 @@ class ExportEffect(inkex.Effect):
 		return value, unit
 	
 	@classmethod
-	def _measure_to_pixels(cls, string, default_unit_factor = None):
+	def _measure_to_pixels(cls, string):
 		"""
-		Parse a string containing a measure and return it's value converted to pixels. If the measure has no unit, it will be assumed that the unit has the size of the specified number of pixels.
+		Parse a string containing a measure and return it's value converted to pixels.
 		"""
 		
 		value, unit = cls._parse_measure(string)
 		
-		return value * cls._get_unit_factor(unit, default_unit_factor)
+		return value * cls._get_unit_factor(unit)
 	
 	@classmethod
 	def _get_inkscape_layer_name(cls, node):
@@ -210,12 +229,9 @@ class ExportEffect(inkex.Effect):
 		return None
 	
 	@classmethod
-	def _get_unit_factor(cls, unit, default = None):
+	def _get_unit_factor(cls, unit):
 		if unit is None:
-			if default is None:
-				default = 1
-			
-			return default
+			return 1
 		else:
 			return cls._unit_factors[unit]
 	
