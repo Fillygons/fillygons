@@ -3,6 +3,8 @@ Based on code from Aaron Spike. See http://www.bobcookdev.com/inkscape/inkscape-
 """
 
 import pkgutil, os, re, collections, itertools
+from lxml import etree
+from lib import util
 from . import inkex, simpletransform, cubicsuperpath, cspsubdiv, inkscape
 
 
@@ -241,3 +243,22 @@ class ExportEffect(inkex.Effect):
 			return '_'
 		else:
 			return re.sub('[^a-zA-Z0-9]', '_', layer.export_name)
+	
+	@classmethod
+	def check_document_units(cls, path):
+		with open(path, 'r') as file:
+			p = etree.XMLParser(huge_tree = True)
+			document = etree.parse(file, parser = p)
+		
+		height_attr = document.getroot().get('height')
+		
+		if height_attr is None:
+			raise util.UserError('SVG document has no height attribute. See https://github.com/Feuermurmel/openscad-template/wiki/Absolute-Measurements')
+		
+		_, height_unit = cls._parse_measure(height_attr)
+		
+		if height_unit is None or height_unit == 'px':
+			raise util.UserError('Height of SVG document is not an absolute measure. See https://github.com/Feuermurmel/openscad-template/wiki/Absolute-Measurements')
+		
+		if document.getroot().get('viewBox') is None:
+			raise util.UserError('SVG document has no viewBox attribute. See https://github.com/Feuermurmel/openscad-template/wiki/Absolute-Measurements')

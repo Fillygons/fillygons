@@ -41,6 +41,7 @@ def main(in_path, out_path):
 	try:
 		_, out_suffix = os.path.splitext(out_path)
 		
+		effect.ExportEffect.check_document_units(in_path)
 		
 		with util.TemporaryDirectory() as temp_dir:
 			temp_svg_path = os.path.join(temp_dir, os.path.basename(in_path))
