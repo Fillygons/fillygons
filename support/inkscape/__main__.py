@@ -38,22 +38,26 @@ def _unfuck_svg_document(temp_svg_path):
 
 @util.main
 def main(in_path, out_path):
-	_, out_suffix = os.path.splitext(out_path)
-	
-	with util.TemporaryDirectory() as temp_dir:
-		temp_svg_path = os.path.join(temp_dir, os.path.basename(in_path))
+	try:
+		_, out_suffix = os.path.splitext(out_path)
 		
-		shutil.copyfile(in_path, temp_svg_path)
 		
-		_unfuck_svg_document(temp_svg_path)
-		
-		export_effect = effect.ExportEffect()
-		export_effect.affect(args = [temp_svg_path], output = False)
-		
-	with open(out_path, 'w') as file:
-		if out_suffix == '.dxf':
-			export_effect.write_dxf(file)
-		elif out_suffix == '.asy':
-			export_effect.write_asy(file)
-		else:
-			raise Exception('Unknown file type: {}'.format(out_suffix))
+		with util.TemporaryDirectory() as temp_dir:
+			temp_svg_path = os.path.join(temp_dir, os.path.basename(in_path))
+			
+			shutil.copyfile(in_path, temp_svg_path)
+			
+			_unfuck_svg_document(temp_svg_path)
+			
+			export_effect = effect.ExportEffect()
+			export_effect.affect(args = [temp_svg_path], output = False)
+			
+		with open(out_path, 'w') as file:
+			if out_suffix == '.dxf':
+				export_effect.write_dxf(file)
+			elif out_suffix == '.asy':
+				export_effect.write_asy(file)
+			else:
+				raise Exception('Unknown file type: {}'.format(out_suffix))
+	except util.UserError as e:
+		raise util.UserError('While processing {}: {}', in_path, e)
