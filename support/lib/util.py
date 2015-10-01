@@ -73,7 +73,6 @@ def command_context(args, remove_env = [], set_env = { }, working_dir = None, us
 	
 	try:
 		process = subprocess.Popen(args, env = env, cwd = working_dir, stderr = stderr)
-		process.wait()
 	except OSError as e:
 		raise UserError('Error running {}: {}', args[0], e)
 	
@@ -88,15 +87,16 @@ def command_context(args, remove_env = [], set_env = { }, working_dir = None, us
 		
 		raise
 	finally:
-		process.wait()
+		# Use communicate so that we won't deadlock if the process generates some unread output.
+		process.communicate()
 	
 	if process.returncode:
 		raise UserError('Command failed: {}', ' '.join(args))
 
 
 def command(args, remove_env = [], set_env = { }, working_dir = None):
-	with command_context(args, remove_env, set_env, working_dir) as process:
-		process.wait()
+	with command_context(args, remove_env, set_env, working_dir):
+		pass
 
 
 def bash_escape_string(string):
