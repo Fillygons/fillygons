@@ -1,4 +1,4 @@
-_inf = 1e5;
+_inf = 1e4;
 _inf2 = 2 * _inf;
 
 module extrude(min = -_inf, max = _inf) {

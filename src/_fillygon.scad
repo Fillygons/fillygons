@@ -15,7 +15,7 @@ num_teeth = 3;
 // Minimum dihedral alnge between this face and any other face.
 min_angle = acos(1 / 3);
 
-// Length on each end of an edge ehere no teeht are placed.
+// Length on each end of an edge ehere no teeht are placed. This value works for angles as low as τ / 6.
 corner_clearance = sqrt(3) * thickness / 2;
 
 // Overhang of the ball dedents relative to the teeth surface.
@@ -86,7 +86,7 @@ module fillygon(angles) {
 	module polygon_region() {
 		extrude() {
 			difference() {
-				polygon(gap / 2);
+				polygon();
 				polygon(loop_width);
 			}
 		}
@@ -156,6 +156,14 @@ module fillygon(angles) {
 				}
 			}
 			
+			// The part to cut away inside the corner clearance so that two parts can join and rotate..
+			module clearance() {
+				teeth_start = corner_clearance + hgap;
+				
+				sector_3d(ymax = hgap, xmin = 0, xmax = teeth_start);
+				sector_3d(ymax = hgap, xmin = side_length - teeth_start, xmax = side_length);
+			}
+			
 			// Deciding which elements to add and subtract involves some magic. Here we decide which elements need to be part of the positive and negative regions which define the teeth.
 			if (invert) {
 				difference() {
@@ -164,6 +172,7 @@ module fillygon(angles) {
 				}
 				
 				dedent_holes();
+				clearance();
 			} else {
 				teeth();
 				dedent_balls();
