@@ -164,6 +164,11 @@ module fillygon(angles) {
 				
 				dedent_holes();
 				clearance();
+				
+				// To allow rotating two joined parts.
+				rotate([90 - min_angle / 2, 0, 0]) {
+					clearance();
+				}
 			} else {
 				teeth();
 				dedent_balls();
