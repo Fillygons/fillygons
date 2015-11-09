@@ -4,7 +4,7 @@ include <_util.scad>
 thickness = 4;
 
 // Width of the rim along the edges of the piece connecting the teeth.
-border_width = 1.5 * thickness;
+loop_width = 1.5 * thickness;
 
 // Length of a pieces sides, measured along the ideal polygon's edges.
 side_length = 30;
@@ -16,12 +16,12 @@ num_teeth = 3;
 min_angle = acos(1 / 3) * rad;
 
 // Length on each end of an edge ehere no teeht are placed.
-corner_clearance = 3;
+corner_clearance = 3.5;
 
 // Gap between touching surfaces.
 gap = 0.2;
 
-$fn = 16;
+$fn = 8;
 
 module fillygon(angles) {
 	module more(i) {
@@ -34,11 +34,11 @@ module fillygon(angles) {
 		}
 	}
 	
-	// The 2D shape of the ideal polygon.
-	module ideal_polygon() {
+	// The 2D shape of the ideal polygon, optionally offset.
+	module polygon(offset = 0) {
 		module tail(i) {
 			intersection() {
-				half_plane();
+				sector_2d(ymin = offset);
 				
 				more(i) {
 					tail(i + 1);
@@ -64,51 +64,35 @@ module fillygon(angles) {
 		tail(0);
 	}
 	
-	// The whole part without the gaps between the teeth cut out.
-	module border() {
-		translate([0, 0, -thickness / 2]) {
-			linear_extrude(thickness) {
-				difference() {
-					ideal_polygon();
-					
-					offset(-border_width) {
-						ideal_polygon();
-					}
-				}
-			}
+	// The whole part without any teeth or the hole cut out.
+	module full_part() {
+		extrude(-thickness / 2, thickness / 2) {
+			polygon();
 		}
 		
 		teeth_cylinders();
 	}
 	
-	// The volume which is cut out from the cylinders and the border to for the teeth.
-	module teeth_gaps() {
+	// The part up until the border where the teeth start.
+	module inner_part() {
+		extrude(-thickness / 2, thickness / 2) {
+			difference() {
+				polygon(thickness / 2);
+				polygon(loop_width);
+			}
+		}
+	}
+	
+	// The volume which is occupied by the teeth.
+	module teeth_region() {
 		used_lenght = side_length - 2 * corner_clearance;
 		tooth_width = used_lenght / num_teeth;
 		
 		module tail(i) {
-			intersection() {
-				intersection_for (j = [0:num_teeth - 1]) {
-					translate([corner_clearance + j * tooth_width, 0, 0]) {
-						union() {
-							rotate([0, -90, 0]) {
-								half_space();
-							}
-							
-							translate([tooth_width / 2, 0, 0]) {
-								rotate([0, 90, 0]) {
-									half_space();
-								}
-							}
-						}
-					}
-				}
+			for (j = [0:num_teeth - 1]) {
+				xmin = corner_clearance + j * tooth_width;
 				
-				translate([0, thickness / 2]) {
-					rotate([90, 0, 0]) {
-						half_space();
-					}
-				}
+				sector_3d(xmin = xmin, xmax = xmin + tooth_width / 2, ymax = thickness / 2);
 			}
 			
 			more(i) {
@@ -119,10 +103,12 @@ module fillygon(angles) {
 		tail(0);
 	}
 	
-	difference() {
-		border();
-		teeth_gaps();
+	intersection() {
+		full_part();
+		teeth_region();
 	}
+	
+	inner_part();
 }
 
 module regular_fillygon(num_sides) {

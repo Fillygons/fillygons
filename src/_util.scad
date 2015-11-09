@@ -1,25 +1,25 @@
-_inf = 1e6;
+_inf = 1e5;
 _inf2 = 2 * _inf;
 
 rad = 180 / PI;
 
-module infinite_extrude() {
-	translate([0, 0, -_inf]) {
-		linear_extrude(height = _inf2) {
-			children(0);
+module extrude(min = -_inf, max = _inf) {
+	translate([0, 0, min]) {
+		linear_extrude(max - min) {
+			children();
 		}
 	}
 }
 
-module half_plane() {
-	translate([0, _inf]) {
-		square(_inf2, center = true);
+module sector_2d(xmin = -_inf, xmax = _inf, ymin = -_inf, ymax = _inf) {
+	translate([xmin, ymin]) {
+		square([xmax - xmin, ymax - ymin]);
 	}
 }
 
-module half_space() {
-	translate([0, 0, _inf]) {
-		cube(_inf2, center = true);
+module sector_3d(xmin = -_inf, xmax = _inf, ymin = -_inf, ymax = _inf, zmin = -_inf, zmax = _inf) {
+	translate([xmin, ymin, zmin]) {
+		cube([xmax - xmin, ymax - ymin, zmax - zmin]);
 	}
 }
 
