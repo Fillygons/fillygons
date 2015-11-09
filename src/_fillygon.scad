@@ -84,12 +84,13 @@ module fillygon(angles) {
 	}
 	
 	// The volume which is occupied by the teeth.
+	// If invert is set to false, the region for the teeth and their dedent spheres is produced, if set to true, the region between the teeth and the dedent holes is produced.
 	module teeth_region(invert = false) {
 		used_lenght = side_length - 2 * corner_clearance;
 		tooth_width = used_lenght / num_teeth;
 		
 		// Offset added on both sides of the teeth.
-		hgap = gap / 2 * (invert ? -1 : 1);
+		hgap = gap / 2 * (invert ? 1 : -1);
 		
 		module tail(i) {
 			for (j = [0:num_teeth - 1]) {
@@ -114,10 +115,10 @@ module fillygon(angles) {
 		difference() {
 			union() {
 				polygon_region();
-				teeth_region(true);
+				teeth_region();
 			}
 			
-			teeth_region();
+			teeth_region(true);
 		}
 	}
 }
