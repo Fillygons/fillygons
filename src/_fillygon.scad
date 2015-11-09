@@ -77,20 +77,21 @@ module fillygon(angles) {
 	module inner_part() {
 		extrude(-thickness / 2, thickness / 2) {
 			difference() {
-				polygon(thickness / 2);
+				polygon();
 				polygon(loop_width);
 			}
 		}
 	}
 	
 	// The volume which is occupied by the teeth.
-	module teeth_region() {
+	module teeth_region(invert = false) {
 		used_lenght = side_length - 2 * corner_clearance;
 		tooth_width = used_lenght / num_teeth;
 		
 		module tail(i) {
 			for (j = [0:num_teeth - 1]) {
-				xmin = corner_clearance + j * tooth_width;
+				offset = invert ? tooth_width / 2 : 0;
+				xmin = corner_clearance + j * tooth_width + offset;
 				
 				sector_3d(xmin = xmin, xmax = xmin + tooth_width / 2, ymax = thickness / 2);
 			}
@@ -108,7 +109,10 @@ module fillygon(angles) {
 		teeth_region();
 	}
 	
-	inner_part();
+	difference() {
+		inner_part();
+		teeth_region(true);
+	}
 }
 
 module regular_fillygon(num_sides) {
