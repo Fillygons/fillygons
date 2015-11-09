@@ -77,7 +77,7 @@ module fillygon(angles) {
 	module polygon_region() {
 		extrude() {
 			difference() {
-				polygon();
+				polygon(gap / 2);
 				polygon(loop_width);
 			}
 		}
@@ -88,12 +88,15 @@ module fillygon(angles) {
 		used_lenght = side_length - 2 * corner_clearance;
 		tooth_width = used_lenght / num_teeth;
 		
+		// Offset added on both sides of the teeth.
+		hgap = gap / 2 * (invert ? -1 : 1);
+		
 		module tail(i) {
 			for (j = [0:num_teeth - 1]) {
 				offset = invert ? tooth_width / 2 : 0;
 				xmin = corner_clearance + j * tooth_width + offset;
 				
-				sector_3d(xmin = xmin, xmax = xmin + tooth_width / 2, ymax = thickness / 2);
+				sector_3d(xmin = xmin - hgap, xmax = xmin + tooth_width / 2 + hgap, ymax = thickness / 2 + gap);
 			}
 			
 			more(i) {
