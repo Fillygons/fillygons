@@ -16,7 +16,7 @@ num_teeth = 3;
 min_angle = acos(1 / 3) * rad;
 
 // Length on each end of an edge ehere no teeht are placed.
-corner_clearance = 3.5;
+corner_clearance = sqrt(3) * thickness / 2;
 
 // Gap between touching surfaces.
 gap = 0.2;
