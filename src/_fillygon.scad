@@ -73,9 +73,9 @@ module fillygon(angles) {
 		teeth_cylinders();
 	}
 	
-	// The part up until the border where the teeth start.
-	module inner_part() {
-		extrude(-thickness / 2, thickness / 2) {
+	// The volume occupied by the ideal polygon loop.
+	module polygon_region() {
+		extrude() {
 			difference() {
 				polygon();
 				polygon(loop_width);
@@ -106,12 +106,15 @@ module fillygon(angles) {
 	
 	intersection() {
 		full_part();
-		teeth_region();
-	}
-	
-	difference() {
-		inner_part();
-		teeth_region(true);
+		
+		union() {
+			difference() {
+				polygon_region();
+				teeth_region();
+			}
+			
+			teeth_region(true);
+		}
 	}
 }
 
