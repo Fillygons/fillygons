@@ -18,6 +18,15 @@ min_angle = acos(1 / 3);
 // Length on each end of an edge ehere no teeht are placed.
 corner_clearance = sqrt(3) * thickness / 2;
 
+// Overhang of the ball dedents relative to the teeth surface.
+dedent_sphere_offset = 0.6;
+
+// Diameter of the ball dedent spheres.
+dedent_sphere_dimeter = thickness;
+
+// Diameter of the holes which accept the ball dedent spheres.
+dedent_hole_diameter = 2.6;
+
 // Gap between touching surfaces.
 gap = 0.4;
 
@@ -87,17 +96,48 @@ module fillygon(angles) {
 	// If invert is set to false, the region for the teeth and their dedent spheres is produced, if set to true, the region between the teeth and the dedent holes is produced.
 	module teeth_region(invert = false) {
 		used_lenght = side_length - 2 * corner_clearance;
-		tooth_width = used_lenght / num_teeth;
+		tooth_width = used_lenght / (num_teeth * 2);
+		
+		function pos(pos) = corner_clearance + pos * tooth_width;
 		
 		// Offset added on both sides of the teeth.
 		hgap = gap / 2 * (invert ? 1 : -1);
 		
 		module tail(i) {
-			for (j = [0:num_teeth - 1]) {
-				offset = invert ? tooth_width / 2 : 0;
-				xmin = corner_clearance + j * tooth_width + offset;
+			module teeth() {
+				for (j = [0:num_teeth - 1]) {
+					offset = invert ? 1 : 0;
+					
+					sector_3d(
+						xmin = pos(2 * j + offset) - hgap,
+						xmax = pos(2 * j + offset + 1) + hgap,
+						ymax = thickness / 2 + gap);
+				}
+			}
+			
+			module dedent_balls() {
+				// Offset of the sphere's center relative to the tooth surface it is placed on.
+				ball_offset = dedent_sphere_dimeter / 2 - dedent_sphere_offset + hgap;
 				
-				sector_3d(xmin = xmin - hgap, xmax = xmin + tooth_width / 2 + hgap, ymax = thickness / 2 + gap);
+				translate([pos(2) + ball_offset, 0, 0]) {
+					sphere(d = dedent_sphere_dimeter);
+				}
+				
+				translate([pos(5) - ball_offset, 0, 0]) {
+					sphere(d = dedent_sphere_dimeter);
+				}
+			}
+			
+			if (invert) {
+				difference() {
+					teeth();
+					dedent_balls();
+				}
+			} else {
+				union() {
+					teeth();
+					dedent_balls();
+				}
 			}
 			
 			more(i) {
