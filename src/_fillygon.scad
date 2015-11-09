@@ -128,16 +128,37 @@ module fillygon(angles) {
 				}
 			}
 			
+			module dedent_holes() {
+				// Offset of the sphere's center relative to the tooth surface it is placed on.
+				module hole_shape() {
+					translate([hgap, 0, 0]) {
+						rotate([0, 90, 0]) {
+							cylinder(h = dedent_sphere_offset, d1 = dedent_hole_diameter, d2 = dedent_hole_diameter - 2 * dedent_sphere_offset);
+						}
+					}
+				}
+				
+				translate([pos(4), 0, 0]) {
+					hole_shape();
+				}
+				
+				translate([pos(1), 0, 0]) {
+					scale([-1, 1, 1]) {
+						hole_shape();
+					}
+				}
+			}
+			
 			if (invert) {
 				difference() {
 					teeth();
 					dedent_balls();
 				}
+				
+				dedent_holes();
 			} else {
-				union() {
-					teeth();
-					dedent_balls();
-				}
+				teeth();
+				dedent_balls();
 			}
 			
 			more(i) {
