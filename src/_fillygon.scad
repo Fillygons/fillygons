@@ -30,7 +30,7 @@ dedent_hole_diameter = 2.6;
 // Gap between touching surfaces.
 gap = 0.4;
 
-$fn = 8;
+$fn = 32;
 
 module fillygon(angles) {
 	module more(i) {
