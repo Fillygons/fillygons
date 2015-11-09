@@ -110,13 +110,14 @@ module fillygon(angles) {
 	intersection() {
 		full_part();
 		
-		union() {
-			difference() {
+		// Add the teeht before removing the gaps between the teeth to prevent teeth from bleeding into the gaps on acute angles.
+		difference() {
+			union() {
 				polygon_region();
-				teeth_region();
+				teeth_region(true);
 			}
 			
-			teeth_region(true);
+			teeth_region();
 		}
 	}
 }
