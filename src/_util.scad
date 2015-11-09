@@ -1,8 +1,6 @@
 _inf = 1e5;
 _inf2 = 2 * _inf;
 
-rad = 180 / PI;
-
 module extrude(min = -_inf, max = _inf) {
 	translate([0, 0, min]) {
 		linear_extrude(max - min) {

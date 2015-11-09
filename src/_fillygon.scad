@@ -13,7 +13,7 @@ side_length = 30;
 num_teeth = 3;
 
 // Minimum dihedral alnge between this face and any other face.
-min_angle = acos(1 / 3) * rad;
+min_angle = acos(1 / 3);
 
 // Length on each end of an edge ehere no teeht are placed.
 corner_clearance = sqrt(3) * thickness / 2;
