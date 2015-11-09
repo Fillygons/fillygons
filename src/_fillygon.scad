@@ -43,11 +43,11 @@ module fillygon(angles) {
 		}
 	}
 	
-	// The 2D shape of the ideal polygon, optionally offset.
+	// The infintely extruded region of the polygon with an optional offset.
 	module polygon(offset = 0) {
 		module tail(i) {
 			intersection() {
-				sector_2d(ymin = offset);
+				sector_3d(ymin = offset);
 				
 				more(i) {
 					tail(i + 1);
@@ -75,21 +75,12 @@ module fillygon(angles) {
 	
 	// The whole part without any teeth or the hole cut out.
 	module full_part() {
-		extrude(-thickness / 2, thickness / 2) {
+		intersection() {
 			polygon();
+			sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
 		}
 		
 		teeth_cylinders();
-	}
-	
-	// The volume occupied by the ideal polygon loop.
-	module polygon_region() {
-		extrude() {
-			difference() {
-				polygon();
-				polygon(loop_width);
-			}
-		}
 	}
 	
 	// The volume which is occupied by the teeth.
@@ -192,11 +183,12 @@ module fillygon(angles) {
 		// Add the teeht before removing the gaps between the teeth to prevent teeth from bleeding into the gaps on acute angles.
 		difference() {
 			union() {
-				polygon_region();
+				polygon();
 				teeth_region();
 			}
 			
 			teeth_region(true);
+			polygon(loop_width);
 		}
 	}
 }
