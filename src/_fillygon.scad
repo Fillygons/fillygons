@@ -19,7 +19,7 @@ min_angle = acos(1 / 3);
 corner_clearance = sqrt(3) * thickness / 2;
 
 // Gap between touching surfaces.
-gap = 0.2;
+gap = 0.4;
 
 $fn = 8;
 
