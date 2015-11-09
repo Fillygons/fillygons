@@ -107,11 +107,18 @@ module fillygon(angles) {
 			module teeth() {
 				for (j = [0:num_teeth - 1]) {
 					offset = invert ? 1 : 0;
+					xmin = pos(2 * j + offset) - hgap;
+					xmax = pos(2 * j + offset + 1) + hgap;
+					ymax = thickness / 2 + gap;
 					
-					sector_3d(
-						xmin = pos(2 * j + offset) - hgap,
-						xmax = pos(2 * j + offset + 1) + hgap,
-						ymax = thickness / 2 + gap);
+					sector_3d(xmin = xmin, xmax = xmax, ymax = ymax);
+					
+					// The part that needs to be removed to support acute angles.
+					if (invert) {
+						rotate([90 - min_angle, 0, 0]) {
+							sector_3d(xmin = xmin, xmax = xmax, ymax = ymax, zmax = 0);
+						}
+					}
 				}
 			}
 			
@@ -149,6 +156,7 @@ module fillygon(angles) {
 				}
 			}
 			
+			// Deciding which elements to add and subtract involves some magic. Here we decide which elements need to be part of the positive and negative regions which define the teeth.
 			if (invert) {
 				difference() {
 					teeth();
