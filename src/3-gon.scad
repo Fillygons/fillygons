@@ -1,3 +1,3 @@
 use <_fillygon.scad>
 
-render() regular_fillygon(3);
+render() rotate([180, 0, 0]) regular_fillygon(3);
