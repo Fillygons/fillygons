@@ -19,13 +19,13 @@ min_angle = 60;
 corner_clearance = sqrt(3) * thickness / 2;
 
 // Overhang of the ball dedents relative to the teeth surface.
-dedent_sphere_offset = 0.6;
+dedent_sphere_offset = 0.5;
 
 // Diameter of the ball dedent spheres.
 dedent_sphere_dimeter = thickness;
 
 // Diameter of the holes which accept the ball dedent spheres.
-dedent_hole_diameter = 2.6;
+dedent_hole_diameter = 2.0;
 
 // Gap between touching surfaces.
 gap = 0.4;
