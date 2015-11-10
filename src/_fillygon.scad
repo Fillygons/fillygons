@@ -114,7 +114,9 @@ module fillygon(angles) {
 			}
 			
 			module dedent_balls() {
-				module ball(pos, dir) {
+				module ball(pos) {
+					dir = 1 - pos % 2 * 2;
+					
 					// Offset of the sphere's center relative to the tooth surface it is placed on.
 					ball_offset = dedent_sphere_dimeter / 2 - dedent_sphere_offset + hgap;
 					
@@ -129,13 +131,15 @@ module fillygon(angles) {
 					}
 				}
 				
-				ball(1, -1);
-				ball(4, 1);
+				ball(1);
+				ball(4);
 			}
 			
 			module dedent_holes() {
 				// Offset of the sphere's center relative to the tooth surface it is placed on.
-				module hole(pos, dir) {
+				module hole(pos) {
+					dir = 1 - pos % 2 * 2;
+					
 					translate([pos(pos), 0, 0]) {
 						rotate([0, dir * 90, 0]) {
 							translate([0, 0, hgap]) {
@@ -145,8 +149,8 @@ module fillygon(angles) {
 					}
 				}
 				
-				hole(2, 1);
-				hole(5, -1);
+				hole(2);
+				hole(5);
 			}
 			
 			// The part to cut away inside the corner clearance so that two parts can join and rotate..
