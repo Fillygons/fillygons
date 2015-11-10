@@ -20,18 +20,3 @@ module sector_3d(xmin = -_inf, xmax = _inf, ymin = -_inf, ymax = _inf, zmin = -_
 		cube([xmax - xmin, ymax - ymin, zmax - zmin]);
 	}
 }
-
-module inverse_minkowski_2d() {
-	difference() {
-		square(_inf, center = true);
-		
-		minkowski() {
-			children(0);
-			
-			difference() {
-				square(_inf2, center = true);
-				children(1);
-			}
-		}
-	}
-}
