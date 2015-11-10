@@ -129,8 +129,8 @@ module fillygon(angles) {
 					}
 				}
 				
-				ball(2, 1);
-				ball(5, -1);
+				ball(1, -1);
+				ball(4, 1);
 			}
 			
 			module dedent_holes() {
@@ -145,8 +145,8 @@ module fillygon(angles) {
 					}
 				}
 				
-				hole(4, 1);
-				hole(1, -1);
+				hole(2, 1);
+				hole(5, -1);
 			}
 			
 			// The part to cut away inside the corner clearance so that two parts can join and rotate..
