@@ -114,37 +114,39 @@ module fillygon(angles) {
 			}
 			
 			module dedent_balls() {
-				// Offset of the sphere's center relative to the tooth surface it is placed on.
-				ball_offset = dedent_sphere_dimeter / 2 - dedent_sphere_offset + hgap;
-				
-				translate([pos(2) + ball_offset, 0, 0]) {
-					sphere(d = dedent_sphere_dimeter);
-				}
-				
-				translate([pos(5) - ball_offset, 0, 0]) {
-					sphere(d = dedent_sphere_dimeter);
-				}
-			}
-			
-			module dedent_holes() {
-				// Offset of the sphere's center relative to the tooth surface it is placed on.
-				module hole_shape() {
-					translate([hgap, 0, 0]) {
-						rotate([0, 90, 0]) {
-							cylinder(h = dedent_sphere_offset, d1 = dedent_hole_diameter, d2 = dedent_hole_diameter - 2 * dedent_sphere_offset);
+				module ball(pos, dir) {
+					// Offset of the sphere's center relative to the tooth surface it is placed on.
+					ball_offset = dedent_sphere_dimeter / 2 - dedent_sphere_offset + hgap;
+					
+					translate([pos(pos) + ball_offset * dir, 0, 0]) {
+						intersection() {
+							sphere(d = dedent_sphere_dimeter);
+							
+							scale([dir, 1, 1]) {
+								sector_3d(xmax = 0);
+							}
 						}
 					}
 				}
 				
-				translate([pos(4), 0, 0]) {
-					hole_shape();
-				}
-				
-				translate([pos(1), 0, 0]) {
-					scale([-1, 1, 1]) {
-						hole_shape();
+				ball(2, 1);
+				ball(5, -1);
+			}
+			
+			module dedent_holes() {
+				// Offset of the sphere's center relative to the tooth surface it is placed on.
+				module hole(pos, dir) {
+					translate([pos(pos), 0, 0]) {
+						rotate([0, dir * 90, 0]) {
+							translate([0, 0, hgap]) {
+								cylinder(h = dedent_sphere_offset, d1 = dedent_hole_diameter, d2 = dedent_hole_diameter - 2 * dedent_sphere_offset);
+							}
+						}
 					}
 				}
+				
+				hole(4, 1);
+				hole(1, -1);
 			}
 			
 			// The part to cut away inside the corner clearance so that two parts can join and rotate..
