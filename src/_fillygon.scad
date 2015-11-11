@@ -145,13 +145,32 @@ module fillygon(angles) {
 		}
 	}
 	
+	module clearance() {
+		// The part to cut away inside the corner clearance so that two parts can join and rotate..
+		module clearance_sections() {
+			teeth_start = corner_clearance + gap / 2;
+			
+			sector_3d(ymax = hgap, xmin = 0, xmax = teeth_start);
+			sector_3d(ymax = hgap, xmin = side_length - teeth_start, xmax = side_length);
+		}
+		
+		trace() {
+			clearance_sections();
+			
+			// To allow rotating two joined parts.
+			rotate([90 - min_angle / 2, 0, 0]) {
+				clearance_sections();
+			}
+		}
+	}
+	
 	// The volume which is occupied by the teeth.
 	// If invert is set to false, the region for the teeth and their dedent spheres is produced, if set to true, the region between the teeth and the dedent holes is produced.
 	module teeth_region(invert = false) {
 		// Offset added on both sides of the teeth.
 		hgap = gap / 2 * (invert ? 1 : -1);
 		
-		module teeth() {
+		trace() {
 			for (j = [0:num_teeth - 1]) {
 				offset = invert ? 1 : 0;
 				xmin = pos(2 * j + offset) - hgap;
@@ -166,29 +185,6 @@ module fillygon(angles) {
 						sector_3d(xmin = xmin, xmax = xmax, ymax = ymax, zmax = 0);
 					}
 				}
-			}
-		}
-		
-		// The part to cut away inside the corner clearance so that two parts can join and rotate..
-		module clearance() {
-			teeth_start = corner_clearance + hgap;
-			
-			sector_3d(ymax = hgap, xmin = 0, xmax = teeth_start);
-			sector_3d(ymax = hgap, xmin = side_length - teeth_start, xmax = side_length);
-		}
-		
-		trace() {
-			// Deciding which elements to add and subtract involves some magic. Here we decide which elements need to be part of the positive and negative regions which define the teeth.
-			if (invert) {
-				teeth();
-				clearance();
-				
-				// To allow rotating two joined parts.
-				rotate([90 - min_angle / 2, 0, 0]) {
-					clearance();
-				}
-			} else {
-				teeth();
 			}
 		}
 	}
@@ -208,6 +204,7 @@ module fillygon(angles) {
 				union() {
 					teeth_region(true);
 					dedent_holes();
+					clearance();
 				}
 				
 				dedent_balls();
