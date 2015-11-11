@@ -89,16 +89,6 @@ module fillygon(angles) {
 		}
 	}
 	
-	// The whole part without any teeth or the hole cut out.
-	module full_part() {
-		intersection() {
-			polygon();
-			sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-		}
-		
-		teeth_cylinders();
-	}
-	
 	used_lenght = side_length - 2 * corner_clearance;
 	tooth_width = used_lenght / (num_teeth * 2);
 	
@@ -183,16 +173,27 @@ module fillygon(angles) {
 		}
 	}
 	
-	difference() {
-		full_part();
-		clearance();
-		dedent_holes();
-		teeth_gaps();
-	}
-	
 	intersection() {
-		full_part();
-		dedent_balls();
+		sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
+		
+		union() {
+			difference() {
+				union() {
+					polygon();
+					teeth_cylinders();
+				}
+				
+				clearance();
+				dedent_holes();
+				teeth_gaps();
+				polygon(loop_width);
+			}
+			
+			intersection() {
+				teeth_cylinders();
+				dedent_balls();
+			}
+		}
 	}
 }
 
