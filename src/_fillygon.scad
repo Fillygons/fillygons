@@ -126,6 +126,24 @@ module fillygon(angles) {
 			ball(4);
 		}
 	}
+		
+	module dedent_holes() {
+		// Offset of the sphere's center relative to the tooth surface it is placed on.
+		module hole(pos) {
+			translate([pos(pos), 0, 0]) {
+				rotate([0, dir(pos) * 90, 0]) {
+					translate([0, 0, gap / 2]) {
+						cylinder(h = dedent_sphere_offset, d1 = dedent_hole_diameter, d2 = dedent_hole_diameter - 2 * dedent_sphere_offset);
+					}
+				}
+			}
+		}
+		
+		trace() {
+			hole(2);
+			hole(5);
+		}
+	}
 	
 	// The volume which is occupied by the teeth.
 	// If invert is set to false, the region for the teeth and their dedent spheres is produced, if set to true, the region between the teeth and the dedent holes is produced.
@@ -151,24 +169,6 @@ module fillygon(angles) {
 			}
 		}
 		
-		module dedent_holes() {
-			// Offset of the sphere's center relative to the tooth surface it is placed on.
-			module hole(pos) {
-				dir = 1 - pos % 2 * 2;
-				
-				translate([pos(pos), 0, 0]) {
-					rotate([0, dir * 90, 0]) {
-						translate([0, 0, hgap]) {
-							cylinder(h = dedent_sphere_offset, d1 = dedent_hole_diameter, d2 = dedent_hole_diameter - 2 * dedent_sphere_offset);
-						}
-					}
-				}
-			}
-			
-			hole(2);
-			hole(5);
-		}
-		
 		// The part to cut away inside the corner clearance so that two parts can join and rotate..
 		module clearance() {
 			teeth_start = corner_clearance + hgap;
@@ -180,11 +180,7 @@ module fillygon(angles) {
 		trace() {
 			// Deciding which elements to add and subtract involves some magic. Here we decide which elements need to be part of the positive and negative regions which define the teeth.
 			if (invert) {
-				difference() {
-					teeth();
-				}
-				
-				dedent_holes();
+				teeth();
 				clearance();
 				
 				// To allow rotating two joined parts.
@@ -209,7 +205,11 @@ module fillygon(angles) {
 			}
 			
 			difference() {
-				teeth_region(true);
+				union() {
+					teeth_region(true);
+					dedent_holes();
+				}
+				
 				dedent_balls();
 			}
 			
