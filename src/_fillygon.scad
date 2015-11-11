@@ -75,17 +75,13 @@ module fillygon(angles) {
 	
 	// The infintely extruded region of the polygon with an optional offset.
 	module polygon(offset = 0) {
-		trace(true) {
-			sector_3d(ymin = offset);
-		}
+		sector_3d(ymin = offset);
 	}
 	
 	// The cylinders which form part of the teeth.
 	module teeth_cylinders() {
-		trace() {
-			rotate([0, 90, 0]) {
-				cylinder(h = side_length, r = thickness / 2);
-			}
+		rotate([0, 90, 0]) {
+			cylinder(h = side_length, r = thickness / 2);
 		}
 	}
 	
@@ -111,10 +107,8 @@ module fillygon(angles) {
 			}
 		}
 		
-		trace() {
-			ball(1);
-			ball(4);
-		}
+		ball(1);
+		ball(4);
 	}
 		
 	module dedent_holes() {
@@ -129,10 +123,8 @@ module fillygon(angles) {
 			}
 		}
 		
-		trace() {
-			hole(2);
-			hole(5);
-		}
+		hole(2);
+		hole(5);
 	}
 	
 	module clearance() {
@@ -144,31 +136,27 @@ module fillygon(angles) {
 			sector_3d(ymax = gap / 2, xmin = side_length - teeth_start, xmax = side_length);
 		}
 		
-		trace() {
+		clearance_sections();
+		
+		// To allow rotating two joined parts.
+		rotate([90 - min_angle / 2, 0, 0]) {
 			clearance_sections();
-			
-			// To allow rotating two joined parts.
-			rotate([90 - min_angle / 2, 0, 0]) {
-				clearance_sections();
-			}
 		}
 	}
 	
 	// The volume which is occupied by the teeth.
 	// If invert is set to false, the region for the teeth and their dedent spheres is produced, if set to true, the region between the teeth and the dedent holes is produced.
 	module teeth_gaps() {
-		trace() {
-			for (j = [0:num_teeth - 1]) {
-				xmin = pos(2 * j + 1) - gap / 2;
-				xmax = pos(2 * j + 2) + gap / 2;
-				ymax = thickness / 2 + gap;
-				
+		for (j = [0:num_teeth - 1]) {
+			xmin = pos(2 * j + 1) - gap / 2;
+			xmax = pos(2 * j + 2) + gap / 2;
+			ymax = thickness / 2 + gap;
+			
+			sector_3d(xmin = xmin, xmax = xmax, ymax = ymax);
+			
+			// The part that needs to be removed to support acute angles.
+			rotate([90 - min_angle, 0, 0]) {
 				sector_3d(xmin = xmin, xmax = xmax, ymax = ymax);
-				
-				// The part that needs to be removed to support acute angles.
-				rotate([90 - min_angle, 0, 0]) {
-					sector_3d(xmin = xmin, xmax = xmax, ymax = ymax);
-				}
 			}
 		}
 	}
@@ -179,19 +167,19 @@ module fillygon(angles) {
 		union() {
 			difference() {
 				union() {
-					polygon();
-					teeth_cylinders();
+					trace(true) sector_3d(ymin = 0);
+					trace() teeth_cylinders();
 				}
 				
-				clearance();
-				dedent_holes();
-				teeth_gaps();
-				polygon(loop_width);
+				trace() clearance();
+				trace() dedent_holes();
+				trace() teeth_gaps();
+				trace(true) sector_3d(ymin = loop_width);
 			}
 			
 			intersection() {
-				teeth_cylinders();
-				dedent_balls();
+				trace() teeth_cylinders();
+				trace() dedent_balls();
 			}
 		}
 	}
