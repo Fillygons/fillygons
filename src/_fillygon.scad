@@ -43,34 +43,50 @@ module fillygon(angles) {
 		}
 	}
 	
-	// The infintely extruded region of the polygon with an optional offset.
-	module polygon(offset = 0) {
+	module trace(intersect = false) {
 		module tail(i) {
-			intersection() {
-				sector_3d(ymin = offset);
+			if (intersect) {
+				intersection() {
+					children();
+					
+					more(i) {
+						tail(i + 1) {
+							children();
+						}
+					}
+				}
+			} else {
+				children();
 				
 				more(i) {
-					tail(i + 1);
+					tail(i + 1) {
+						children();
+					}
 				}
 			}
 		}
 		
-		tail(0);
+		tail(0) {
+			union() {
+				children();
+			}
+		}
+	}
+	
+	// The infintely extruded region of the polygon with an optional offset.
+	module polygon(offset = 0) {
+		trace(true) {
+			sector_3d(ymin = offset);
+		}
 	}
 	
 	// The cylinders which form part of the teeth.
 	module teeth_cylinders() {
-		module tail(i) {
+		trace() {
 			rotate([0, 90, 0]) {
 				cylinder(h = side_length, r = thickness / 2);
 			}
-			
-			more(i) {
-				tail(i + 1);
-			}
 		}
-		
-		tail(0);
 	}
 	
 	// The whole part without any teeth or the hole cut out.
@@ -94,73 +110,73 @@ module fillygon(angles) {
 		// Offset added on both sides of the teeth.
 		hgap = gap / 2 * (invert ? 1 : -1);
 		
-		module tail(i) {
-			module teeth() {
-				for (j = [0:num_teeth - 1]) {
-					offset = invert ? 1 : 0;
-					xmin = pos(2 * j + offset) - hgap;
-					xmax = pos(2 * j + offset + 1) + hgap;
-					ymax = thickness / 2 + gap;
-					
-					sector_3d(xmin = xmin, xmax = xmax, ymax = ymax);
-					
-					// The part that needs to be removed to support acute angles.
-					if (invert) {
-						rotate([90 - min_angle, 0, 0]) {
-							sector_3d(xmin = xmin, xmax = xmax, ymax = ymax, zmax = 0);
-						}
-					}
-				}
-			}
-			
-			module dedent_balls() {
-				module ball(pos) {
-					dir = 1 - pos % 2 * 2;
-					
-					// Offset of the sphere's center relative to the tooth surface it is placed on.
-					ball_offset = dedent_sphere_dimeter / 2 - dedent_sphere_offset + hgap;
-					
-					translate([pos(pos) + ball_offset * dir, 0, 0]) {
-						intersection() {
-							sphere(d = dedent_sphere_dimeter);
-							
-							scale([dir, 1, 1]) {
-								sector_3d(xmax = 0);
-							}
-						}
-					}
-				}
+		module teeth() {
+			for (j = [0:num_teeth - 1]) {
+				offset = invert ? 1 : 0;
+				xmin = pos(2 * j + offset) - hgap;
+				xmax = pos(2 * j + offset + 1) + hgap;
+				ymax = thickness / 2 + gap;
 				
-				ball(1);
-				ball(4);
+				sector_3d(xmin = xmin, xmax = xmax, ymax = ymax);
+				
+				// The part that needs to be removed to support acute angles.
+				if (invert) {
+					rotate([90 - min_angle, 0, 0]) {
+						sector_3d(xmin = xmin, xmax = xmax, ymax = ymax, zmax = 0);
+					}
+				}
 			}
-			
-			module dedent_holes() {
+		}
+		
+		module dedent_balls() {
+			module ball(pos) {
+				dir = 1 - pos % 2 * 2;
+				
 				// Offset of the sphere's center relative to the tooth surface it is placed on.
-				module hole(pos) {
-					dir = 1 - pos % 2 * 2;
-					
-					translate([pos(pos), 0, 0]) {
-						rotate([0, dir * 90, 0]) {
-							translate([0, 0, hgap]) {
-								cylinder(h = dedent_sphere_offset, d1 = dedent_hole_diameter, d2 = dedent_hole_diameter - 2 * dedent_sphere_offset);
-							}
+				ball_offset = dedent_sphere_dimeter / 2 - dedent_sphere_offset + hgap;
+				
+				translate([pos(pos) + ball_offset * dir, 0, 0]) {
+					intersection() {
+						sphere(d = dedent_sphere_dimeter);
+						
+						scale([dir, 1, 1]) {
+							sector_3d(xmax = 0);
 						}
 					}
 				}
-				
-				hole(2);
-				hole(5);
 			}
 			
-			// The part to cut away inside the corner clearance so that two parts can join and rotate..
-			module clearance() {
-				teeth_start = corner_clearance + hgap;
+			ball(1);
+			ball(4);
+		}
+		
+		module dedent_holes() {
+			// Offset of the sphere's center relative to the tooth surface it is placed on.
+			module hole(pos) {
+				dir = 1 - pos % 2 * 2;
 				
-				sector_3d(ymax = hgap, xmin = 0, xmax = teeth_start);
-				sector_3d(ymax = hgap, xmin = side_length - teeth_start, xmax = side_length);
+				translate([pos(pos), 0, 0]) {
+					rotate([0, dir * 90, 0]) {
+						translate([0, 0, hgap]) {
+							cylinder(h = dedent_sphere_offset, d1 = dedent_hole_diameter, d2 = dedent_hole_diameter - 2 * dedent_sphere_offset);
+						}
+					}
+				}
 			}
 			
+			hole(2);
+			hole(5);
+		}
+		
+		// The part to cut away inside the corner clearance so that two parts can join and rotate..
+		module clearance() {
+			teeth_start = corner_clearance + hgap;
+			
+			sector_3d(ymax = hgap, xmin = 0, xmax = teeth_start);
+			sector_3d(ymax = hgap, xmin = side_length - teeth_start, xmax = side_length);
+		}
+		
+		trace() {
 			// Deciding which elements to add and subtract involves some magic. Here we decide which elements need to be part of the positive and negative regions which define the teeth.
 			if (invert) {
 				difference() {
@@ -179,13 +195,7 @@ module fillygon(angles) {
 				teeth();
 				dedent_balls();
 			}
-			
-			more(i) {
-				tail(i + 1);
-			}
 		}
-		
-		tail(0);
 	}
 	
 	intersection() {
