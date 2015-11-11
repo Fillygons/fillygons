@@ -74,14 +74,16 @@ module fillygon(angles) {
 	}
 	
 	// The infintely extruded region of the polygon with an optional offset.
-	module polygon(offset = 0) {
+	module edge(offset = 0) {
 		sector_3d(ymin = offset);
 	}
 	
-	// The cylinders which form part of the teeth.
-	module teeth_cylinders() {
+	// The cylinder which form part of the teeth.
+	module teeth_cylinder() {
 		rotate([0, 90, 0]) {
-			cylinder(h = side_length, r = thickness / 2);
+			extrude() {
+				circle(d = thickness);
+			}
 		}
 	}
 	
@@ -127,61 +129,94 @@ module fillygon(angles) {
 		hole(5);
 	}
 	
-	module clearance() {
-		// The part to cut away inside the corner clearance so that two parts can join and rotate..
-		module clearance_sections() {
-			teeth_start = corner_clearance + gap / 2;
-			
-			sector_3d(ymax = gap / 2, xmin = 0, xmax = teeth_start);
-			sector_3d(ymax = gap / 2, xmin = side_length - teeth_start, xmax = side_length);
-		}
-		
-		clearance_sections();
+	// The part to cut away inside the corner clearance so that two parts can join and rotate.
+	module clearance_chamfer() {
+		sector_3d(ymax = gap / 2);
 		
 		// To allow rotating two joined parts.
 		rotate([90 - min_angle / 2, 0, 0]) {
-			clearance_sections();
+			sector_3d(ymax = gap / 2);
+		}
+	}
+	
+	module clearance_region() {
+		sector_3d(xmin = 0, xmax = corner_clearance + gap / 2);
+		sector_3d(xmin = side_length - corner_clearance + gap / 2, xmax = side_length);
+	}
+	
+	module edge_region() {
+		sector_3d(xmin = 0, xmax = side_length);
+	}
+	
+	// The part that needs to be removed to support acute angles.
+	module teeth_chamfer() {
+		sector_3d(ymax = thickness / 2 + gap);
+		
+		rotate([90 - min_angle, 0, 0]) {
+			sector_3d(ymax = thickness / 2 + gap);
 		}
 	}
 	
 	// The volume which is occupied by the teeth.
 	// If invert is set to false, the region for the teeth and their dedent spheres is produced, if set to true, the region between the teeth and the dedent holes is produced.
-	module teeth_gaps() {
+	module teeth() {
 		for (j = [0:num_teeth - 1]) {
-			xmin = pos(2 * j + 1) - gap / 2;
-			xmax = pos(2 * j + 2) + gap / 2;
-			ymax = thickness / 2 + gap;
+			xmin = pos(2 * j) + gap / 2;
+			xmax = pos(2 * j + 1) - gap / 2;
 			
-			sector_3d(xmin = xmin, xmax = xmax, ymax = ymax);
-			
-			// The part that needs to be removed to support acute angles.
-			rotate([90 - min_angle, 0, 0]) {
-				sector_3d(xmin = xmin, xmax = xmax, ymax = ymax);
-			}
+			sector_3d(xmin = xmin, xmax = xmax);
 		}
 	}
 	
-	intersection() {
-		sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-		
+	difference() {
 		union() {
-			difference() {
-				union() {
-					trace(true) sector_3d(ymin = 0);
-					trace() teeth_cylinders();
-				}
-				
-				trace() clearance();
-				trace() dedent_holes();
-				trace() teeth_gaps();
-				trace(true) sector_3d(ymin = loop_width);
+			trace(true) intersection() {
+				edge(gap / 2);
+				sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
 			}
 			
-			intersection() {
-				trace() teeth_cylinders();
-				trace() dedent_balls();
+			trace() difference() {
+				intersection() {
+					union() {
+						intersection() {
+							edge();
+							sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
+						}
+						
+						teeth_cylinder();
+					}
+					
+					teeth();
+				}
+				
+				edge(gap / 2);
+			}
+			
+			trace() intersection() {
+				dedent_balls();
+				teeth_cylinder();
 			}
 		}
+		
+		trace() difference() {
+			intersection() {
+				teeth_chamfer();
+				edge_region();
+			}
+			
+			clearance_region();
+			teeth();
+			dedent_balls();
+		}
+		
+		trace() intersection() {
+			clearance_chamfer();
+			clearance_region();
+		}
+		
+		trace() dedent_holes();
+		
+		trace(true) edge(loop_width);
 	}
 }
 
