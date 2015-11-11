@@ -99,14 +99,37 @@ module fillygon(angles) {
 		teeth_cylinders();
 	}
 	
+	used_lenght = side_length - 2 * corner_clearance;
+	tooth_width = used_lenght / (num_teeth * 2);
+	
+	function pos(pos) = corner_clearance + pos * tooth_width;
+	function dir(pos) = 1 - pos % 2 * 2;
+	
+	module dedent_balls() {
+		module ball(pos) {
+			// Offset of the sphere's center relative to the tooth surface it is placed on.
+			ball_offset = dedent_sphere_dimeter / 2 - dedent_sphere_offset + gap / 2;
+			
+			translate([pos(pos) + ball_offset * dir(pos), 0, 0]) {
+				intersection() {
+					sphere(d = dedent_sphere_dimeter);
+					
+					scale([dir(pos), 1, 1]) {
+						sector_3d(xmax = 0);
+					}
+				}
+			}
+		}
+		
+		trace() {
+			ball(1);
+			ball(4);
+		}
+	}
+	
 	// The volume which is occupied by the teeth.
 	// If invert is set to false, the region for the teeth and their dedent spheres is produced, if set to true, the region between the teeth and the dedent holes is produced.
 	module teeth_region(invert = false) {
-		used_lenght = side_length - 2 * corner_clearance;
-		tooth_width = used_lenght / (num_teeth * 2);
-		
-		function pos(pos) = corner_clearance + pos * tooth_width;
-		
 		// Offset added on both sides of the teeth.
 		hgap = gap / 2 * (invert ? 1 : -1);
 		
@@ -126,28 +149,6 @@ module fillygon(angles) {
 					}
 				}
 			}
-		}
-		
-		module dedent_balls() {
-			module ball(pos) {
-				dir = 1 - pos % 2 * 2;
-				
-				// Offset of the sphere's center relative to the tooth surface it is placed on.
-				ball_offset = dedent_sphere_dimeter / 2 - dedent_sphere_offset + hgap;
-				
-				translate([pos(pos) + ball_offset * dir, 0, 0]) {
-					intersection() {
-						sphere(d = dedent_sphere_dimeter);
-						
-						scale([dir, 1, 1]) {
-							sector_3d(xmax = 0);
-						}
-					}
-				}
-			}
-			
-			ball(1);
-			ball(4);
 		}
 		
 		module dedent_holes() {
@@ -181,7 +182,6 @@ module fillygon(angles) {
 			if (invert) {
 				difference() {
 					teeth();
-					dedent_balls();
 				}
 				
 				dedent_holes();
@@ -193,7 +193,6 @@ module fillygon(angles) {
 				}
 			} else {
 				teeth();
-				dedent_balls();
 			}
 		}
 	}
@@ -206,9 +205,14 @@ module fillygon(angles) {
 			union() {
 				polygon();
 				teeth_region();
+				dedent_balls();
 			}
 			
-			teeth_region(true);
+			difference() {
+				teeth_region(true);
+				dedent_balls();
+			}
+			
 			polygon(loop_width);
 		}
 	}
