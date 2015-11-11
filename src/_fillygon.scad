@@ -150,8 +150,8 @@ module fillygon(angles) {
 		module clearance_sections() {
 			teeth_start = corner_clearance + gap / 2;
 			
-			sector_3d(ymax = hgap, xmin = 0, xmax = teeth_start);
-			sector_3d(ymax = hgap, xmin = side_length - teeth_start, xmax = side_length);
+			sector_3d(ymax = gap / 2, xmin = 0, xmax = teeth_start);
+			sector_3d(ymax = gap / 2, xmin = side_length - teeth_start, xmax = side_length);
 		}
 		
 		trace() {
@@ -166,52 +166,33 @@ module fillygon(angles) {
 	
 	// The volume which is occupied by the teeth.
 	// If invert is set to false, the region for the teeth and their dedent spheres is produced, if set to true, the region between the teeth and the dedent holes is produced.
-	module teeth_region(invert = false) {
-		// Offset added on both sides of the teeth.
-		hgap = gap / 2 * (invert ? 1 : -1);
-		
+	module teeth_gaps() {
 		trace() {
 			for (j = [0:num_teeth - 1]) {
-				offset = invert ? 1 : 0;
-				xmin = pos(2 * j + offset) - hgap;
-				xmax = pos(2 * j + offset + 1) + hgap;
+				xmin = pos(2 * j + 1) - gap / 2;
+				xmax = pos(2 * j + 2) + gap / 2;
 				ymax = thickness / 2 + gap;
 				
 				sector_3d(xmin = xmin, xmax = xmax, ymax = ymax);
 				
 				// The part that needs to be removed to support acute angles.
-				if (invert) {
-					rotate([90 - min_angle, 0, 0]) {
-						sector_3d(xmin = xmin, xmax = xmax, ymax = ymax, zmax = 0);
-					}
+				rotate([90 - min_angle, 0, 0]) {
+					sector_3d(xmin = xmin, xmax = xmax, ymax = ymax);
 				}
 			}
 		}
 	}
 	
+	difference() {
+		full_part();
+		clearance();
+		dedent_holes();
+		teeth_gaps();
+	}
+	
 	intersection() {
 		full_part();
-		
-		// Add the teeht before removing the gaps between the teeth to prevent teeth from bleeding into the gaps on acute angles.
-		difference() {
-			union() {
-				polygon();
-				teeth_region();
-				dedent_balls();
-			}
-			
-			difference() {
-				union() {
-					teeth_region(true);
-					dedent_holes();
-					clearance();
-				}
-				
-				dedent_balls();
-			}
-			
-			polygon(loop_width);
-		}
+		dedent_balls();
 	}
 }
 
