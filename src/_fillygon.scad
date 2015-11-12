@@ -102,7 +102,8 @@ module fillygon(angles) {
 						sphere(d = dedent_sphere_dimeter);
 					}
 					
-					sector_3d(xmax = 0);
+					// Needs to be slightly past 0.1 because otherwise the final shape will have infinitely thin gaps.
+					sector_3d(xmax = 0.1);
 				}
 			}
 		}
