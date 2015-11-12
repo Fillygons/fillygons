@@ -158,43 +158,31 @@ module fillygon(angles) {
 	}
 	
 	// The volume which is occupied by the teeth.
-	// If invert is set to false, the region for the teeth and their dedent spheres is produced, if set to true, the region between the teeth and the dedent holes is produced.
 	module teeth() {
-		for (j = [0:num_teeth - 1]) {
-			xmin = pos(2 * j) + gap / 2;
-			xmax = pos(2 * j + 1) - gap / 2;
+		difference() {
+			for (j = [0:num_teeth - 1]) {
+				xmin = pos(2 * j) + gap / 2;
+				xmax = pos(2 * j + 1) - gap / 2;
+				
+				sector_3d(xmin = xmin, xmax = xmax);
+			}
 			
-			sector_3d(xmin = xmin, xmax = xmax);
+			dedent_holes();
 		}
+		
+		dedent_balls();
 	}
 	
 	difference() {
 		union() {
-			trace(true) intersection() {
-				edge(gap / 2);
+			intersection() {
+				trace(true) edge();
 				sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
 			}
 			
-			trace() difference() {
-				intersection() {
-					union() {
-						intersection() {
-							edge();
-							sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-						}
-						
-						teeth_cylinder();
-					}
-					
-					teeth();
-				}
-				
-				edge(gap / 2);
-			}
-			
 			trace() intersection() {
-				dedent_balls();
 				teeth_cylinder();
+				teeth();
 			}
 		}
 		
@@ -206,15 +194,12 @@ module fillygon(angles) {
 			
 			clearance_region();
 			teeth();
-			dedent_balls();
 		}
 		
 		trace() intersection() {
 			clearance_chamfer();
 			clearance_region();
 		}
-		
-		trace() dedent_holes();
 		
 		trace(true) edge(loop_width);
 	}
