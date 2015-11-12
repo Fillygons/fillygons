@@ -18,6 +18,11 @@ function generate_file() {
 	fi
 }
 
-# Call generate_file for each file to be generated.
-# E.g.:
-# generate_file src/test.scad echo "cube();"
+n-gon() {
+	echo 'use <_fillygon.scad>'
+	echo "render() rotate([180, 0, 0]) regular_fillygon($1);"
+}
+
+for i in {3..8}; do
+	generate_file "src/$i-gon.scad" n-gon "$i"
+done
