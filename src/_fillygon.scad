@@ -91,32 +91,6 @@ module fillygon(angles) {
 		}
 	}
 	
-	module dedent_ball(pos) {
-		// Offset of the sphere's center relative to the tooth surface it is placed on.
-		ball_offset = dedent_sphere_dimeter / 2 - dedent_sphere_offset;
-		
-		translate([pos(pos), 0, 0]) {
-			scale([dir(pos), 1, 1]) {
-				intersection() {
-					translate([ball_offset, 0, 0]) {
-						sphere(d = dedent_sphere_dimeter);
-					}
-					
-					// Needs to be slightly past 0.1 because otherwise the final shape will have infinitely thin gaps.
-					sector_3d(xmax = 0.1);
-				}
-			}
-		}
-	}
-		
-	module dedent_hole(pos) {
-		translate([pos(pos), 0, 0]) {
-			rotate([0, dir(pos) * 90, 0]) {
-				cylinder(h = dedent_sphere_offset, d1 = dedent_hole_diameter, d2 = dedent_hole_diameter - 2 * dedent_sphere_offset);
-			}
-		}
-	}
-	
 	// The part to cut away inside the corner clearance so that two parts can join and rotate.
 	module clearance_chamfer() {
 		sector_3d(ymax = gap / 2);
@@ -145,8 +119,36 @@ module fillygon(angles) {
 		}
 	}
 	
-	// The volume which is occupied by the teeth.
-	module teeth() {
+	// The volume of a dedent ball placed on a tooth at the specified position.
+	module dedent_ball(pos) {
+		// Offset of the sphere's center relative to the tooth surface it is placed on.
+		ball_offset = dedent_sphere_dimeter / 2 - dedent_sphere_offset;
+		
+		translate([pos(pos), 0, 0]) {
+			scale([dir(pos), 1, 1]) {
+				intersection() {
+					translate([ball_offset, 0, 0]) {
+						sphere(d = dedent_sphere_dimeter);
+					}
+					
+					// The ball needs to extend slightly past the origin because otherwise the final shape will have infinitely thin gaps.
+					sector_3d(xmax = 0.1);
+				}
+			}
+		}
+	}
+	
+	// The volume to remove from the teeth to create the hole for a ball dedent on a tooth at the specified position.
+	module dedent_hole(pos) {
+		translate([pos(pos), 0, 0]) {
+			rotate([0, dir(pos) * 90, 0]) {
+				cylinder(h = dedent_sphere_offset, d1 = dedent_hole_diameter, d2 = dedent_hole_diameter - 2 * dedent_sphere_offset);
+			}
+		}
+	}
+	
+	// The volume which is occupied by the teeth. This includes the dedents and extends to infinity.
+	module teeth_region() {
 		difference() {
 			for (j = [0:num_teeth - 1]) {
 				sector_3d(xmin = pos(2 * j), xmax = pos(2 * j + 1));
