@@ -23,6 +23,6 @@ n-gon() {
 	echo "render() rotate([180, 0, 0]) regular_fillygon($1);"
 }
 
-for i in {3..8}; do
+for i in 3 4 5 6 8 10; do
 	generate_file "src/$i-gon.scad" n-gon "$i"
 done
