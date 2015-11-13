@@ -13,7 +13,7 @@ side_length = 30;
 num_teeth = 3;
 
 // Minimum dihedral alnge between this face and any other face.
-min_angle = 60;
+min_angle = 55;
 
 // Length on each end of an edge ehere no teeht are placed. This value works for angles as low as τ / 6.
 corner_clearance = sqrt(3) * thickness / 2;
