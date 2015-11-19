@@ -164,30 +164,51 @@ module fillygon(angles) {
 	
 	difference() {
 		union() {
-			intersection() {
-				trace(true) edge();
+			difference() {
 				sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
+				trace() teeth_chamfer();
+			}
+			
+			difference() {
+				sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
+				trace() teeth_chamfer();
+			}
+			
+			difference() {
+				intersection() {
+					sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
+					trace() intersection() {
+						clearance_region();
+						teeth_chamfer();
+					}
+						
+				}
+				
+				trace() clearance_chamfer();
 			}
 			
 			trace() intersection() {
-				teeth_cylinder();
-				teeth();
+				union() {
+					teeth_cylinder();
+					intersection() {
+						sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
+						teeth_chamfer();
+						edge();
+					}
+				}
+				
+				teeth_region();
 			}
-		}
-		
-		trace() difference() {
-			intersection() {
-				teeth_chamfer();
-				edge_region();
-			}
-			
-			clearance_region();
-			teeth();
 		}
 		
 		trace() intersection() {
-			clearance_chamfer();
-			clearance_region();
+			difference() {
+				teeth_chamfer();
+				teeth_region();
+				clearance_region();
+			}
+			
+			edge_region();
 		}
 		
 		trace(true) edge(loop_width);
