@@ -4,7 +4,7 @@ include <_util.scad>
 thickness = 3;
 
 // Width of the rim along the edges of the piece connecting the teeth.
-loop_width = 6;
+loop_width = 2 * thickness;
 
 // Length of a pieces sides, measured along the ideal polygon's edges.
 side_length = 30;
@@ -15,17 +15,24 @@ num_teeth = 3;
 // Minimum dihedral alnge between this face and any other face.
 min_angle = 40;
 
+// Length on each end of an edge ehere no teeht are placed..
+corner_clearance = 7;
+
 // Overhang of the ball dedents relative to the teeth surface.
-dedent_sphere_offset = 0.6;
+dedent_sphere_offset = 0.5;
 
 // Diameter of the ball dedent spheres.
-dedent_sphere_dimeter = 3;
+dedent_sphere_dimeter = thickness;
+
+dedent_piece_width = 1.4;
+
+dedent_piece_gap = 0.6;
 
 // Diameter of the holes which accept the ball dedent spheres.
-dedent_hole_diameter = 2.2;
+dedent_hole_diameter = 2.0;
 
 // Gap between touching surfaces.
-gap = 0.3;
+gap = 0.4;
 
 $fn = 32;
 
@@ -68,17 +75,22 @@ module fillygon(angles) {
 		}
 	}
 	
-	offset = 9;
-	pos_list = [
-		2.5,
-		offset - gap / 2,
-		side_length / 2 + gap / 2,
-		side_length - offset - 1.4 - 1 - gap / 2,
-		side_length - offset - 1.4 - gap / 2,
-		side_length - offset - gap / 2];
+	used_lenght = side_length - 2 * corner_clearance;
+	tooth_width = used_lenght / (num_teeth * 2);
+	
+	w = (side_length / 2 - corner_clearance - dedent_piece_width * 2 - dedent_piece_gap - gap) / 2;
+	
+	positions = [
+		corner_clearance,
+		corner_clearance + w,
+		side_length / 2 - w,
+		side_length / 2,
+		side_length / 2 + w,
+		side_length - corner_clearance - w,
+		side_length - corner_clearance];
 	
 	function dir(pos) = 1 - pos % 2 * 2;
-	function pos(pos) = pos_list[pos];
+	function pos(pos) = positions[pos] + dir(pos) * gap / 2;
 	
 	// The infintely extruded region of the polygon with an optional offset.
 	module edge(offset = 0) {
@@ -96,12 +108,7 @@ module fillygon(angles) {
 	
 	// The part to cut away inside the corner clearance so that two parts can join and rotate.
 	module clearance_chamfer() {
-		sector_3d(ymax = gap / 2);
-		
-		// To allow rotating two joined parts.
-		rotate([90 - min_angle / 2, 0, 0]) {
-			sector_3d(ymax = gap / 2);
-		}
+		teeth_chamfer();
 	}
 	
 	module clearance_region() {
@@ -115,9 +122,11 @@ module fillygon(angles) {
 	
 	// The part that needs to be removed to support acute angles.
 	module teeth_chamfer() {
-		sector_3d(ymax = thickness / 2 + gap);
-		
 		rotate([90 - min_angle, 0, 0]) {
+			sector_3d(ymax = thickness / 2 + gap);
+		}
+		
+		rotate([min_angle - 90, 0, 0]) {
 			sector_3d(ymax = thickness / 2 + gap);
 		}
 	}
@@ -141,6 +150,14 @@ module fillygon(angles) {
 		}
 	}
 	
+	module dedent_ball_cutting(pos) {
+		translate([pos(pos), 0, 0]) {
+			scale([dir(pos), 1, 1]) {
+				sector_3d(xmin = dedent_piece_width, xmax = dedent_piece_width + dedent_piece_gap);
+			}
+		}
+	}
+	
 	// The volume to remove from the teeth to create the hole for a ball dedent on a tooth at the specified position.
 	module dedent_hole(pos) {
 		translate([pos(pos), 0, 0]) {
@@ -152,73 +169,74 @@ module fillygon(angles) {
 	
 	// The volume which is occupied by the teeth. This includes the dedents and extends to infinity.
 	module teeth_region() {
+		balls = [4, 5];
+		
 		difference() {
 			for (j = [0:num_teeth - 1]) {
 				sector_3d(xmin = pos(2 * j), xmax = pos(2 * j + 1));
 			}
 			
-			dedent_hole(1);
+			for (i = balls) {
+				dedent_ball_cutting(i);
+				dedent_hole(2 * num_teeth - i);
+			}
 		}
 		
-		dedent_ball(5);
-	}
-	
-	module mirror() {
-		union() {
-			children();
-			scale([1, 1, -1]) children();
+		for (i = balls) {
+			dedent_ball(i);
 		}
 	}
 	
-	intersection() {
-		difference() {
-			union() {
-				difference() {
+	difference() {
+		union() {
+			difference() {
+				sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
+				trace() teeth_chamfer();
+			}
+			
+			difference() {
+				sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
+				trace() teeth_chamfer();
+			}
+			
+			difference() {
+				intersection() {
 					sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-					trace() mirror() teeth_chamfer();
+					trace() intersection() {
+						clearance_region();
+						teeth_chamfer();
+					}
+						
 				}
 				
-				difference() {
-					intersection() {
-						sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-						trace() intersection() {
-							clearance_region();
-							mirror() teeth_chamfer();
-						}
-							
-					}
-					
-					trace() mirror() teeth_chamfer();
-				}
-				
-				trace() intersection() {
-					union() {
-						teeth_cylinder();
-						intersection() {
-							sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-							mirror() teeth_chamfer();
-							edge();
-						}
-					}
-					
-					teeth_region();
-				}
+				trace() clearance_chamfer();
 			}
 			
 			trace() intersection() {
-				difference() {
-					mirror() teeth_chamfer();
-					teeth_region();
-					clearance_region();
+				union() {
+					teeth_cylinder();
+					intersection() {
+						sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
+						teeth_chamfer();
+						edge();
+					}
 				}
 				
-				edge_region();
+				teeth_region();
 			}
-			
-			trace(true) edge(loop_width);
 		}
 		
-		cube(1000, center = true);
+		trace() intersection() {
+			difference() {
+				teeth_chamfer();
+				teeth_region();
+				clearance_region();
+			}
+			
+			edge_region();
+		}
+		
+		trace(true) edge(loop_width);
 	}
 }
 
