@@ -1,13 +1,13 @@
 include <_util.scad>
 
 // Thickness of the pieces.
-thickness = 3;
+thickness = 4;
 
 // Width of the rim along the edges of the piece connecting the teeth.
 loop_width = 2 * thickness;
 
 // Length of a pieces sides, measured along the ideal polygon's edges.
-side_length = 30;
+side_length = 40;
 
 // Number of teeth along each side.
 num_teeth = 3;
@@ -16,7 +16,7 @@ num_teeth = 3;
 min_angle = 40;
 
 // Length on each end of an edge ehere no teeht are placed..
-corner_clearance = 7;
+corner_clearance = 8;
 
 // Overhang of the ball dedents relative to the teeth surface.
 dedent_sphere_offset = 0.5;
@@ -26,7 +26,7 @@ dedent_sphere_dimeter = thickness;
 
 dedent_piece_width = 1.4;
 
-dedent_piece_gap = 0.6;
+dedent_piece_gap = 1;
 
 // Diameter of the holes which accept the ball dedent spheres.
 dedent_hole_diameter = 2.0;
