@@ -186,57 +186,61 @@ module fillygon(angles) {
 			dedent_ball(i);
 		}
 	}
-	
-	difference() {
-		union() {
-			difference() {
-				sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-				trace() teeth_chamfer();
-			}
-			
-			difference() {
-				sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-				trace() teeth_chamfer();
-			}
-			
-			difference() {
-				intersection() {
+
+	intersection() {
+		difference() {
+			union() {
+				difference() {
 					sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-					trace() intersection() {
-						clearance_region();
-						teeth_chamfer();
-					}
-						
+					trace() teeth_chamfer();
 				}
 				
-				trace() clearance_chamfer();
+				difference() {
+					sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
+					trace() teeth_chamfer();
+				}
+				
+				difference() {
+					intersection() {
+						sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
+						trace() intersection() {
+							clearance_region();
+							teeth_chamfer();
+						}
+							
+					}
+					
+					trace() clearance_chamfer();
+				}
+				
+				trace() intersection() {
+					union() {
+						teeth_cylinder();
+						intersection() {
+							sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
+							teeth_chamfer();
+							edge();
+						}
+					}
+					
+					teeth_region();
+				}
 			}
 			
 			trace() intersection() {
-				union() {
-					teeth_cylinder();
-					intersection() {
-						sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-						teeth_chamfer();
-						edge();
-					}
+				difference() {
+					teeth_chamfer();
+					teeth_region();
+					clearance_region();
 				}
 				
-				teeth_region();
-			}
-		}
-		
-		trace() intersection() {
-			difference() {
-				teeth_chamfer();
-				teeth_region();
-				clearance_region();
+				edge_region();
 			}
 			
-			edge_region();
+			trace(true) edge(loop_width);
 		}
 		
-		trace(true) edge(loop_width);
+		cube(1000, center = true);
 	}
 }
 
