@@ -1,4 +1,4 @@
-use <_fillygon.scad>
+use <../_fillygon.scad>
 
 render() intersection() {
 	translate([0, -15, -15]) cube(30);

@@ -1,4 +1,4 @@
-include <_fillygon.scad>
+include <../_fillygon.scad>
 
 render() {
 	translate([0, side_length, 0]) {

@@ -1,4 +1,4 @@
-include <_fillygon.scad>
+include <../_fillygon.scad>
 
 render() {
 	rotate([0, 50 - 180, 0]) {
