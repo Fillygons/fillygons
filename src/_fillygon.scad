@@ -9,9 +9,6 @@ loop_width = 2 * thickness;
 // Length of a pieces sides, measured along the ideal polygon's edges.
 side_length = 40;
 
-// Number of teeth along each side.
-num_teeth = 3;
-
 // Minimum dihedral alnge between this face and any other face.
 min_angle = 40;
 
@@ -75,22 +72,10 @@ module fillygon(angles) {
 		}
 	}
 	
-	used_lenght = side_length - 2 * corner_clearance;
-	tooth_width = used_lenght / (num_teeth * 2);
-	
-	w = (side_length / 2 - corner_clearance - dedent_piece_width * 2 - dedent_piece_gap - gap) / 2;
-	
-	positions = [
-		corner_clearance,
-		corner_clearance + w,
-		side_length / 2 - w,
-		side_length / 2,
-		side_length / 2 + w,
-		side_length - corner_clearance - w,
-		side_length - corner_clearance];
+	positions = [8.0, 11.6, 16.2, 19.8, 24.2, 25.6, 26.6, 28, 32];
 	
 	function dir(pos) = 1 - pos % 2 * 2;
-	function pos(pos) = positions[pos] + dir(pos) * gap / 2;
+	function pos(pos) = positions[pos];
 	
 	// The infintely extruded region of the polygon with an optional offset.
 	module edge(offset = 0) {
@@ -113,7 +98,7 @@ module fillygon(angles) {
 	
 	module clearance_region() {
 		sector_3d(xmin = 0, xmax = pos(0));
-		sector_3d(xmin = pos(num_teeth * 2), xmax = side_length);
+		sector_3d(xmin = pos(len(positions) - 1), xmax = side_length);
 	}
 	
 	module edge_region() {
@@ -150,14 +135,6 @@ module fillygon(angles) {
 		}
 	}
 	
-	module dedent_ball_cutting(pos) {
-		translate([pos(pos), 0, 0]) {
-			scale([dir(pos), 1, 1]) {
-				sector_3d(xmin = dedent_piece_width, xmax = dedent_piece_width + dedent_piece_gap);
-			}
-		}
-	}
-	
 	// The volume to remove from the teeth to create the hole for a ball dedent on a tooth at the specified position.
 	module dedent_hole(pos) {
 		translate([pos(pos), 0, 0]) {
@@ -169,22 +146,17 @@ module fillygon(angles) {
 	
 	// The volume which is occupied by the teeth. This includes the dedents and extends to infinity.
 	module teeth_region() {
-		balls = [4, 5];
-		
 		difference() {
-			for (j = [0:num_teeth - 1]) {
+			for (j = [0:(len(positions) - 1) / 2]) {
 				sector_3d(xmin = pos(2 * j), xmax = pos(2 * j + 1));
 			}
 			
-			for (i = balls) {
-				dedent_ball_cutting(i);
-				dedent_hole(2 * num_teeth - i);
-			}
+			dedent_hole(1);
+			dedent_hole(2);
 		}
 		
-		for (i = balls) {
-			dedent_ball(i);
-		}
+		dedent_ball(4);
+		dedent_ball(7);
 	}
 
 	intersection() {
