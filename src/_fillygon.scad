@@ -21,12 +21,20 @@ dedent_sphere_offset = 0.5;
 // Diameter of the ball dedent spheres.
 dedent_sphere_dimeter = thickness;
 
-dedent_piece_width = 1.4;
-
-dedent_piece_gap = 1;
-
 // Diameter of the holes which accept the ball dedent spheres.
 dedent_hole_diameter = 2.0;
+
+// With of the small, flexiple teeth.
+small_tooth_width = 1.4;
+
+// Gap between the small, flexiple teeth.
+small_tooth_gap = 1;
+
+// Depth to which to cut around the small, flexiple teeth.
+small_teeth_cutting_depth = 5.5;
+
+// With to cut around the small, flexiple teeth.
+small_teeth_cutting_width = 0.6;
 
 // Gap between touching surfaces.
 gap = 0.4;
@@ -72,14 +80,35 @@ module fillygon(angles) {
 		}
 	}
 	
-	positions = [8.0, 11.6, 16.2, 19.8, 24.2, 25.6, 26.6, 28, 32];
+	used_width = side_length - 2 * corner_clearance;
+	small_teeth_width = 2 * small_tooth_width + small_tooth_gap;
+	
+	positions = [
+		gap / 2,
+		used_width / 4 - small_teeth_width / 2 - gap,
+		used_width / 4 + small_teeth_width / 2 + gap,
+		used_width / 2 - gap / 2,
+		used_width * 3 / 4 - small_teeth_width / 2,
+		used_width * 3 / 4 - small_tooth_gap / 2,
+		used_width * 3 / 4 + small_tooth_gap / 2,
+		used_width * 3 / 4 + small_teeth_width / 2,
+		used_width + gap / 2];
 	
 	function dir(pos) = 1 - pos % 2 * 2;
-	function pos(pos) = positions[pos];
+	function pos(pos) = corner_clearance + positions[pos];
 	
 	// The infintely extruded region of the polygon with an optional offset.
 	module edge(offset = 0) {
 		sector_3d(ymin = offset);
+	}
+	
+	// Translate and possibly mirror an object to position it at the specified position.
+	module at_position(pos) {
+		translate([pos(pos), 0, 0]) {
+			scale([dir(pos), 1, 1]) {
+				children();
+			}
+		}
 	}
 	
 	// The cylinder which form part of the teeth.
@@ -89,11 +118,6 @@ module fillygon(angles) {
 				circle(d = thickness);
 			}
 		}
-	}
-	
-	// The part to cut away inside the corner clearance so that two parts can join and rotate.
-	module clearance_chamfer() {
-		teeth_chamfer();
 	}
 	
 	module clearance_region() {
@@ -121,26 +145,31 @@ module fillygon(angles) {
 		// Offset of the sphere's center relative to the tooth surface it is placed on.
 		ball_offset = dedent_sphere_dimeter / 2 - dedent_sphere_offset;
 		
-		translate([pos(pos), 0, 0]) {
-			scale([dir(pos), 1, 1]) {
-				intersection() {
-					translate([ball_offset, 0, 0]) {
-						sphere(d = dedent_sphere_dimeter);
-					}
-					
-					// The ball needs to extend slightly past the origin because otherwise the final shape will have infinitely thin gaps.
-					sector_3d(xmax = 0.1);
+		at_position(pos) {
+			intersection() {
+				translate([ball_offset, 0, 0]) {
+					sphere(d = dedent_sphere_dimeter);
 				}
+				
+				// The ball needs to extend slightly past the origin because otherwise the final shape will have infinitely thin gaps.
+				sector_3d(xmax = 0.1);
 			}
 		}
 	}
 	
 	// The volume to remove from the teeth to create the hole for a ball dedent on a tooth at the specified position.
 	module dedent_hole(pos) {
-		translate([pos(pos), 0, 0]) {
-			rotate([0, dir(pos) * 90, 0]) {
+		at_position(pos) {
+			rotate([0, 90, 0]) {
 				cylinder(h = dedent_sphere_offset, d1 = dedent_hole_diameter, d2 = dedent_hole_diameter - 2 * dedent_sphere_offset);
 			}
+		}
+	}
+	
+	// A region to be cut out between teeth.
+	module dedent_cutting(pos) {
+		at_position(pos) {
+			sector_3d(xmin = -small_teeth_cutting_width, xmax = 0, ymax = small_teeth_cutting_depth);
 		}
 	}
 	
@@ -158,31 +187,25 @@ module fillygon(angles) {
 		dedent_ball(4);
 		dedent_ball(7);
 	}
-
+	
+	module dedent_cutting_region() {
+		dedent_cutting(4);
+		dedent_cutting(5);
+		dedent_cutting(6);
+		dedent_cutting(7);
+	}
+	
 	intersection() {
 		difference() {
 			union() {
-				difference() {
+				intersection() {
 					sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-					trace() teeth_chamfer();
-				}
-				
-				difference() {
-					sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-					trace() teeth_chamfer();
-				}
-				
-				difference() {
-					intersection() {
-						sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-						trace() intersection() {
-							clearance_region();
-							teeth_chamfer();
-						}
-							
-					}
 					
-					trace() clearance_chamfer();
+					trace(true) difference() {
+						edge();
+						teeth_chamfer();
+						dedent_cutting_region();
+					}
 				}
 				
 				trace() intersection() {
@@ -211,8 +234,6 @@ module fillygon(angles) {
 			
 			trace(true) edge(loop_width);
 		}
-		
-		cube(1000, center = true);
 	}
 }
 
