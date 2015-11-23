@@ -1,6 +1,6 @@
-use <../_fillygon.scad>
+include <../_fillygon.scad>
 
 render() intersection() {
-	translate([0, -15, -15]) cube(30);
+	translate([0, -15, -15]) cube(side_length);
 	fillygon([]);
 }
