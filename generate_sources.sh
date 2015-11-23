@@ -20,7 +20,7 @@ function generate_file() {
 
 n-gon() {
 	echo 'use <_fillygon.scad>'
-	echo "render() rotate([180, 0, 0]) regular_fillygon($1);"
+	echo "render() regular_fillygon($1);"
 }
 
 for i in 3 4 5 6 8 10; do
