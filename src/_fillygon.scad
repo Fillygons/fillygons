@@ -10,7 +10,7 @@ loop_width = 2 * thickness;
 side_length = 40;
 
 // Minimum dihedral alnge between this face and any other face.
-min_angle = 40;
+min_angle = 38;
 
 // Length on each end of an edge ehere no teeht are placed..
 corner_clearance = 8;
