@@ -1,0 +1,264 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 9.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[      9358,        255]
+NotebookOptionsPosition[      8763,        232]
+NotebookOutlinePosition[      9238,        249]
+CellTagsIndexPosition[      9195,        246]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{"Quit", "[", "]"}]], "Input",
+ CellChangeTimes->{{3.657224146668141*^9, 3.6572241480719223`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Module", "[", "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+    "sideLength", ",", "clearance", ",", "smallToothWidth", ",", 
+     "smallToothGap", ",", "gap", ",", "r", ",", "sol"}], "}"}], ",", 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"sideLength", "=", "40"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"clearance", "=", "8.2"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"smallToothWidth", "=", "1.4"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"smallToothGap", "=", "1"}], ";"}], "*)"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"gap", "=", "0.4"}], ";"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"r", "[", "x_", "]"}], ":=", 
+     RowBox[{"co2", "-", 
+      RowBox[{"(", 
+       RowBox[{"x", "-", "co1"}], ")"}]}]}], ";", "\[IndentingNewLine]", 
+    RowBox[{"sol", "=", 
+     RowBox[{"Solve", "[", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"{", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"co1", "\[Equal]", "0"}], ",", "\[IndentingNewLine]", 
+         RowBox[{"co2", "\[Equal]", "sideLength"}], ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{"ce", "\[Equal]", 
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{"co1", "+", "co2"}], ")"}], "/", "2"}]}], ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"co2", "-", "lt2e"}], "\[Equal]", "clearance"}], ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"lt2s", "-", 
+           RowBox[{"r", "[", "st1s", "]"}]}], "\[Equal]", "gap"}], ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"r", "[", "st2e", "]"}], "-", "lt1e"}], "\[Equal]", 
+          "gap"}], ",", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"lt1e", "-", "lt1s"}], "\[Equal]", 
+          RowBox[{"lt2e", "-", "lt2s"}]}], ",", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"lt1s", "-", "ce"}], "\[Equal]", 
+          RowBox[{"gap", "/", "2"}]}], ",", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"st1e", "-", "st1s"}], "\[Equal]", "smallToothWidth"}], ",",
+          "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"st2e", "-", "st2s"}], "\[Equal]", "smallToothWidth"}], ",",
+          "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"st2s", "-", "st1e"}], "\[Equal]", "smallToothGap"}]}], 
+        "\[IndentingNewLine]", "}"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"{", 
+        RowBox[{
+        "co1", ",", "st1s", ",", "st1e", ",", "st2s", ",", "st2e", ",", "ce", 
+         ",", "lt1s", ",", "lt1e", ",", "lt2s", ",", "lt2e", ",", "co2"}], 
+        "}"}]}], "\[IndentingNewLine]", "]"}]}], ";", "\[IndentingNewLine]", 
+    RowBox[{"Print", "[", 
+     RowBox[{"TableForm", "[", 
+      RowBox[{"Expand", "[", 
+       RowBox[{"List", "@@@", 
+        RowBox[{
+        "sol", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}]}], 
+       "]"}], "]"}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"Print", "[", 
+     RowBox[{
+      RowBox[{"st2e", "-", "st1s", "+", "gap"}], "/.", "sol"}], "]"}], ";", 
+    "\[IndentingNewLine]", 
+    RowBox[{"Print", "[", 
+     RowBox[{
+      RowBox[{"lt1e", "-", "lt1s", "+", "gap"}], "/.", "sol"}], "]"}], 
+    ";"}]}], "\[IndentingNewLine]", "]"}]], "Input",
+ CellChangeTimes->{{3.657223393259595*^9, 3.657223622624864*^9}, {
+   3.6572236876141167`*^9, 3.657223868451613*^9}, {3.657224029707244*^9, 
+   3.6572242857171173`*^9}, {3.657224398211775*^9, 3.65722440531503*^9}, {
+   3.65722744657115*^9, 3.657227454146696*^9}, {3.657227730896524*^9, 
+   3.6572277365994873`*^9}, {3.657272990375218*^9, 3.65727307053372*^9}, {
+   3.657273102393146*^9, 3.657273109077186*^9}, 3.6572731416540327`*^9, {
+   3.657273177610118*^9, 3.657273207069519*^9}, {3.657273360004343*^9, 
+   3.6572733693745413`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"co1", "0"},
+    {"st1s", 
+     RowBox[{
+      FractionBox["clearance$646", "2"], "-", 
+      FractionBox["gap$646", "4"], "+", 
+      FractionBox["sideLength$646", "4"], "-", 
+      FractionBox["smallToothGap$646", "2"], "-", "smallToothWidth$646"}]},
+    {"st1e", 
+     RowBox[{
+      FractionBox["clearance$646", "2"], "-", 
+      FractionBox["gap$646", "4"], "+", 
+      FractionBox["sideLength$646", "4"], "-", 
+      FractionBox["smallToothGap$646", "2"]}]},
+    {"st2s", 
+     RowBox[{
+      FractionBox["clearance$646", "2"], "-", 
+      FractionBox["gap$646", "4"], "+", 
+      FractionBox["sideLength$646", "4"], "+", 
+      FractionBox["smallToothGap$646", "2"]}]},
+    {"st2e", 
+     RowBox[{
+      FractionBox["clearance$646", "2"], "-", 
+      FractionBox["gap$646", "4"], "+", 
+      FractionBox["sideLength$646", "4"], "+", 
+      FractionBox["smallToothGap$646", "2"], "+", "smallToothWidth$646"}]},
+    {"ce", 
+     FractionBox["sideLength$646", "2"]},
+    {"lt1s", 
+     RowBox[{
+      FractionBox["gap$646", "2"], "+", 
+      FractionBox["sideLength$646", "2"]}]},
+    {"lt1e", 
+     RowBox[{
+      RowBox[{"-", 
+       FractionBox["clearance$646", "2"]}], "-", 
+      FractionBox[
+       RowBox[{"3", " ", "gap$646"}], "4"], "+", 
+      FractionBox[
+       RowBox[{"3", " ", "sideLength$646"}], "4"], "-", 
+      FractionBox["smallToothGap$646", "2"], "-", "smallToothWidth$646"}]},
+    {"lt2s", 
+     RowBox[{
+      RowBox[{"-", 
+       FractionBox["clearance$646", "2"]}], "+", 
+      FractionBox[
+       RowBox[{"5", " ", "gap$646"}], "4"], "+", 
+      FractionBox[
+       RowBox[{"3", " ", "sideLength$646"}], "4"], "+", 
+      FractionBox["smallToothGap$646", "2"], "+", "smallToothWidth$646"}]},
+    {"lt2e", 
+     RowBox[{
+      RowBox[{"-", "clearance$646"}], "+", "sideLength$646"}]},
+    {"co2", "sideLength$646"}
+   },
+   GridBoxAlignment->{
+    "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+     "RowsIndexed" -> {}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}, "RowsIndexed" -> {}}],
+  Function[BoxForm`e$, 
+   TableForm[BoxForm`e$]]]], "Print",
+ CellChangeTimes->{{3.657224217090708*^9, 3.6572242861950283`*^9}, 
+   3.657224408123638*^9, 3.6572274553805313`*^9, 3.657227738731938*^9, 
+   3.6572730726522903`*^9, 3.657273109521295*^9, 3.657273142760932*^9, {
+   3.6572731783961277`*^9, 3.6572732074884367`*^9}, 3.657273369950979*^9}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   FractionBox["clearance$646", "2"], "+", 
+   FractionBox[
+    RowBox[{"3", " ", "gap$646"}], "4"], "+", 
+   FractionBox["sideLength$646", "4"], "+", 
+   FractionBox["smallToothGap$646", "2"], "+", "smallToothWidth$646", "+", 
+   RowBox[{
+    FractionBox["1", "4"], " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"-", "2"}], " ", "clearance$646"}], "+", "gap$646", "-", 
+      "sideLength$646", "+", 
+      RowBox[{"2", " ", "smallToothGap$646"}], "+", 
+      RowBox[{"4", " ", "smallToothWidth$646"}]}], ")"}]}]}], "}"}]], "Print",\
+
+ CellChangeTimes->{{3.657224217090708*^9, 3.6572242861950283`*^9}, 
+   3.657224408123638*^9, 3.6572274553805313`*^9, 3.657227738731938*^9, 
+   3.6572730726522903`*^9, 3.657273109521295*^9, 3.657273142760932*^9, {
+   3.6572731783961277`*^9, 3.6572732074884367`*^9}, 3.657273369953031*^9}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"-", 
+    FractionBox["clearance$646", "2"]}], "-", 
+   FractionBox["gap$646", "4"], "+", 
+   FractionBox["sideLength$646", "4"], "-", 
+   FractionBox["smallToothGap$646", "2"], "-", "smallToothWidth$646"}], 
+  "}"}]], "Print",
+ CellChangeTimes->{{3.657224217090708*^9, 3.6572242861950283`*^9}, 
+   3.657224408123638*^9, 3.6572274553805313`*^9, 3.657227738731938*^9, 
+   3.6572730726522903`*^9, 3.657273109521295*^9, 3.657273142760932*^9, {
+   3.6572731783961277`*^9, 3.6572732074884367`*^9}, 3.657273369954568*^9}]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{837, 867},
+WindowMargins->{{51, Automatic}, {Automatic, 0}},
+FrontEndVersion->"9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, \
+2013)",
+StyleDefinitions->FrontEnd`FileName[{$UserBaseDirectory, "SystemFiles", 
+   "FrontEnd", "StyleSheets"}, "My Default.nb", CharacterEncoding -> "UTF-8"]
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[557, 20, 120, 2, 28, "Input"],
+Cell[CellGroupData[{
+Cell[702, 26, 3912, 90, 454, "Input"],
+Cell[CellGroupData[{
+Cell[4639, 120, 2640, 71, 262, "Print"],
+Cell[7282, 193, 884, 21, 74, "Print"],
+Cell[8169, 216, 566, 12, 39, "Print"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
