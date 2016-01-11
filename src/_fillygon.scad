@@ -41,7 +41,7 @@ gap = 0.4;
 
 $fn = 32;
 
-module fillygon(angles) {
+module fillygon(angles, reversed_edges = []) {
 	module trace(intersect = false) {
 		module more(i) {
 			if (i < len(angles)) {
@@ -56,9 +56,23 @@ module fillygon(angles) {
 		}
 		
 		module tail(i) {
+			module reverse() {
+				if (i < len(reversed_edges) && reversed_edges[i]) {
+					translate([side_length / 2, 0, 0]) {
+						scale([-1, 1, 1]) {
+							translate([-side_length / 2, 0, 0]) {
+								children();
+							}
+						}
+					}
+				} else {
+					children();
+				}
+			}
+			
 			if (intersect) {
 				intersection() {
-					union() {
+					reverse() {
 						children();
 					}
 					
@@ -67,16 +81,22 @@ module fillygon(angles) {
 					}
 				}
 			} else {
-				children();
-				
-				more(i) {
-					children();
+				union() {
+					reverse() {
+						children();
+					}
+					
+					more(i) {
+						children();
+					}
 				}
 			}
 		}
 		
 		tail(0) {
-			children();
+			union() {
+				children();
+			}
 		}
 	}
 	
@@ -237,6 +257,6 @@ module fillygon(angles) {
 	}
 }
 
-module regular_fillygon(num_sides) {
-	fillygon([for (_ = [2:num_sides]) 180 - 360 / num_sides]);
+module regular_fillygon(num_sides, inverted_edges = []) {
+	fillygon([for (_ = [2:num_sides]) 180 - 360 / num_sides], inverted_edges);
 }
