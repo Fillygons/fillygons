@@ -238,5 +238,5 @@ module fillygon(angles) {
 }
 
 module regular_fillygon(num_sides) {
-	fillygon([for (_ = [1:num_sides]) 180 - 360 / num_sides]);
+	fillygon([for (_ = [2:num_sides]) 180 - 360 / num_sides]);
 }
