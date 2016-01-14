@@ -240,3 +240,10 @@ module fillygon(angles) {
 module regular_fillygon(num_sides) {
 	fillygon([for (_ = [1:num_sides]) 180 - 360 / num_sides]);
 }
+
+module regular_fillygon_large(num_sides, scale) {
+	fillygon([for (i = [for (_ = [1:num_sides])
+			concat([180 - 360 / num_sides], [for (_ = [1:scale-1]) 180])
+			]) for (j = i) j
+		]);
+}
