@@ -218,51 +218,49 @@ module fillygon(angles, reversed_edges = []) {
 		dedent_cutting(7);
 	}
 	
-	intersection() {
-		difference() {
-			union() {
-				intersection() {
-					// A thick plane with the thickness of the part.
-					sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-					
-					// The region inside the chamfers and
-					trace(true) difference() {
-						edge();
-						teeth_chamfer();
-						dedent_cutting_region();
-					}
-				}
+	difference() {
+		union() {
+			intersection() {
+				// A thick plane with the thickness of the part.
+				sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
 				
-				trace() intersection() {
-					union() {
-						teeth_cylinder();
-						intersection() {
-							sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-							teeth_chamfer();
-							edge();
-						}
-					}
-					
-					teeth_region();
-				}
-			}
-			
-			// Cut away parts of the teeth that reach into adjacent edges on acute corner angles.
-			trace() intersection() {
-				difference() {
+				// The region inside the chamfers and
+				trace(true) difference() {
+					edge();
 					teeth_chamfer();
-					teeth_region();
-					clearance_region();
+					dedent_cutting_region();
 				}
-				
-				edge_region();
 			}
 			
-			// Cut out the inside of the loop.
-			trace(true) intersection() {
-				edge(loop_width);
-				sector_3d(zmin = filling_height - thickness / 2);
+			trace() intersection() {
+				union() {
+					teeth_cylinder();
+					intersection() {
+						sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
+						teeth_chamfer();
+						edge();
+					}
+				}
+				
+				teeth_region();
 			}
+		}
+		
+		// Cut away parts of the teeth that reach into adjacent edges on acute corner angles.
+		trace() intersection() {
+			difference() {
+				teeth_chamfer();
+				teeth_region();
+				clearance_region();
+			}
+			
+			edge_region();
+		}
+		
+		// Cut out the inside of the loop.
+		trace(true) intersection() {
+			edge(loop_width);
+			sector_3d(zmin = filling_height - thickness / 2);
 		}
 	}
 }
