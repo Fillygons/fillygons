@@ -25,7 +25,7 @@ dedent_sphere_offset = 0.5;
 dedent_sphere_dimeter = thickness;
 
 // Diameter of the holes which accept the ball dedent spheres.
-dedent_hole_diameter = 2.0;
+dedent_hole_diameter = 2;
 
 // With of the small, flexiple teeth.
 small_tooth_width = 1.4;
@@ -222,8 +222,10 @@ module fillygon(angles, reversed_edges = []) {
 		difference() {
 			union() {
 				intersection() {
+					// A thick plane with the thickness of the part.
 					sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
 					
+					// The region inside the chamfers and
 					trace(true) difference() {
 						edge();
 						teeth_chamfer();
@@ -245,6 +247,7 @@ module fillygon(angles, reversed_edges = []) {
 				}
 			}
 			
+			// Cut away parts of the teeth that reach into adjacent edges on acute corner angles.
 			trace() intersection() {
 				difference() {
 					teeth_chamfer();
@@ -255,6 +258,7 @@ module fillygon(angles, reversed_edges = []) {
 				edge_region();
 			}
 			
+			// Cut out the inside of the loop.
 			trace(true) intersection() {
 				edge(loop_width);
 				sector_3d(zmin = filling_height - thickness / 2);
