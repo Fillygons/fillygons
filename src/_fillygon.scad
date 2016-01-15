@@ -237,13 +237,9 @@ module fillygon(angles) {
 	}
 }
 
-module regular_fillygon(num_sides) {
-	fillygon([for (_ = [1:num_sides]) 180 - 360 / num_sides]);
-}
-
-module regular_fillygon_large(num_sides, scale) {
-	fillygon([for (i = [for (_ = [1:num_sides])
-			concat([180 - 360 / num_sides], [for (_ = [1:scale-1]) 180])
-			]) for (j = i) j
-		]);
+module regular_fillygon(num_sides, side_repetitions = 1) {
+	dirs = [for (i = [1:num_sides]) for (j = [1:side_repetitions]) 360 / num_sides * i];
+	angles = [for (i = [1:len(dirs) - 1]) 180 - dirs[i] + dirs[i - 1]];
+	
+	fillygon(angles);
 }
