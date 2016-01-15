@@ -6,6 +6,9 @@ thickness = 4;
 // Width of the rim along the edges of the piece connecting the teeth.
 loop_width = 2 * thickness;
 
+// Heigth up to which to to fill the inside of the loop.
+filling_height = 1;
+
 // Length of a pieces sides, measured along the ideal polygon's edges.
 side_length = 40;
 
@@ -252,7 +255,10 @@ module fillygon(angles, reversed_edges = []) {
 				edge_region();
 			}
 			
-			trace(true) edge(loop_width);
+			trace(true) intersection() {
+				edge(loop_width);
+				sector_3d(zmin = filling_height - thickness / 2);
+			}
 		}
 	}
 }
