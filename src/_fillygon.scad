@@ -12,11 +12,8 @@ side_length = 40;
 // Minimum dihedral alnge between this face and any other face.
 min_angle = 38;
 
-// Length on each end of an edge ehere no teeht are placed.
+// Length on each end of an edge ehere no teeht are placed..
 corner_clearance = 8;
-
-// Height of a vertical part cut into the edges to make them less sharp.
-edge_miter_height = 1;
 
 // Overhang of the ball dedents relative to the teeth surface.
 dedent_sphere_offset = 0.5;
@@ -154,11 +151,6 @@ module fillygon(angles, reversed_edges = []) {
 	
 	// The part that needs to be removed to support acute angles.
 	module teeth_chamfer() {
-		edge_pos = (thickness / 2 + gap) / sin(min_angle);
-		miter_pos = edges_pos + (edge_miter_height / 2) / tan(min_angle);
-		
-		sector_3d(ymax = miter_pos);
-		
 		rotate([90 - min_angle, 0, 0]) {
 			sector_3d(ymax = thickness / 2 + gap);
 		}
