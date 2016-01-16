@@ -39,12 +39,9 @@ small_teeth_cutting_depth = 5.5;
 // With to cut around the small, flexiple teeth.
 small_teeth_cutting_width = 0.6;
 
-// Gap between touching surfaces.
-gap = 0.4;
-
 $fn = 32;
 
-module fillygon(angles, reversed_edges = [], filled = false) {
+module fillygon(angles, reversed_edges = [], filled = false, gap = 0.4) {
 	module trace(intersect = false) {
 		module more(i) {
 			if (i < len(angles)) {
@@ -269,9 +266,9 @@ module fillygon(angles, reversed_edges = [], filled = false) {
 	}
 }
 
-module regular_fillygon(num_sides, side_repetitions = 1, reversed_edges = [], filled = false) {
+module regular_fillygon(num_sides, side_repetitions = 1, reversed_edges = [], filled = false, gap = 0.4) {
 	dirs = [for (i = [1:num_sides]) for (j = [1:side_repetitions]) 360 / num_sides * i];
 	angles = [for (i = [1:len(dirs) - 1]) 180 - dirs[i] + dirs[i - 1]];
 	
-	fillygon(angles, reversed_edges = reversed_edges, filled = filled);
+	fillygon(angles, reversed_edges = reversed_edges, filled = filled, gap = gap);
 }

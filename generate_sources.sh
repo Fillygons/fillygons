@@ -31,8 +31,10 @@ code() {
 
 # Arguments: file-name, included-file, called-function, arguments
 fillygon() {
-	generate_file "src/$1.scad" code "$2" "$3($4)"
-	generate_file "src/$1-filled.scad" code "$2" "$3($4, filled = true)"
+	for i in 0.25 0.4; do
+		generate_file "src/$1-${i}mm.scad" code "$2" "$3($4, gap = $i)"
+		generate_file "src/$1-filled-${i}mm.scad" code "$2" "$3($4, filled = true, gap = $i)"
+	done
 }
 
 # Arguments: file-name, sides, side-repetitions, reversed-sides
