@@ -28,6 +28,7 @@ PYTHON_CMD := PYTHONPATH="support" $(PYTHON)
 INKSCAPE_CMD := INKSCAPE=$(INKSCAPE) DXF_FLATNESS=$(DXF_FLATNESS) $(PYTHON_CMD) -m inkscape  
 OPENSCAD_CMD := OPENSCAD=$(OPENSCAD) $(PYTHON_CMD) -m openscad
 ASYMPTOTE_CMD := ASYMPTOTE=$(ASYMPTOTE) $(PYTHON_CMD) -m asymptote
+CURA_CMD := CURA=$(CURA) $(PYTHON_CMD) -m cura
 
 # Function with arguments (ext, subst_ext, names).
 # Takes a list of file names and returns all elements whose basename do not start with a `_' and which have extension ext. The returned names will have their extension replaced by subst_ext.
@@ -47,6 +48,9 @@ SCAD_STL_FILES := $(call filter_compiled,.scad,.stl,$(filter-out $(FLAT_SCAD_FIL
 
 # DXF files produced from OpenSCAD fiels. Ignore non-OpenSCAD files in FLAT_SCAD_FILES.
 SCAD_DXF_FILES := $(call filter_compiled,.scad,.dxf,$(filter $(FLAT_SCAD_FILES),$(SRC_FILES)))
+
+# GCode files to be generated form compiled STL files.
+STL_GCODE_FILES := $(call filter_compiled,.stl,.gcode,$(SCAD_STL_FILES))
 
 # DXF files produced from SVG files. This excludes SVG files that are exported to Asymptote Files. Also, ignores an SVG file, if the same DXF file can also be produced from an OpenSCAD file. This is just to get reproducable builds without aborting it.
 SVG_DXF_FILES := $(filter-out $(SCAD_DXF_FILES),$(call filter_compiled,.svg,.dxf,$(SRC_FILES)))
@@ -73,7 +77,7 @@ GLOBAL_DEPS := Makefile $(wildcard config.mk settings.mk)
 EXISTING_TARGETS := $(filter $(SVG_DXF_FILES) $(SCAD_DXF_FILES) $(SCAD_STL_FILES) $(SVG_ASY_FILES) $(ASY_PDF_FILES) $(GENERATED_FILES) $(DEPENDENCY_FILES),$(EXISTING_FILES))
 
 # Goal to build Everything. Also generates files which aren't compiled to anything else. Deined here to make it the default goal.
-all: generated $(SCAD_DXF_FILES) $(SCAD_STL_FILES) $(ASY_PDF_FILES)
+all: generated $(SCAD_DXF_FILES) $(SCAD_STL_FILES) $(ASY_PDF_FILES) $(STL_GCODE_FILES)
 
 # Everything^-1.
 clean:
@@ -86,6 +90,7 @@ dxf: $(SVG_DXF_FILES) $(SCAD_DXF_FILES)
 stl: $(SCAD_STL_FILES)
 asy: $(SVG_ASY_FILES)
 pdf: $(ASY_PDF_FILES)
+gcode: $(STL_GCODE_FILES)
 
 # Rule to convert an SVG file to a DXF file.
 $(SVG_DXF_FILES): %.dxf: %.svg $(GLOBAL_DEPS)
@@ -106,6 +111,11 @@ $(SCAD_DXF_FILES): %.dxf: %.scad $(GLOBAL_DEPS) | $(SCAD_ORDER_DEPS)
 $(SCAD_STL_FILES): %.stl: %.scad $(GLOBAL_DEPS) | $(SCAD_ORDER_DEPS)
 	echo [openscad] $@
 	$(OPENSCAD_CMD) $< $@
+
+# Rule to generate GCode from an STL file.
+$(STL_GCODE_FILES): %.gcode: %.stl stuff/profile.ini $(GLOBAL_DEPS)
+	echo [cura] $@
+	$(CURA_CMD) $< $@ stuff/profile.ini
 
 # Rule to compile an Asymptote file to a PDF file.
 $(ASY_PDF_FILES): %.pdf: %.asy $(GLOBAL_DEPS) | $(ASY_DEPS)

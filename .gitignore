@@ -3,5 +3,6 @@
 
 /src/**/*.dxf
 /src/**/*.stl
+/src/**/*.gcode
 /src/**/*.pdf
 /src/**/*.d
