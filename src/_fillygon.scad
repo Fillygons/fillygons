@@ -28,7 +28,7 @@ dedent_sphere_offset = 0.5;
 dedent_sphere_dimeter = thickness;
 
 // Diameter of the holes which accept the ball dedent spheres.
-dedent_hole_diameter = 2;
+dedent_hole_diameter = 2.0;
 
 // With of the small, flexiple teeth.
 small_tooth_width = 1.4;
@@ -59,6 +59,8 @@ module fillygon(angles, reversed_edges = [], filled = false, gap = 0.4) {
 		}
 		
 		module tail(i) {
+			$corner_angle = all_angles[i];
+			
 			module reverse() {
 				if (i < len(reversed_edges) && reversed_edges[i]) {
 					translate([side_length / 2, 0, 0]) {
@@ -102,6 +104,14 @@ module fillygon(angles, reversed_edges = [], filled = false, gap = 0.4) {
 			}
 		}
 	}
+	
+	// Used for cutting a chamfer into the corners.
+	num_corners = len(angles) + 1;
+	all_angles = concat([180 * (num_corners - 2) - sum_list(angles)], angles);
+	
+	// Used for bevels on edges and at corners.
+	edge_pos = (thickness / 2 + gap) / sin(min_angle);
+	bevel_pos = edge_pos + (edge_bevel_height / 2) / tan(min_angle);
 	
 	used_width = side_length - 2 * corner_clearance;
 	small_teeth_width = 2 * small_tooth_width + small_tooth_gap;
@@ -154,8 +164,12 @@ module fillygon(angles, reversed_edges = [], filled = false, gap = 0.4) {
 	
 	// The part that needs to be removed to support acute angles.
 	module teeth_chamfer() {
-		edge_pos = (thickness / 2 + gap) / sin(min_angle);
-		bevel_pos = edge_pos + (edge_bevel_height / 2) / tan(min_angle);
+		half_angle = $corner_angle / 2;
+		corner_bevel_pos = bevel_pos / sin(half_angle) + edge_bevel_height / (2 * tan(half_angle));
+		
+		rotate([0, 0, half_angle]) {
+			sector_3d(xmax = corner_bevel_pos);
+		}
 		
 		sector_3d(ymax = bevel_pos);
 		

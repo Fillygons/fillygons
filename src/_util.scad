@@ -20,3 +20,5 @@ module sector_3d(xmin = -_inf, xmax = _inf, ymin = -_inf, ymax = _inf, zmin = -_
 		cube([xmax - xmin, ymax - ymin, zmax - zmin]);
 	}
 }
+
+function sum_list(v, i = 0) = i < len(v) ? v[i] + sum_list(v, i + 1) : 0;
