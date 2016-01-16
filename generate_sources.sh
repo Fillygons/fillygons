@@ -18,15 +18,20 @@ function generate_file() {
 	fi
 }
 
-n-gon() {
+fillygon() {
 	echo 'use <_fillygon.scad>'
-	echo "render() regular_fillygon($1, side_repetitions = $2);"
+	echo "render() regular_fillygon($1, side_repetitions = $2, filled = $3);"
+}
+
+generate_fillygon() {
+	generate_file "src/$1.scad" fillygon $2 $3 false
+	generate_file "src/$1-filled.scad" fillygon $2 $3 true
 }
 
 for i in {3..12}; do
-	generate_file "src/$i-gon.scad" n-gon "$i" 1
+	generate_fillygon "$i-gon" $i 1
 done
 
 for i in {3..6}; do
-	generate_file "src/$i-gon-double.scad" n-gon "$i" 2
+	generate_fillygon "$i-gon-double" $i 2
 done
