@@ -1,3 +1,3 @@
 use <_fillygon.scad>
 
-render() regular_fillygon(3, [true]);
+render() regular_fillygon(3, reversed_edges = [true]);
