@@ -20,18 +20,23 @@ function generate_file() {
 
 fillygon() {
 	echo 'use <_fillygon.scad>'
-	echo "render() regular_fillygon($1, side_repetitions = $2, filled = $3);"
+	echo "render() $1;"
 }
 
-generate_fillygon() {
-	generate_file "src/$1.scad" fillygon $2 $3 false
-	generate_file "src/$1-filled.scad" fillygon $2 $3 true
+generate_regular_fillygon() {
+	generate_file "src/$1.scad" fillygon "regular_fillygon($2, side_repetitions = $3, reversed_sides = [$4])"
+	generate_file "src/$1-filled.scad" fillygon "regular_fillygon($2, side_repetitions = $3, reversed_sides = [$4], filled = true)"
 }
 
 for i in {3..12}; do
-	generate_fillygon "$i-gon" $i 1
+	generate_regular_fillygon "$i-gon" $i 1
 done
 
+generate_regular_fillygon "3-gon-reversed" $i 1 true
+generate_regular_fillygon "4-gon-reversed-1" $i 1 true
+generate_regular_fillygon "4-gon-reversed-2" $i 1 true,true
+generate_regular_fillygon "4-gon-reversed-3" $i 1 true,false,true
+
 for i in {3..6}; do
-	generate_fillygon "$i-gon-double" $i 2
+	generate_regular_fillygon "$i-gon-double" $i 2
 done
