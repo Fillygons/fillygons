@@ -18,25 +18,50 @@ function generate_file() {
 	fi
 }
 
-fillygon() {
+code() {
 	echo 'use <_fillygon.scad>'
-	echo "render() $1;"
+	
+	if [ "$1" ]; then
+		echo "include <$1>"
+	fi
+	
+	echo "render() $2;"
+
 }
 
-generate_regular_fillygon() {
-	generate_file "src/$1.scad" fillygon "regular_fillygon($2, side_repetitions = $3, reversed_sides = [$4])"
-	generate_file "src/$1-filled.scad" fillygon "regular_fillygon($2, side_repetitions = $3, reversed_sides = [$4], filled = true)"
+# Arguments: file-name, included-file, called-function, arguments
+fillygon() {
+	generate_file "src/$1.scad" code "$2" "$3($4)"
+	generate_file "src/$1-filled.scad" code "$2" "$3($4, filled = true)"
 }
 
+# Arguments: file-name, sides, side-repetitions, reversed-sides
+regular_fillygon() {
+	fillygon "$1" '' 'regular_fillygon' "$2, side_repetitions = $3, reversed_sides = [$4]"
+}
+
+# Arguments: file-name, included-file, reversed-sides
+non_regular_fillygon() {
+	fillygon "$1" "$2" 'fillygon' "angles, reversed_sides = [$3]"
+}
+
+# Regular n-gons.
 for i in {3..12}; do
-	generate_regular_fillygon "$i-gon" $i 1
+	regular_fillygon "$i-gon" $i 1
 done
 
-generate_regular_fillygon "3-gon-reversed" $i 1 true
-generate_regular_fillygon "4-gon-reversed-1" $i 1 true
-generate_regular_fillygon "4-gon-reversed-2" $i 1 true,true
-generate_regular_fillygon "4-gon-reversed-3" $i 1 true,false,true
+# n-gons with reversed sides.
+regular_fillygon "3-gon-reversed" 3 1 true
+regular_fillygon "4-gon-reversed-1" 4 1 true
+regular_fillygon "4-gon-reversed-2" 4 1 true,true
+regular_fillygon "4-gon-reversed-3" 4 1 true,false,true
 
+# n-gons with doubled sides.
 for i in {3..6}; do
-	generate_regular_fillygon "$i-gon-double" $i 2
+	regular_fillygon "$i-gon-double" $i 2
+done
+
+# n-gons with custom angles.
+for i in $(ls src/custom_angles | sed -rn 's,^_(.*)\.scad$,\1,p'); do
+	non_regular_fillygon "$i" "custom_angles/_$i.scad"
 done
