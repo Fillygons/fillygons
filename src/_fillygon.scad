@@ -44,7 +44,7 @@ gap = 0.4;
 
 $fn = 32;
 
-module fillygon(angles, reversed_edges = []) {
+module fillygon(angles, reversed_edges = [], filled = false) {
 	module trace(intersect = false) {
 		module more(i) {
 			if (i < len(angles)) {
@@ -260,14 +260,18 @@ module fillygon(angles, reversed_edges = []) {
 		// Cut out the inside of the loop.
 		trace(true) intersection() {
 			edge(loop_width);
-			sector_3d(zmin = filling_height - thickness / 2);
+			
+			if (filled) {
+				// Prevents a thin layer form being cut away.
+				sector_3d(zmin = filling_height - thickness / 2);
+			}
 		}
 	}
 }
 
-module regular_fillygon(num_sides, side_repetitions = 1, reversed_edges = []) {
+module regular_fillygon(num_sides, side_repetitions = 1, reversed_edges = [], filled = false) {
 	dirs = [for (i = [1:num_sides]) for (j = [1:side_repetitions]) 360 / num_sides * i];
 	angles = [for (i = [1:len(dirs) - 1]) 180 - dirs[i] + dirs[i - 1]];
 	
-	fillygon(angles, reversed_edges = reversed_edges);
+	fillygon(angles, reversed_edges = reversed_edges, filled = filled);
 }
