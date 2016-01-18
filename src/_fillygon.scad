@@ -48,9 +48,10 @@ $fn = 32;
 // angles: A list of n - 1 numbers, specifying the interior angles.
 // reversed_edges: A list of booleans, specifying on which edges to reverse the tenons. The passed list is padded to n elemens with the value false.
 // filled: Specifies whether to close the inside of the polygon by filling in the lower side.
+// filled_corners: Whether to fill corners with a separate chamfer instead of using the same chamfer as between the teeth.
 // min_convex_angle: Minimum dihedral angle supported in a convex configuration.
 // min_concave_angle: Minimum dihedral angle supported in a non-convex configuration.
-module fillygon(angles, reversed_edges = [], filled = false, min_convex_angle = min_angle, min_concave_angle = min_angle, gap = 0.4) {
+module fillygon(angles, reversed_edges = [], filled = false, filled_corners = false, min_convex_angle = min_angle, min_concave_angle = min_angle, gap = 0.4) {
 	module trace(intersect = false) {
 		module more(i) {
 			if (i < len(angles)) {
@@ -274,8 +275,24 @@ module fillygon(angles, reversed_edges = [], filled = false, min_convex_angle = 
 					edge();
 					
 					// The chamfer region in the region of the teeth and corresponding gaps.
-					teeth_chamfer();
+					difference() {
+						teeth_chamfer();
+						
+						if (filled_corners) {
+							// Disable the teeth-region chamfer inside the clearance.
+							clearance_region();
+						}
+					}
 					
+					if (filled_corners) {
+						// The chamfer region in the region of the teeth and corresponding gaps.
+						intersection() {
+							clearance_chamfer();
+							clearance_region();
+						}
+					}
+					
+					// Cut small gaps around the flexible teeth.
 					dedent_cutting_region();
 				}
 			}
