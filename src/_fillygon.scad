@@ -111,13 +111,13 @@ module fillygon(angles, reversed_edges = [], filled = false, min_convex_angle = 
 		}
 	}
 	
+	// TODO: Exchange bevel and chamfer in names as I have mixed them up. See http://www.basiccarpentrytechniques.com/Handwork%20in%20Wood/images/271-400.png.
+	// Calculates the x-position of the chamfer for an edge produced by 2 planes with distance d from the origin and anges a1 and a2 so that the changer has a height of h.
+	function bevel_pos(d, h, a1, a2) = (h * cos(a1 - a2) - h * cos(a1 + a2) + 2 * d * sin(a1) + 2 * d * sin(a2)) / (2 * sin(a1 + a2));
+	
 	// Used for cutting a chamfer into the corners.
 	num_corners = len(angles) + 1;
 	all_angles = concat([180 * (num_corners - 2) - sum_list(angles)], angles);
-	
-	// Used for bevels on edges and at corners.
-	edge_pos = (thickness / 2 + gap) / sin(min_angle);
-	bevel_pos = edge_pos + (edge_bevel_height / 2) / tan(min_angle);
 	
 	used_width = side_length - 2 * corner_clearance;
 	small_teeth_width = 2 * small_tooth_width + small_tooth_gap;
@@ -171,8 +171,6 @@ module fillygon(angles, reversed_edges = [], filled = false, min_convex_angle = 
 	
 	// The part that needs to be removed to support acute angles.
 	module teeth_chamfer() {
-		half_angle = $corner_angle / 2;
-		corner_bevel_pos = bevel_pos / sin(half_angle) + edge_bevel_height / (2 * tan(half_angle));
 		// Top chamfer.
 		if (min_concave_angle < 90) {
 			rotate([min_concave_angle - 90, 0, 0]) {
