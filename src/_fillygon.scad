@@ -42,7 +42,7 @@ small_teeth_cutting_depth = 5.5;
 // With to cut around the small, flexiple teeth.
 small_teeth_cutting_width = 0.6;
 
-$fn = 8;
+$fn = 32;
 
 // Produces a single fillygon with n edges. The piece is oriented so that the outside of the polygon is on top.
 // angles: A list of n - 1 numbers, specifying the interior angles.
