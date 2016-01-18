@@ -124,7 +124,7 @@ $(ASY_PDF_FILES): %.pdf: %.asy $(GLOBAL_DEPS) | $(ASY_DEPS)
 	$(ASYMPTOTE_CMD) $< $@
 
 # Rule for automaticaly generated OpenSCAD files.
-$(GENERATED_FILES): generate_sources.sh $(GLOBAL_DEPS)
+$(GENERATED_FILES): generate_sources.sh generate_sources.py $(GLOBAL_DEPS)
 	echo [generate] $@
 	./generate_sources.sh $@
 
