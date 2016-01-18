@@ -212,15 +212,27 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 	
 	// The part that needs to be removed at the corners, if they are filled.
 	module clearance_chamfer() {
+		offset = gap / 2;
 		
 		// Top chamfer.
 		rotate([min_concave_angle / 2 - 90, 0, 0]) {
-			sector_3d(ymax = gap / 2);
+			sector_3d(ymax = offset);
 		}
 		
 		// Bottom chamfer.
 		rotate([90 - min_convex_angle / 2, 0, 0]) {
-			sector_3d(ymax = gap / 2);
+			sector_3d(ymax = offset);
+		}
+		
+		// Position at which to place a chamfer, if both sides are bevelled.
+		bevel_pos = bevel_pos(offset, min_concave_angle / 2, min_convex_angle / 2);
+		
+		// Edge chamfer.
+		sector_3d(ymax = bevel_pos);
+		
+		// Corner chamfer.
+		rotate([0, 0, $corner_angle / 2]) {
+			sector_3d(xmax = corner_chamfer_pos(bevel_pos, $corner_angle));
 		}
 	}
 	
