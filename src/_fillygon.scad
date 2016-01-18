@@ -18,8 +18,8 @@ min_angle = 38;
 // Length on each end of an edge ehere no teeht are placed.
 corner_clearance = 8;
 
-// Height of a vertical part cut into the edges to make them less sharp.
-edge_bevel_height = 1;
+// Width of a vertical part cut into the edges to make them less sharp.
+bevel_height = 1;
 
 // Overhang of the ball dedents relative to the teeth surface.
 dedent_sphere_offset = 0.5;
@@ -66,6 +66,7 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 		}
 		
 		module tail(i) {
+			// Ugly hack to pass the angle of the previous corner into the child modules.
 			$corner_angle = all_angles[i];
 			
 			module reverse() {
@@ -113,8 +114,11 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 	}
 	
 	// TODO: Exchange bevel and chamfer in names as I have mixed them up. See http://www.basiccarpentrytechniques.com/Handwork%20in%20Wood/images/271-400.png.
-	// Calculates the x-position of the chamfer for an edge produced by 2 planes with distance d from the origin and anges a1 and a2 so that the changer has a height of h.
-	function bevel_pos(d, h, a1, a2) = (h * cos(a1 - a2) - h * cos(a1 + a2) + 2 * d * sin(a1) + 2 * d * sin(a2)) / (2 * sin(a1 + a2));
+	// Calculates the x-position of the chamfer for an edge produced by 2 planes with distance d from the origin and anges a1 and a2.
+	function bevel_pos(d, a1, a2) = (bevel_height * (cos(a1 - a2) + cos(a1 + a2)) / 2 + d * (cos(a1) + cos(a2))) / sin(a1 + a2);
+	
+	// Calculates the x-position of the chamfer for a corner produced by 2 planes with distances d from the origin and internal angle a.
+	function corner_chamfer_pos(d, a) = bevel_pos(d, a / 2, a / 2);
 	
 	// Used for cutting a chamfer into the corners.
 	num_corners = len(angles) + 1;
@@ -172,27 +176,38 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 	
 	// The part that needs to be removed to support acute angles.
 	module teeth_chamfer() {
+		offset = thickness / 2 + gap;
+		
 		// Top chamfer.
 		if (min_concave_angle < 90) {
 			rotate([min_concave_angle - 90, 0, 0]) {
-				sector_3d(ymax = thickness / 2 + gap);
+				sector_3d(ymax = offset);
 			}
 		}
 		
 		// Bottom chamfer.
 		if (min_convex_angle < 90) {
 			rotate([90 - min_convex_angle, 0, 0]) {
-				sector_3d(ymax = thickness / 2 + gap);
+				sector_3d(ymax = offset);
 			}
 		}
 		
-		bevel_pos = bevel_pos(thickness / 2 + gap, min_concave_angle, min_convex_angle, edge_bevel_height);
+		// Position at which to place a chamfer, if both sides are bevelled.
+		bevel_pos = bevel_pos(offset, min_concave_angle, min_convex_angle);
 		
-		// Cut away vertically to allow for the cylinder parts of the teeth of the connected tile.
-		edge_pos = min_concave_angle < 90 && min_convex_angle < 90 ? bevel_pos : thickness / 2 + gap;
+		// Whether a chamfer is necessary.
+		needs_bevel = min_concave_angle < 90 && min_convex_angle < 90;
 		
-		// Edge bevel.
+		// Either cut a chamfer or cut to allow for the cylinder parts of the teeth of the connected tile.
+		edge_pos = needs_bevel ? bevel_pos : thickness / 2 + gap;
+		
+		// Edge chamfer.
 		sector_3d(ymax = edge_pos);
+		
+		// Corner chamfer.
+		rotate([0, 0, $corner_angle / 2]) {
+			sector_3d(xmax = corner_chamfer_pos(edge_pos, $corner_angle));
+		}
 	}
 	
 	// The part that needs to be removed at the corners, if they are filled.
@@ -334,7 +349,7 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 			edge(loop_width);
 			
 			if (filled) {
-				// Prevents a thin layer form being cut away.
+				// Prevents a thin layer form being cut away, closing the tile's face.
 				sector_3d(zmin = filling_height - thickness / 2);
 			}
 		}
