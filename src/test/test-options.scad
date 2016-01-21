@@ -5,11 +5,9 @@ module place(index) {
 		children();
 	}
 	
-	translate([index * 40 + 20, 0, 0]) {
-		rotate([0, 0, 180]) {
-			translate([-20, 0, 0]) {
-				children();
-			}
+	translate([index * 40, -20, 0]) {
+		rotate([180, 0, 0]) {
+			children();
 		}
 	}
 }
