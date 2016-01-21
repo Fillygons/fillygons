@@ -324,9 +324,9 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 	}
 }
 
-module regular_fillygon(num_sides, side_repetitions = 1, reversed_edges = [], filled = false, gap = 0.4) {
+module regular_fillygon(num_sides, side_repetitions = 1, reversed_edges = [], filled = false, filled_corners = false, min_convex_angle = min_angle, min_concave_angle = min_angle, gap = 0.4) {
 	dirs = [for (i = [1:num_sides]) for (j = [1:side_repetitions]) 360 / num_sides * i];
 	angles = [for (i = [1:len(dirs) - 1]) 180 - dirs[i] + dirs[i - 1]];
 	
-	fillygon(angles, reversed_edges = reversed_edges, filled = filled, gap = gap);
+	fillygon(angles, reversed_edges = reversed_edges, filled = filled, filled_corners = filled_corners, min_convex_angle = min_convex_angle, min_concave_angle = min_concave_angle, gap = gap);
 }
