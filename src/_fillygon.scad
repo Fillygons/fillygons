@@ -71,7 +71,7 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 	}
 	
 	// Calculates the x-position of the chamfer for an edge produced by 2 planes with distance d from the origin and anges a1 and a2.
-	function chamfer_pos(d, a1, a2) = (chamfer_height * (cos(a1 - a2) + cos(a1 + a2)) / 2 + d * (cos(a1) + cos(a2))) / sin(a1 + a2);
+	function chamfer_pos(d, a1, a2) = abs(a1 - 90) * PI / 180 < 1 / 1000 && abs(a2 - 90) * PI / 180 < 1 / 1000 ? d : (chamfer_height * (cos(a1 - a2) + cos(a1 + a2)) / 2 + d * (cos(a1) + cos(a2))) / sin(a1 + a2);
 	
 	// Calculates the x-position of the chamfer for a corner produced by 2 planes with distances d from the origin and internal angle a.
 	function corner_chamfer_pos(d, a) = chamfer_pos(d, a / 2, a / 2);
