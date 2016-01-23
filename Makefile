@@ -3,6 +3,7 @@ INKSCAPE := inkscape
 OPENSCAD := openscad
 PYTHON := python2
 ASYMPTOTE := asy
+CURA := cura
 
 # Settings affecting the compiled results. You can overwrite these in a file called settings.mk in the same directory as this makefile. See readme.creole.
 DXF_FLATNESS := 0.1
