@@ -57,7 +57,7 @@ def TemporaryDirectory():
 
 
 @contextlib.contextmanager
-def command_context(args, remove_env = [], set_env = { }, working_dir = None, use_stderr = False):
+def command_context(args, remove_env = [], set_env = { }, working_dir = None, use_stdout = True, use_stderr = False):
 	env = dict(os.environ)
 	
 	for i in remove_env:
@@ -66,13 +66,18 @@ def command_context(args, remove_env = [], set_env = { }, working_dir = None, us
 	for k, v in set_env.items():
 		env[k] = v
 	
+	if use_stdout:
+		stdout = subprocess.PIPE
+	else:
+		stdout = None
+	
 	if use_stderr:
 		stderr = subprocess.PIPE
 	else:
 		stderr = None
 	
 	try:
-		process = subprocess.Popen(args, env = env, cwd = working_dir, stderr = stderr)
+		process = subprocess.Popen(args, env = env, cwd = working_dir, stdout = stdout, stderr = stderr)
 	except OSError as e:
 		raise UserError('Error running {}: {}', args[0], e)
 	
@@ -87,16 +92,20 @@ def command_context(args, remove_env = [], set_env = { }, working_dir = None, us
 		
 		raise
 	finally:
-		# Use communicate so that we won't deadlock if the process generates some unread output.
-		process.communicate()
+		try:
+			# Use communicate so that we won't deadlock if the process generates some unread output.
+			process.communicate()
+		except (ValueError, OSError):
+			# Ignore exceptions here because we're just trying to get the process to complete.
+			pass
 	
 	if process.returncode:
 		raise UserError('Command failed: {}', ' '.join(args))
 
 
-def command(args, remove_env = [], set_env = { }, working_dir = None):
-	with command_context(args, remove_env, set_env, working_dir):
-		pass
+def command(args, remove_env = [], set_env = { }, working_dir = None, use_stdout = False, use_stderr = False):
+	with command_context(args, remove_env, set_env, working_dir, use_stdout, use_stderr) as process:
+		return process.communicate()
 
 
 def bash_escape_string(string):
