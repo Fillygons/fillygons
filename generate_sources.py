@@ -42,7 +42,7 @@ def main(path = None):
 		fillygon_filling('regular_fillygon', [], '{}-gon'.format(sides), *name_parts, **arguments, num_sides = sides)
 	
 	def non_regular_fillygon(name, *name_parts, **arguments):
-		fillygon_filling('fillygon', [('include', 'custom_angles/{}.scad'.format(name))], name, *name_parts, **arguments, angles = symbol('angles'))
+		fillygon_filling('fillygon', [('include', 'custom_angles/_{}.scad'.format(name))], name, *name_parts, **arguments, angles = symbol('angles'))
 	
 	# Regular n-gons.
 	for i in range(3, 12 + 1):
