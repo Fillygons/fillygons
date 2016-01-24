@@ -125,8 +125,8 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 	}
 	
 	module clearance_region() {
-		sector_3d(xmin = 0, xmax = pos(0));
-		sector_3d(xmin = pos(len(positions) - 1), xmax = side_length);
+		sector_3d(xmax = pos(0));
+		sector_3d(xmin = pos(len(positions) - 1));
 	}
 	
 	// The region spanning the whole ideal edge.
