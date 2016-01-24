@@ -9,6 +9,16 @@ include <_settings.scad>
 // min_convex_angle: Minimum dihedral angle supported in a convex configuration.
 // min_concave_angle: Minimum dihedral angle supported in a non-convex configuration.
 module fillygon(angles, reversed_edges = [], filled = false, filled_corners = false, min_convex_angle = min_angle, min_concave_angle = min_angle, gap = 0.4) {
+	module reverse() {
+		translate([side_length / 2, 0, 0]) {
+			scale([$reversed_edge ? -1 : 1, 1, 1]) {
+				translate([-side_length / 2, 0, 0]) {
+					children();
+				}
+			}
+		}
+	}
+	
 	module trace(intersect = false) {
 		module more(i) {
 			if (i < len(angles)) {
@@ -25,20 +35,7 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 		module tail(i) {
 			// Ugly hack to pass the angle of the previous corner into the child modules.
 			$corner_angle = all_angles[i];
-			
-			module reverse() {
-				if (i < len(reversed_edges) && reversed_edges[i]) {
-					translate([side_length / 2, 0, 0]) {
-						scale([-1, 1, 1]) {
-							translate([-side_length / 2, 0, 0]) {
-								children();
-							}
-						}
-					}
-				} else {
-					children();
-				}
-			}
+			$reversed_edge = i < len(reversed_edges) && reversed_edges[i];
 			
 			if (intersect) {
 				intersection() {
@@ -165,8 +162,10 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 		sector_3d(ymax = edge_pos);
 		
 		// Corner chamfer.
-		rotate([0, 0, $corner_angle / 2]) {
-			sector_3d(xmax = corner_chamfer_pos(edge_pos, $corner_angle));
+		reverse() {
+			rotate([0, 0, $corner_angle / 2]) {
+				sector_3d(xmax = corner_chamfer_pos(edge_pos, $corner_angle));
+			}
 		}
 	}
 	
@@ -191,8 +190,10 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 		sector_3d(ymax = chamfer_pos);
 		
 		// Corner chamfer.
-		rotate([0, 0, $corner_angle / 2]) {
-			sector_3d(xmax = corner_chamfer_pos(chamfer_pos, $corner_angle));
+		reverse() {
+			rotate([0, 0, $corner_angle / 2]) {
+				sector_3d(xmax = corner_chamfer_pos(chamfer_pos, $corner_angle));
+			}
 		}
 	}
 	
