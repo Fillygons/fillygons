@@ -101,8 +101,6 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 	function dir(pos) = 1 - pos % 2 * 2;
 	function pos(pos) = corner_clearance + positions[pos] + gaps[pos] * gap / 2;
 	
-	echo([for (i = range(9)) pos(i) - corner_clearance]);
-	
 	// The infintely extruded region of the polygon with an optional offset.
 	module edge(offset = 0) {
 		sector_3d(ymin = offset);
