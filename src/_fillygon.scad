@@ -80,22 +80,28 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 	num_corners = len(angles) + 1;
 	all_angles = concat([180 * (num_corners - 2) - sum_list(angles)], angles);
 	
-	used_width = side_length - 2 * corner_clearance;
-	small_teeth_width = 2 * small_tooth_width + small_tooth_gap;
+	// These are, in order, the left and right edges of the first and second instance of the large and small teeth. The last element is the right end of the cutting which complements the first tooth. All elements are relative to the end of the left clearance region.
+	positions = accumulate_list([
+		0,
+		large_teeth_width,
+		2 * small_teeth_width + small_teeth_gap,
+		large_teeth_width,
+		large_teeth_width,
+		small_teeth_width,
+		small_teeth_gap,
+		small_teeth_width,
+		large_teeth_width]);
 	
-	positions = [
-		gap / 2,
-		used_width / 4 - small_teeth_width / 2 - gap,
-		used_width / 4 + small_teeth_width / 2 + gap,
-		used_width / 2 - gap / 2,
-		used_width * 3 / 4 - small_teeth_width / 2,
-		used_width * 3 / 4 - small_tooth_gap / 2,
-		used_width * 3 / 4 + small_tooth_gap / 2,
-		used_width * 3 / 4 + small_teeth_width / 2,
-		used_width + gap / 2];
+	// Length on each end of an edge where no teeth are placed.
+	corner_clearance = (side_length - positions[len(positions) - 1]) / 2;
+	
+	// List which specifies, for each entry in the positions list, in which direction gap /  2 should be added, if at all.
+	gaps = [1, -1, 1, -1, 1, 0, 0, -1, 1];
 	
 	function dir(pos) = 1 - pos % 2 * 2;
-	function pos(pos) = corner_clearance + positions[pos];
+	function pos(pos) = corner_clearance + positions[pos] + gaps[pos] * gap / 2;
+	
+	echo([for (i = range(9)) pos(i) - corner_clearance]);
 	
 	// The infintely extruded region of the polygon with an optional offset.
 	module edge(offset = 0) {
