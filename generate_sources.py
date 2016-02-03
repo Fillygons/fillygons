@@ -3,6 +3,7 @@ import sys, os, json, collections
 
 symbol = collections.namedtuple('symbol', ['name'])
 
+
 def serialize_value(value):
 	if isinstance(value, list):
 		return '[{}]'.format(', '.join(map(serialize_value, value)))
@@ -34,9 +35,13 @@ def main(path = None):
 		for i in .25, .4:
 			generate_file(function, includes, *name_parts, '{}mm'.format(i), **arguments, gap = i)
 	
+	def fillygon_corners(function, includes, *name_parts, **arguments):
+		fillygon_gap(function, includes, *name_parts, **arguments)
+		fillygon_gap(function, includes, *name_parts, 'corners', **arguments, filled_corners = True, min_convex_angle = 90, min_concave_angle = 180)
+	
 	def fillygon_filling(function, includes, *name_parts, **arguments):
 		fillygon_gap(function, includes, *name_parts, **arguments)
-		fillygon_gap(function, includes, *name_parts, 'filled', filled = True, **arguments)
+		fillygon_corners(function, includes, *name_parts, 'filled', filled = True, **arguments)
 	
 	def regular_fillygon(sides, *name_parts, **arguments):
 		fillygon_filling('regular_fillygon', [], '{}-gon'.format(sides), *name_parts, **arguments, num_sides = sides)
