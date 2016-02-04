@@ -37,14 +37,10 @@ def main(path = None):
 	def fillygon_filling(function, includes, *name_parts, **arguments):
 		fillygon_gap(function, includes, *name_parts, **arguments)
 		fillygon_gap(function, includes, *name_parts, 'filled', filled = True, **arguments)
-
-	def fillygon_filling_corner(function, includes, *name_parts, **arguments):
-		fillygon_filling(function, includes, *name_parts, **arguments)
-		fillygon_filling(function, includes, *name_parts, 'filledcorners', filled_corners = True, **arguments)
-
+	
 	def regular_fillygon(sides, *name_parts, **arguments):
-		fillygon_filling_corner('regular_fillygon', [], '{}-gon'.format(sides), *name_parts, **arguments, num_sides = sides)
-
+		fillygon_filling('regular_fillygon', [], '{}-gon'.format(sides), *name_parts, **arguments, num_sides = sides)
+	
 	def non_regular_fillygon(name, *name_parts, **arguments):
 		fillygon_filling('fillygon', [('include', 'custom_angles/_{}.scad'.format(name))], name, *name_parts, **arguments, angles = symbol('angles'))
 	
