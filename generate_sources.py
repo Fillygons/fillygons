@@ -40,7 +40,7 @@ def main(path = None):
 		fillygon_gap(function, includes, *name_parts, 'corners', **arguments, filled_corners = True, min_convex_angle = 90, min_concave_angle = 180)
 	
 	def fillygon_filling(function, includes, *name_parts, **arguments):
-		fillygon_gap(function, includes, *name_parts, **arguments)
+		fillygon_corners(function, includes, *name_parts, **arguments)
 		fillygon_corners(function, includes, *name_parts, 'filled', filled = True, **arguments)
 	
 	def regular_fillygon(sides, *name_parts, **arguments):
