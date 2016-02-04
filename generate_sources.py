@@ -1,14 +1,20 @@
-import sys, os, json, collections
+import sys, os, json
 
 
-symbol = collections.namedtuple('symbol', ['name'])
+class expression(str): pass
+
+
+def call(function, **arguments):
+	args_str = ['{} = {}'.format(k, serialize_value(v)) for k, v in sorted(arguments.items())]
+	
+	return expression('{}({})'.format(function, ', '.join(args_str)))
 
 
 def serialize_value(value):
 	if isinstance(value, list):
 		return '[{}]'.format(', '.join(map(serialize_value, value)))
-	elif isinstance(value, symbol):
-		return value.name
+	elif isinstance(value, expression):
+		return value
 	else:
 		return json.dumps(value)
 
@@ -21,9 +27,7 @@ def main(path = None):
 			for type, path in [('use', '_fillygon.scad')] + includes:
 				yield '{} <{}>'.format(type, path)
 			
-			args_str = ['{} = {}'.format(k, serialize_value(v)) for k, v in sorted(arguments.items())]
-			
-			yield 'render() {}({});'.format(function, ', '.join(args_str))
+			yield 'render() {};'.format(call(function, **arguments))
 		
 		path = 'src/{}.scad'.format('-'.join(name_parts))
 		
@@ -47,7 +51,7 @@ def main(path = None):
 		fillygon_filling('regular_fillygon', [], '{}-gon'.format(sides), *name_parts, **arguments, num_sides = sides)
 	
 	def non_regular_fillygon(name, *name_parts, **arguments):
-		fillygon_filling('fillygon', [('include', 'custom_angles/_{}.scad'.format(name))], name, *name_parts, **arguments, angles = symbol('angles'))
+		fillygon_filling('fillygon', [('include', 'custom_angles/_{}.scad'.format(name))], name, *name_parts, **arguments, angles = expression('angles'))
 	
 	# Regular n-gons.
 	for i in range(3, 12 + 1):
