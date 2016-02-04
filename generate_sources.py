@@ -1,4 +1,4 @@
-import sys, os, json
+import sys, os, json, contextlib
 
 
 class expression(str): pass
@@ -20,11 +20,23 @@ def serialize_value(value):
 
 
 def main(path = None):
+	includes = []
+	
+	@contextlib.contextmanager
+	def include(path, type = 'use'):
+		includes.append((type, path))
+		
+		yield
+		
+		includes.pop()
+	
 	files = { }
 	
-	def generate_file(function : list, includes : list, *name_parts, **arguments):
+	def generate_file(function : list, *name_parts, **arguments):
+		current_includes = list(includes)
+		
 		def fn():
-			for type, path in [('use', '_fillygon.scad')] + includes:
+			for type, path in current_includes:
 				yield '{} <{}>'.format(type, path)
 			
 			yield 'render() {};'.format(call(function, **arguments))
@@ -35,23 +47,28 @@ def main(path = None):
 		
 		files[path] = fn
 	
-	def fillygon_gap(function, includes, *name_parts, **arguments):
+	def fillygon(function, *name_parts, **arguments):
+		with include('_fillygon.scad'):
+			generate_file(function, *name_parts, **arguments)
+	
+	def fillygon_gap(function, *name_parts, **arguments):
 		for i in .25, .4:
-			generate_file(function, includes, *name_parts, '{}mm'.format(i), **arguments, gap = i)
+			fillygon(function, *name_parts, '{}mm'.format(i), **arguments, gap = i)
 	
-	def fillygon_corners(function, includes, *name_parts, **arguments):
-		fillygon_gap(function, includes, *name_parts, **arguments)
-		fillygon_gap(function, includes, *name_parts, 'corners', **arguments, filled_corners = True, min_convex_angle = 90, min_concave_angle = 180)
+	def fillygon_corners(function, *name_parts, **arguments):
+		fillygon_gap(function, *name_parts, **arguments)
+		fillygon_gap(function, *name_parts, 'corners', **arguments, filled_corners = True, min_convex_angle = 90, min_concave_angle = 180)
 	
-	def fillygon_filling(function, includes, *name_parts, **arguments):
-		fillygon_corners(function, includes, *name_parts, **arguments)
-		fillygon_corners(function, includes, *name_parts, 'filled', filled = True, **arguments)
+	def fillygon_filling(function, *name_parts, **arguments):
+		fillygon_corners(function, *name_parts, **arguments)
+		fillygon_corners(function, *name_parts, 'filled', filled = True, **arguments)
 	
 	def regular_fillygon(sides, *name_parts, **arguments):
-		fillygon_filling('regular_fillygon', [], '{}-gon'.format(sides), *name_parts, **arguments, num_sides = sides)
+		fillygon_filling('regular_fillygon', '{}-gon'.format(sides), *name_parts, **arguments, num_sides = sides)
 	
 	def non_regular_fillygon(name, *name_parts, **arguments):
-		fillygon_filling('fillygon', [('include', 'custom_angles/_{}.scad'.format(name))], name, *name_parts, **arguments, angles = expression('angles'))
+		with include('custom_angles/_{}.scad'.format(name), 'use'):
+			fillygon_filling('fillygon', name, *name_parts, **arguments, angles = expression('angles'))
 	
 	# Regular n-gons.
 	for i in range(3, 12 + 1):
