@@ -70,7 +70,7 @@ def main(path = None):
 		fillygon_filling('{}-gon'.format(sides), *name_parts, **arguments, angles = call('regular_angles', num_sides = sides, side_repetitions = side_repetitions))
 	
 	def non_regular_fillygon(name, *name_parts, **arguments):
-		with include('custom_angles/_{}.scad'.format(name), 'use'):
+		with include('custom_angles/_{}.scad'.format(name), 'include'):
 			fillygon_filling(name, *name_parts, **arguments, angles = expression('angles'))
 	
 	# Regular n-gons.
