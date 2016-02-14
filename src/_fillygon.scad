@@ -218,7 +218,7 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 	module dedent_hole(pos) {
 		at_position(pos) {
 			rotate([0, 90, 0]) {
-				cylinder(h = dedent_sphere_offset, d1 = dedent_hole_diameter, d2 = dedent_hole_diameter - 2 * dedent_sphere_offset);
+				cylinder(h = dedent_sphere_offset, d = dedent_hole_diameter);
 			}
 		}
 	}
