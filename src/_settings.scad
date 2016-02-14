@@ -20,10 +20,10 @@ chamfer_height = 1;
 dedent_sphere_offset = 0.8;
 
 // Diameter of the ball dedent spheres.
-dedent_sphere_dimeter = 2.5;
+dedent_sphere_dimeter = 2.9;
 
 // Diameter of the holes which accept the ball dedent spheres.
-dedent_hole_diameter = 2.2;
+dedent_hole_diameter = 2.0;
 
 // Width of the large teeth.
 large_teeth_width = 3.9;

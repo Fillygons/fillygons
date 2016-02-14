@@ -199,13 +199,16 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 	
 	// The volume of a dedent ball placed on a tooth at the specified position.
 	module dedent_ball(pos) {
+		// Actial diameter used for the sphere, accounting for the gap.
+		diameter = dedent_sphere_dimeter - gap;
+		
 		// Offset of the sphere's center relative to the tooth surface it is placed on.
-		ball_offset = dedent_sphere_dimeter / 2 - dedent_sphere_offset;
+		ball_offset = diameter / 2 - dedent_sphere_offset;
 		
 		at_position(pos) {
 			intersection() {
 				translate([ball_offset, 0, 0]) {
-					sphere(d = dedent_sphere_dimeter);
+					sphere(d = diameter);
 				}
 				
 				// The ball needs to extend slightly past the origin because otherwise the final shape will have infinitely thin gaps.
@@ -218,7 +221,7 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 	module dedent_hole(pos) {
 		at_position(pos) {
 			rotate([0, 90, 0]) {
-				cylinder(h = dedent_sphere_offset, d = dedent_hole_diameter);
+				cylinder(h = dedent_sphere_offset, d = dedent_hole_diameter + gap / 2);
 			}
 		}
 	}
