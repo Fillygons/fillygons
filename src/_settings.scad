@@ -17,13 +17,13 @@ min_angle = 38;
 chamfer_height = 1;
 
 // Overhang of the ball dedents relative to the teeth surface.
-dedent_sphere_offset = 0.8;
+dedent_sphere_offset = 0.6;
 
 // Diameter of the ball dedent spheres.
-dedent_sphere_dimeter = 2.9;
+dedent_sphere_dimeter = 3;
 
 // Diameter of the holes which accept the ball dedent spheres.
-dedent_hole_diameter = 2.0;
+dedent_hole_diameter = 1.7;
 
 // Width of the large teeth.
 large_teeth_width = 3.9;
