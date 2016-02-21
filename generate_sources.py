@@ -55,7 +55,7 @@ def main(path = None):
 			generate_file(name, expression)
 	
 	def fillygon_gap(function, *name_parts, **arguments):
-		for i in .25, .4:
+		for i in .2, .25, .4:
 			fillygon(function, *name_parts, '{}mm'.format(i), **arguments, gap = i)
 	
 	def fillygon_corners(function, *name_parts, **arguments):
