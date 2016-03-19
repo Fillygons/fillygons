@@ -13,9 +13,9 @@ module place(index) {
 }
 
 render() {
-	place(0) regular_fillygon(3, filled_corners = false);
-	place(1) regular_fillygon(3, filled_corners = false, min_concave_angle = 90);
-	place(2) regular_fillygon(3, filled_corners = true, min_concave_angle = 90);
-	place(3) regular_fillygon(3, filled_corners = true, min_concave_angle = 180);
-	place(4) regular_fillygon(3, filled_corners = true, min_concave_angle = 180, min_convex_angle = 180);
+	place(0) fillygon(angles = regular_angles(3), filled_corners = false);
+	place(1) fillygon(angles = regular_angles(3), filled_corners = false, min_concave_angle = 90);
+	place(2) fillygon(angles = regular_angles(3), filled_corners = true, min_concave_angle = 90);
+	place(3) fillygon(angles = regular_angles(3), filled_corners = true, min_concave_angle = 180);
+	place(4) fillygon(angles = regular_angles(3), filled_corners = true, min_concave_angle = 180, min_convex_angle = 180);
 }
