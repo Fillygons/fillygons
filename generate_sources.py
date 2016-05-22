@@ -85,6 +85,10 @@ def main(path = None):
 	regular_fillygon(4, 1, 'reversed-2', reversed_edges = [True, True])
 	regular_fillygon(4, 1, 'reversed-3', reversed_edges = [True, False, True])
 	
+	regular_fillygon(5, 1, 'reversed-1', reversed_edges = [True])
+	regular_fillygon(5, 1, 'reversed-2', reversed_edges = [True, True])
+	regular_fillygon(5, 1, 'reversed-3', reversed_edges = [True, False, True])
+	
 	# n-gons with doubled sides.
 	for i in range(3, 6 + 1):
 		regular_fillygon(i, 2, 'double')
