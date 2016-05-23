@@ -126,6 +126,7 @@ $(ASY_PDF_FILES): %.pdf: %.asy $(GLOBAL_DEPS) | $(ASY_DEPS)
 # Rule for automaticaly generated OpenSCAD files.
 $(GENERATED_FILES): generate_sources.sh generate_sources.py $(GLOBAL_DEPS)
 	echo [generate] $@
+	mkdir -p $(@D)
 	./generate_sources.sh $@
 
 # Include dependency files produced by an earlier build.
