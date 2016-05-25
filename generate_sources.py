@@ -131,8 +131,11 @@ def main(path = None):
 				with argument(angles = expression('angles')):
 					yield from fillygon_filling()
 
-	def reversed_fillygon(sides, variant_reversed, *reversed_edges):
-		with name_part(variant_reversed = variant_reversed):
+	def reversed_fillygon(sides, *reversed_edges):
+		reversed_edges += (False,) * (sides - len(reversed_edges))
+		name = 'reversed-{}'.format(''.join('.r'[i] for i in reversed_edges))
+
+		with name_part(variant_reversed = name):
 			with argument(reversed_edges = reversed_edges):
 				yield from regular_fillygon(sides)
 
@@ -142,15 +145,15 @@ def main(path = None):
 			yield from regular_fillygon(i)
 
 		# n-gons with reversed sides.
-		yield from reversed_fillygon(3, 'reversed-r..', True)
+		yield from reversed_fillygon(3, True)
 
-		yield from reversed_fillygon(4, 'reversed-r...', True)
-		yield from reversed_fillygon(4, 'reversed-rr..', True, True)
-		yield from reversed_fillygon(4, 'reversed-r.r.', True, False, True)
+		yield from reversed_fillygon(4, True)
+		yield from reversed_fillygon(4, True, True)
+		yield from reversed_fillygon(4, True, False, True)
 
-		yield from reversed_fillygon(5, 'reversed-r....', True)
-		yield from reversed_fillygon(5, 'reversed-rr...', True, True)
-		yield from reversed_fillygon(5, 'reversed-r.r..', True, False, True)
+		yield from reversed_fillygon(5, True)
+		yield from reversed_fillygon(5, True, True)
+		yield from reversed_fillygon(5, True, False, True)
 
 		with name_part(variant_size = 'double'):
 			with argument(side_repetitions = 2):
