@@ -80,18 +80,21 @@ def main(path = None):
 		return os.path.join('src', 'variants', *path_parts)
 
 	def get_file(expression):
+		name = get_name()
 		current_includes = include.current_value
 		
 		def fn():
 			for type, path in current_includes:
-				yield '{} <{}>'.format(type, path)
+				relative_path = os.path.relpath(path, os.path.dirname(name))
+				
+				yield '{} <{}>'.format(type, relative_path)
 			
 			yield 'render() {};'.format(serialize_value(expression))
 
-		return get_name(), fn
+		return name, fn
 	
 	def fillygon():
-		with include('_fillygon.scad'):
+		with include('src/_fillygon.scad'):
 			expression = call('fillygon', **argument.current_value)
 
 			yield get_file(expression)
@@ -126,7 +129,7 @@ def main(path = None):
 				yield from fillygon_filling()
 
 	def non_regular_fillygon(name):
-		with include('custom_angles/_{}.scad'.format(name), 'include'):
+		with include('src/custom_angles/_{}.scad'.format(name), 'include'):
 			with name_part(polygon = name):
 				with argument(angles = expression('angles')):
 					yield from fillygon_filling()
