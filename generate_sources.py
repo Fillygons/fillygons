@@ -123,10 +123,15 @@ def main(path = None):
 			with argument(filled = True):
 				yield from fillygon_corners(True)
 	
-	def regular_fillygon(sides):
+	def regular_fillygon(sides, side_repetitions = 1):
 		with name_part(polygon = '{}-gon'.format(sides)):
-			with argument(angles = call('regular_angles', num_sides = sides)):
-				yield from fillygon_filling()
+			with argument(angles = call('regular_angles', num_sides = sides, side_repetitions = side_repetitions)):
+				if side_repetitions == 1:
+					yield from fillygon_filling()
+				else:
+					with name_part(variant_size = 'double'):
+						yield from fillygon_filling()
+
 
 	def non_regular_fillygon(name):
 		with include('src/custom_angles/_{}.scad'.format(name), 'include'):
@@ -158,11 +163,9 @@ def main(path = None):
 		yield from reversed_fillygon(5, True, True)
 		yield from reversed_fillygon(5, True, False, True)
 
-		with name_part(variant_size = 'double'):
-			with argument(side_repetitions = 2):
-				# n-gons with doubled sides.
-				for i in range(3, 6 + 1):
-					yield from regular_fillygon(i)
+		# n-gons with doubled sides.
+		for i in range(3, 6 + 1):
+			yield from regular_fillygon(i, 2)
 
 		# n-gons with custom angles.
 		for i in os.listdir('src/custom_angles'):
