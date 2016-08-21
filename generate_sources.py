@@ -124,8 +124,11 @@ def main(path = None):
 				yield from fillygon_corners(True)
 	
 	def regular_fillygon(sides, side_repetitions = 1):
+		directions = [360 / sides * i for i in range(sides) for _ in range(side_repetitions)]
+		angles = [180 - b + a for a, b in zip(directions, directions[1:])]
+
 		with name_part(polygon = '{}-gon'.format(sides)):
-			with argument(angles = call('regular_angles', num_sides = sides, side_repetitions = side_repetitions)):
+			with argument(angles = angles):
 				if side_repetitions == 1:
 					yield from fillygon_filling()
 				else:

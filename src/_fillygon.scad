@@ -331,8 +331,3 @@ module fillygon(angles, reversed_edges = [], filled = false, filled_corners = fa
 		}
 	}
 }
-
-function regular_angles(num_sides, side_repetitions = 1) =
-	let (dirs = [for (i = [1:num_sides]) for (j = [1:side_repetitions]) 360 / num_sides * i])
-		let(angles = [for (i = [1:len(dirs) - 1]) 180 - dirs[i] + dirs[i - 1]])
-			angles;
