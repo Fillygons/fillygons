@@ -2,6 +2,11 @@
 
 import sys, os, json, contextlib
 
+from math import atan, sqrt, acos, pi
+
+
+degrees = pi / 180
+
 
 class expression(str): pass
 
@@ -135,12 +140,10 @@ def main(path = None):
 					with name_part(variant_size = 'double'):
 						yield from fillygon_filling()
 
-
-	def non_regular_fillygon(name):
-		with include('src/custom_angles/_{}.scad'.format(name), 'include'):
-			with name_part(polygon = name):
-				with argument(angles = expression('angles')):
-					yield from fillygon_filling()
+	def non_regular_fillygon(name, *angles):
+		with name_part(polygon = name):
+			with argument(angles = angles):
+				yield from fillygon_filling()
 
 	def reversed_fillygon(sides, *reversed_edges):
 		reversed_edges += (False,) * (sides - len(reversed_edges))
@@ -149,6 +152,34 @@ def main(path = None):
 		with name_part(variant_reversed = name):
 			with argument(reversed_edges = reversed_edges):
 				yield from regular_fillygon(sides)
+
+	def rhombus(acute_angle):
+		name = 'rhombus-{}'.format(round(acute_angle))
+
+		yield from non_regular_fillygon(name, acute_angle, 180 - acute_angle, acute_angle)
+
+	def six_gon_flat(opposite_angle):
+		other_angle = 180 - opposite_angle / 2
+
+		name = '6-gon-flat-{}'.format(round(opposite_angle))
+
+		yield from non_regular_fillygon(name, other_angle, opposite_angle, other_angle, other_angle, opposite_angle)
+
+	def custom_angles():
+		yield from non_regular_fillygon('rectangle', 180, 90, 90, 180, 90)
+		yield from non_regular_fillygon('triamond', 60, 120, 120, 60)
+
+		yield from rhombus(60)
+		yield from rhombus(atan(2) / degrees)
+		yield from rhombus(acos(1 / 4) / degrees)
+		yield from rhombus(acos(1 / 3) / degrees)
+		yield from rhombus(60)
+
+		yield from six_gon_flat(2 * atan((sqrt(5) + 1) / 2) / degrees)
+		yield from six_gon_flat(90)
+		yield from six_gon_flat(2 * atan(sqrt(2)) / degrees)
+		yield from six_gon_flat(2 * atan((sqrt(5) - 1) / 2) / degrees)
+		yield from six_gon_flat(2 * atan(1 / sqrt(2)) / degrees)
 
 	def variants():
 		# Regular n-gons.
@@ -170,10 +201,7 @@ def main(path = None):
 		for i in range(3, 6 + 1):
 			yield from regular_fillygon(i, 2)
 
-		# n-gons with custom angles.
-		for i in os.listdir('src/custom_angles'):
-			if i.startswith('_') and i.endswith('.scad'):
-				yield from non_regular_fillygon(i[1:-5])
+		yield from custom_angles()
 
 	files = dict(variants())
 
