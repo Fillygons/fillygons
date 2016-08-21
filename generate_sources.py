@@ -53,7 +53,9 @@ def kwargs_accumulator():
 	return name_part
 
 
-def main(path = None):
+def get_variants():
+	variants = {}
+
 	@context_value([])
 	def include(value, path, type = 'use'):
 		return value + [(type, path)]
@@ -84,50 +86,48 @@ def main(path = None):
 
 		return os.path.join('src', 'variants', *path_parts)
 
-	def get_file(expression):
+	def add_file(expression):
 		name = get_name()
 		current_includes = include.current_value
-		
+
 		def fn():
 			for type, path in current_includes:
 				relative_path = os.path.relpath(path, os.path.dirname(name))
-				
+
 				yield '{} <{}>'.format(type, relative_path)
-			
+
 			yield 'render() {};'.format(serialize_value(expression))
 
-		return name, fn
-	
+		variants[name] = fn
+
 	def fillygon():
 		with include('src/_fillygon.scad'):
-			expression = call('fillygon', **argument.current_value)
-
-			yield get_file(expression)
+			add_file(call('fillygon', **argument.current_value))
 
 	def fillygon_gap():
 		for i in .2, .25, .4:
 			with name_part(gap = '{}mm'.format(i)):
 				with argument(gap = i):
-					yield from fillygon()
-	
+					fillygon()
+
 	def fillygon_corners(filled):
 		if filled:
-			yield from fillygon_gap()
+			fillygon_gap()
 		else:
 			with name_part(variant_normal = 'normal'):
-				yield from fillygon_gap()
+				fillygon_gap()
 
 		with name_part(variant_corners = 'corners'):
 			with argument(filled_corners = True, min_convex_angle = 90, min_concave_angle = 180):
-				yield from fillygon_gap()
-	
+				fillygon_gap()
+
 	def fillygon_filling():
-		yield from fillygon_corners(False)
+		fillygon_corners(False)
 
 		with name_part(variant_filled = 'filled'):
 			with argument(filled = True):
-				yield from fillygon_corners(True)
-	
+				fillygon_corners(True)
+
 	def regular_fillygon(sides, side_repetitions = 1):
 		directions = [360 / sides * i for i in range(sides) for _ in range(side_repetitions)]
 		angles = [180 - b + a for a, b in zip(directions, directions[1:])]
@@ -135,15 +135,15 @@ def main(path = None):
 		with name_part(polygon = '{}-gon'.format(sides)):
 			with argument(angles = angles):
 				if side_repetitions == 1:
-					yield from fillygon_filling()
+					fillygon_filling()
 				else:
 					with name_part(variant_size = 'double'):
-						yield from fillygon_filling()
+						fillygon_filling()
 
 	def non_regular_fillygon(name, *angles):
 		with name_part(polygon = name):
 			with argument(angles = angles):
-				yield from fillygon_filling()
+				fillygon_filling()
 
 	def reversed_fillygon(sides, *reversed_edges):
 		reversed_edges += (False,) * (sides - len(reversed_edges))
@@ -151,61 +151,64 @@ def main(path = None):
 
 		with name_part(variant_reversed = name):
 			with argument(reversed_edges = reversed_edges):
-				yield from regular_fillygon(sides)
+				regular_fillygon(sides)
 
 	def rhombus(acute_angle):
 		name = 'rhombus-{}'.format(round(acute_angle))
 
-		yield from non_regular_fillygon(name, acute_angle, 180 - acute_angle, acute_angle)
+		non_regular_fillygon(name, acute_angle, 180 - acute_angle, acute_angle)
 
 	def six_gon_flat(opposite_angle):
 		other_angle = 180 - opposite_angle / 2
 
 		name = '6-gon-flat-{}'.format(round(opposite_angle))
 
-		yield from non_regular_fillygon(name, other_angle, opposite_angle, other_angle, other_angle, opposite_angle)
+		non_regular_fillygon(name, other_angle, opposite_angle, other_angle, other_angle, opposite_angle)
 
-	def custom_angles():
-		yield from non_regular_fillygon('rectangle', 180, 90, 90, 180, 90)
-		yield from non_regular_fillygon('triamond', 60, 120, 120, 60)
+	# Regular n-gons.
+	for i in range(3, 12 + 1):
+		regular_fillygon(i)
 
-		yield from rhombus(60)
-		yield from rhombus(atan(2) / degrees)
-		yield from rhombus(acos(1 / 4) / degrees)
-		yield from rhombus(acos(1 / 3) / degrees)
-		yield from rhombus(60)
+	# n-gons with reversed sides.
+	reversed_fillygon(3, True)
 
-		yield from six_gon_flat(2 * atan((sqrt(5) + 1) / 2) / degrees)
-		yield from six_gon_flat(90)
-		yield from six_gon_flat(2 * atan(sqrt(2)) / degrees)
-		yield from six_gon_flat(2 * atan((sqrt(5) - 1) / 2) / degrees)
-		yield from six_gon_flat(2 * atan(1 / sqrt(2)) / degrees)
+	reversed_fillygon(4, True)
+	reversed_fillygon(4, True, True)
+	reversed_fillygon(4, True, False, True)
 
-	def variants():
-		# Regular n-gons.
-		for i in range(3, 12 + 1):
-			yield from regular_fillygon(i)
+	reversed_fillygon(5, True)
+	reversed_fillygon(5, True, True)
+	reversed_fillygon(5, True, False, True)
 
-		# n-gons with reversed sides.
-		yield from reversed_fillygon(3, True)
+	# n-gons with doubled sides.
+	for i in range(3, 6 + 1):
+		regular_fillygon(i, 2)
 
-		yield from reversed_fillygon(4, True)
-		yield from reversed_fillygon(4, True, True)
-		yield from reversed_fillygon(4, True, False, True)
+	# Rhombi
+	rhombus(60)
+	rhombus(atan(2) / degrees)
+	rhombus(acos(1 / 4) / degrees)
+	rhombus(acos(1 / 3) / degrees)
+	rhombus(60)
 
-		yield from reversed_fillygon(5, True)
-		yield from reversed_fillygon(5, True, True)
-		yield from reversed_fillygon(5, True, False, True)
+	# Flat hexagons
+	six_gon_flat(2 * atan((sqrt(5) + 1) / 2) / degrees)
+	six_gon_flat(90)
+	six_gon_flat(2 * atan(sqrt(2)) / degrees)
+	six_gon_flat(2 * atan((sqrt(5) - 1) / 2) / degrees)
+	six_gon_flat(2 * atan(1 / sqrt(2)) / degrees)
 
-		# n-gons with doubled sides.
-		for i in range(3, 6 + 1):
-			yield from regular_fillygon(i, 2)
+	# Custom angles
+	non_regular_fillygon('rectangle', 180, 90, 90, 180, 90)
+	non_regular_fillygon('triamond', 60, 120, 120, 60)
 
-		yield from custom_angles()
+	return variants
 
-	files = dict(variants())
 
-	for i in sorted(files) if path is None else files[path]():
+def main(path = None):
+	variants = get_variants()
+
+	for i in sorted(variants) if path is None else variants[path]():
 		print(i)
 
 
