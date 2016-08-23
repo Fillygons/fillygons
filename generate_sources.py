@@ -141,7 +141,7 @@ def get_variants():
 					with name_part(variant_size = 'double'):
 						fillygon_filling()
 
-	def non_regular_fillygon(name, *angles):
+	def irregular_fillygon(name, *angles):
 		with name_part(polygon = name):
 			with argument(angles = angles):
 				fillygon_filling()
@@ -157,14 +157,14 @@ def get_variants():
 	def rhombus(acute_angle):
 		name = 'rhombus-{}'.format(round(acute_angle))
 
-		non_regular_fillygon(name, acute_angle, 180 - acute_angle, acute_angle)
+		irregular_fillygon(name, acute_angle, 180 - acute_angle, acute_angle)
 
 	def six_gon_flat(opposite_angle):
 		other_angle = 180 - opposite_angle / 2
 
 		name = '6-gon-flat-{}'.format(round(opposite_angle))
 
-		non_regular_fillygon(name, other_angle, opposite_angle, other_angle, other_angle, opposite_angle)
+		irregular_fillygon(name, other_angle, opposite_angle, other_angle, other_angle, opposite_angle)
 
 	# Regular n-gons.
 	for i in range(3, 12 + 1):
@@ -200,8 +200,8 @@ def get_variants():
 	six_gon_flat(2 * atan(1 / sqrt(2)) / degrees)
 
 	# Custom angles
-	non_regular_fillygon('rectangle', 180, 90, 90, 180, 90)
-	non_regular_fillygon('triamond', 60, 120, 120, 60)
+	irregular_fillygon('rectangle', 180, 90, 90, 180, 90)
+	irregular_fillygon('triamond', 60, 120, 120, 60)
 
 	return variants
 
