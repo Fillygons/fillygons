@@ -5,6 +5,7 @@ import sys, os, json, contextlib
 from math import atan, sqrt, acos, pi
 
 
+golden_ratio = (sqrt(5) + 1) / 2
 degrees = pi / 180
 
 
@@ -192,10 +193,10 @@ def get_variants():
 	rhombus(60)
 
 	# Flat hexagons
-	six_gon_flat(2 * atan((sqrt(5) + 1) / 2) / degrees)
+	six_gon_flat(2 * atan(golden_ratio) / degrees)
 	six_gon_flat(90)
 	six_gon_flat(2 * atan(sqrt(2)) / degrees)
-	six_gon_flat(2 * atan((sqrt(5) - 1) / 2) / degrees)
+	six_gon_flat(2 * atan(1 / golden_ratio) / degrees)
 	six_gon_flat(2 * atan(1 / sqrt(2)) / degrees)
 
 	# Custom angles
