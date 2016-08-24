@@ -190,7 +190,6 @@ def get_variants():
 	rhombus(atan(2) / degrees)
 	rhombus(acos(1 / 4) / degrees)
 	rhombus(acos(1 / 3) / degrees)
-	rhombus(60)
 
 	# Flat hexagons
 	six_gon_flat(2 * atan(golden_ratio) / degrees)
