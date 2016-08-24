@@ -186,11 +186,11 @@ def get_variants():
 		regular_fillygon(i, 2)
 
 	# Rhombi
-	rhombus(60)
-	rhombus(atan(2) / degrees)
-	rhombus(acos(1 / 4) / degrees)
-	rhombus(acos(1 / 3) / degrees)
+	rhombus(2 * atan(1 / sqrt(2)) / degrees)
+	rhombus(2 * atan(1 / golden_ratio) / degrees)
 	rhombus(2 * atan(1 / golden_ratio ** 2) / degrees)
+	rhombus(2 * atan(1 / sqrt(3)) / degrees)
+	rhombus(2 * atan(1 / sqrt(15)) / degrees)
 
 	# Flat hexagons
 	six_gon_flat(2 * atan(golden_ratio) / degrees)
