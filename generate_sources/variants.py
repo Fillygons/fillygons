@@ -1,60 +1,16 @@
-import os, json, contextlib
+import os
 
 from math import atan, sqrt, pi
+
+from generate_sources.utils import call, serialize_value, kwargs_accumulator, \
+    context_value
 
 
 golden_ratio = (sqrt(5) + 1) / 2
 degrees = pi / 180
 
 
-class expression(str): pass
-
-
-def call(function, **arguments):
-    args_str = [
-        '{} = {}'.format(k, serialize_value(v))
-        for k, v in sorted(arguments.items())]
-    
-    return expression('{}({})'.format(function, ', '.join(args_str)))
-
-
-def serialize_value(value):
-    if isinstance(value, list):
-        return '[{}]'.format(', '.join(map(serialize_value, value)))
-    elif isinstance(value, expression):
-        return value
-    else:
-        return json.dumps(value)
-
-
-def context_value(initial_value):
-    def decorator(fn):
-        @contextlib.contextmanager
-        def decorated_function(*args, **kwargs):
-            old_value = decorated_function.current_value
-            decorated_function.current_value = fn(old_value, *args, **kwargs)
-
-            try:
-                yield
-            finally:
-                decorated_function.current_value = old_value
-
-        decorated_function.current_value = initial_value
-
-        return decorated_function
-
-    return decorator
-
-
-def kwargs_accumulator():
-    @context_value({ })
-    def name_part(value, **kwargs):
-        return dict(**value, **kwargs)
-
-    return name_part
-
-
-def get_variants():
+def get_files():
     """
     Return a dict from filenames to file contents represented as generator
     functions yielding a list of lines.
@@ -96,15 +52,15 @@ def get_variants():
         name = get_name()
         current_includes = include.current_value
 
-        def fn():
+        def write_content(file):
             for type, path in current_includes:
                 relative_path = os.path.relpath(path, os.path.dirname(name))
 
-                yield '{} <{}>'.format(type, relative_path)
+                print('{} <{}>'.format(type, relative_path), file=file)
 
-            yield 'render() {};'.format(serialize_value(expression))
+            print('render() {};'.format(serialize_value(expression)), file=file)
 
-        variants[name] = fn
+        variants[name] = write_content
 
     def fillygon():
         with include('src/_fillygon.scad'):
