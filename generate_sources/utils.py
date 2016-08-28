@@ -40,9 +40,17 @@ def context_value(initial_value):
     return decorator
 
 
+def args_accumulator():
+    @context_value([])
+    def context_fn(value, *args):
+        return [*value, *args]
+
+    return context_fn
+
+
 def kwargs_accumulator():
-    @context_value({ })
-    def name_part(value, **kwargs):
+    @context_value({})
+    def context_fn(value, **kwargs):
         return dict(**value, **kwargs)
 
-    return name_part
+    return context_fn

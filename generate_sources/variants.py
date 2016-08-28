@@ -1,13 +1,17 @@
+import json
 import os
+from functools import partial
 
 from math import atan, sqrt, pi
 
 from generate_sources.utils import call, serialize_value, kwargs_accumulator, \
-    context_value
+    context_value, args_accumulator
 
 
 golden_ratio = (sqrt(5) + 1) / 2
 degrees = pi / 180
+
+root_path = 'src'
 
 
 def get_files():
@@ -15,7 +19,8 @@ def get_files():
     Return a dict from filenames to file contents represented as generator
     functions yielding a list of lines.
     """
-    variants = {}
+    files = {}
+    metadata_entries = []
 
     @context_value([])
     def include(value, path, type='use'):
@@ -24,12 +29,15 @@ def get_files():
     argument = kwargs_accumulator()
     name_part = kwargs_accumulator()
 
+    tags = args_accumulator()
+    metadata = kwargs_accumulator()
+
     name_part_order = [
         ['gap'],
         ['polygon', 'variant_size', 'variant_reversed'],
         ['variant_filled', 'variant_corners', 'variant_normal']]
 
-    def get_name():
+    def get_path():
         name_parts_map = name_part.current_value
 
         assert all(any(k in i for i in name_part_order) for k in name_parts_map), \
@@ -46,25 +54,39 @@ def get_files():
 
         path_parts[-1] += '.scad'
 
-        return os.path.join('src', 'variants', *path_parts)
+        return os.path.join('variants', *path_parts)
 
-    def add_file(expression):
-        name = get_name()
+    def add_file(path, write_content_fn):
+        files[os.path.join(root_path, path)] = write_content_fn
+
+    def add_fillygon_file(expression):
+        path = get_path()
         current_includes = include.current_value
 
         def write_content(file):
             for type, path in current_includes:
-                relative_path = os.path.relpath(path, os.path.dirname(name))
+                relative_path = os.path.relpath(path, os.path.dirname(path))
 
                 print('{} <{}>'.format(type, relative_path), file=file)
 
             print('render() {};'.format(serialize_value(expression)), file=file)
 
-        variants[name] = write_content
+        add_file(path, write_content)
+
+        with metadata(path=path, tags=tags.current_value):
+            metadata_entries.append(metadata.current_value)
+
+    def add_metadata_file():
+        add_file('variants.json', partial(json.dump, metadata_entries, indent=4))
 
     def fillygon():
         with include('src/_fillygon.scad'):
-            add_file(call('fillygon', **argument.current_value))
+            angles = argument.current_value['angles']
+            angles = [*angles, 180 * (len(angles) - 1) - sum(angles)]
+
+            with metadata(angles=angles):
+                with tags('{}-gon'.format(len(angles))):
+                    add_fillygon_file(call('fillygon', **argument.current_value))
 
     def fillygon_gap():
         for i in .2, .25, .4:
@@ -84,14 +106,16 @@ def get_files():
                     filled_corners=True,
                     min_convex_angle=90,
                     min_concave_angle=180):
-                fillygon_gap()
+                with tags('filled-corners'):
+                    fillygon_gap()
 
     def fillygon_filling():
         fillygon_corners(False)
 
         with name_part(variant_filled='filled'):
             with argument(filled=True):
-                fillygon_corners(True)
+                with tags('filled-face'):
+                    fillygon_corners(True)
 
     def regular_fillygon(sides, side_repetitions=1):
         directions = [
@@ -105,12 +129,14 @@ def get_files():
                     fillygon_filling()
                 else:
                     with name_part(variant_size='double'):
-                        fillygon_filling()
+                        with tags('double'):
+                            fillygon_filling()
 
     def irregular_fillygon(name, *angles):
         with name_part(polygon=name):
             with argument(angles=angles):
-                fillygon_filling()
+                with tags('irregular'):
+                    fillygon_filling()
 
     def reversed_fillygon(sides, *reversed_edges):
         reversed_edges += (False,) * (sides - len(reversed_edges))
@@ -118,7 +144,8 @@ def get_files():
 
         with name_part(variant_reversed=name):
             with argument(reversed_edges=reversed_edges):
-                regular_fillygon(sides)
+                with tags('reversed'):
+                    regular_fillygon(sides)
 
     def rhombus(acute_angle):
         name = 'rhombus-{}'.format(round(acute_angle))
@@ -175,4 +202,6 @@ def get_files():
     irregular_fillygon('rectangle', 180, 90, 90, 180, 90)
     irregular_fillygon('triamond', 60, 120, 120, 60)
 
-    return variants
+    add_metadata_file()
+
+    return files
