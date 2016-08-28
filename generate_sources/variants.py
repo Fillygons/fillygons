@@ -1,11 +1,10 @@
 import json
 import os
-from functools import partial
 
 from math import atan, sqrt, pi
 
 from generate_sources.utils import call, serialize_value, kwargs_accumulator, \
-    context_value, args_accumulator
+    context_value, args_accumulator, chained_contexts
 
 
 golden_ratio = (sqrt(5) + 1) / 2
@@ -35,7 +34,7 @@ def get_files():
     name_part_order = [
         ['gap'],
         ['polygon', 'variant_size', 'variant_reversed'],
-        ['variant_filled', 'variant_corners', 'variant_normal']]
+        ['variant_filled']]
 
     def get_path():
         name_parts_map = name_part.current_value
@@ -77,7 +76,10 @@ def get_files():
             metadata_entries.append(metadata.current_value)
 
     def add_metadata_file():
-        add_file('variants.json', partial(json.dump, metadata_entries, indent=4))
+        def write_content(file):
+            json.dump(metadata_entries, file, indent=4, sort_keys=True)
+
+        add_file('variants.json', write_content)
 
     def fillygon():
         with include('src/_fillygon.scad'):
@@ -94,28 +96,37 @@ def get_files():
                 with argument(gap=i):
                     fillygon()
 
-    def fillygon_corners(filled):
-        if filled:
-            fillygon_gap()
-        else:
-            with name_part(variant_normal='normal'):
-                fillygon_gap()
-
-        with name_part(variant_corners='corners'):
-            with argument(
-                    filled_corners=True,
-                    min_convex_angle=90,
-                    min_concave_angle=180):
-                with tags('filled-corners'):
-                    fillygon_gap()
-
     def fillygon_filling():
-        fillygon_corners(False)
+        for face in False, True:
+            for corners in False, True:
+                def iter_contexts():
+                    if face:
+                        if corners:
+                            variant_name_part='filled-corners'
+                        else:
+                            variant_name_part='filled'
+                    else:
+                        if corners:
+                            variant_name_part='corners'
+                        else:
+                            variant_name_part='normal'
 
-        with name_part(variant_filled='filled'):
-            with argument(filled=True):
-                with tags('filled-face'):
-                    fillygon_corners(True)
+                    yield name_part(variant_filled=variant_name_part)
+
+                    if face:
+                        yield argument(filled=True)
+                        yield tags('filled-face')
+
+                    if corners:
+                        yield argument(
+                            filled_corners=True,
+                            min_convex_angle=90,
+                            min_concave_angle=180)
+
+                        yield tags('filled-corners')
+
+                with chained_contexts(list(iter_contexts())):
+                    fillygon_gap()
 
     def regular_fillygon(sides, side_repetitions=1):
         directions = [

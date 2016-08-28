@@ -54,3 +54,14 @@ def kwargs_accumulator():
         return dict(**value, **kwargs)
 
     return context_fn
+
+
+@contextlib.contextmanager
+def chained_contexts(contexts):
+    if contexts:
+        context, *rest = contexts
+
+        with context, chained_contexts(rest):
+            yield
+    else:
+        yield
