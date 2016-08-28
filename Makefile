@@ -3,6 +3,7 @@ INKSCAPE := inkscape
 OPENSCAD := openscad
 PYTHON := python2
 ASYMPTOTE := asy
+CURA := cura
 
 # Settings affecting the compiled results. You can overwrite these in a file called settings.mk in the same directory as this makefile. See readme.creole.
 DXF_FLATNESS := 0.1
@@ -122,9 +123,10 @@ $(ASY_PDF_FILES): %.pdf: %.asy $(GLOBAL_DEPS) | $(ASY_DEPS)
 	echo [asymptote] $@
 	$(ASYMPTOTE_CMD) $< $@
 
-# Rule for automaticaly generated OpenSCAD files.
+# Rule for automatically generated source files.
 $(GENERATED_FILES): generate_sources.sh $(GLOBAL_DEPS)
 	echo [generate] $@
+	mkdir -p $(@D)
 	./generate_sources.sh $@
 
 # Include dependency files produced by an earlier build.
