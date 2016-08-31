@@ -4,8 +4,7 @@ import os
 from math import atan, sqrt, pi
 
 from generate_sources.decisions import iter_decisions, Decider
-from generate_sources.utils import call, serialize_value, kwargs_accumulator, \
-    context_value, args_accumulator, chained_contexts
+from generate_sources.utils import call, serialize_value
 
 
 golden_ratio = (sqrt(5) + 1) / 2
@@ -15,15 +14,16 @@ root_path = 'src'
 
 
 def decide_file(decider: Decider):
-    @context_value([])
-    def include(value, path, type='use'):
-        return value + [(type, path)]
+    include = []
 
-    argument = kwargs_accumulator()
-    name_part = kwargs_accumulator()
+    def add_include(path, type='use'):
+        include.append((type, path))
 
-    tags = args_accumulator()
-    metadata = kwargs_accumulator()
+    argument = {}
+    name_part = {}
+
+    tags = []
+    metadata = {}
 
     name_part_order = [
         ['gap'],
@@ -31,14 +31,12 @@ def decide_file(decider: Decider):
         ['variant_filled']]
 
     def get_path():
-        name_parts_map = name_part.current_value
-
-        assert all(any(k in i for i in name_part_order) for k in name_parts_map), \
-            (name_part_order, name_parts_map.keys())
+        assert all(any(k in i for i in name_part_order) for k in name_part), \
+            (name_part_order, name_part.keys())
 
         def iter_path_parts():
             for i in name_part_order:
-                name_parts = [name_parts_map[j] for j in i if j in name_parts_map]
+                name_parts = [name_part[j] for j in i if j in name_part]
 
                 if name_parts:
                     yield '-'.join(name_parts)
@@ -51,7 +49,7 @@ def decide_file(decider: Decider):
 
     def get_fillygon_file(expression):
         path = get_path()
-        current_includes = include.current_value
+        current_includes = list(include)
 
         def write_content(file):
             for type, path in current_includes:
@@ -61,57 +59,59 @@ def decide_file(decider: Decider):
 
             print('render() {};'.format(serialize_value(expression)), file=file)
 
-        with metadata(path=path, tags=tags.current_value):
-            return path, write_content, metadata.current_value
+        metadata.update(path=path, tags=tags)
+
+        return path, write_content, metadata
 
     def fillygon():
-        with include('src/_fillygon.scad'):
-            angles = argument.current_value['angles']
-            angles = [*angles, 180 * (len(angles) - 1) - sum(angles)]
+        add_include('src/_fillygon.scad')
 
-            with metadata(angles=angles):
-                with tags('{}-gon'.format(len(angles))):
-                    return get_fillygon_file(call('fillygon', **argument.current_value))
+        angles = argument['angles']
+        angles = [*angles, 180 * (len(angles) - 1) - sum(angles)]
+
+        metadata.update(angles=angles)
+        tags.append('{}-gon'.format(len(angles)))
+
+        return get_fillygon_file(call('fillygon', **argument))
 
     def fillygon_gap():
         i = decider.get([.2, .25, .4])
 
-        with name_part(gap='{}mm'.format(i)):
-            with argument(gap=i):
-                return fillygon()
+        name_part.update(gap='{}mm'.format(i))
+        argument.update(gap=i)
+
+        return fillygon()
 
     def fillygon_filling():
         face = decider.get_boolean()
         corners = decider.get_boolean()
 
-        def iter_contexts():
-            if face:
-                if corners:
-                    variant_name_part='filled-corners'
-                else:
-                    variant_name_part='filled'
-            else:
-                if corners:
-                    variant_name_part='corners'
-                else:
-                    variant_name_part='normal'
-
-            yield name_part(variant_filled=variant_name_part)
-
-            if face:
-                yield argument(filled=True)
-                yield tags('filled-face')
-
+        if face:
             if corners:
-                yield argument(
-                    filled_corners=True,
-                    min_convex_angle=90,
-                    min_concave_angle=180)
+                variant_name_part='filled-corners'
+            else:
+                variant_name_part='filled'
+        else:
+            if corners:
+                variant_name_part='corners'
+            else:
+                variant_name_part='normal'
 
-                yield tags('filled-corners')
+        name_part.update(variant_filled=variant_name_part)
 
-        with chained_contexts(list(iter_contexts())):
-            return fillygon_gap()
+        if face:
+            argument.update(filled=True)
+            tags.append('filled-face')
+
+        if corners:
+            argument.update(
+                filled_corners=True,
+                min_convex_angle=90,
+                min_concave_angle=180)
+
+            tags.append('filled-corners')
+
+        return fillygon_gap()
 
     def regular_fillygon(sides, side_repetitions=1):
         directions = [
@@ -119,20 +119,23 @@ def decide_file(decider: Decider):
             for i in range(sides) for _ in range(side_repetitions)]
         angles = [180 - b + a for a, b in zip(directions, directions[1:])]
 
-        with name_part(polygon='{}-gon'.format(sides)):
-            with argument(angles=angles):
-                if side_repetitions == 1:
-                    return fillygon_filling()
-                else:
-                    with name_part(variant_size='double'):
-                        with tags('double'):
-                            return fillygon_filling()
+        name_part.update(polygon='{}-gon'.format(sides))
+        argument.update(angles=angles)
+
+        if side_repetitions == 1:
+            return fillygon_filling()
+        else:
+            name_part.update(variant_size='double')
+            tags.append('double')
+
+            return fillygon_filling()
 
     def irregular_fillygon(name, *angles):
-        with name_part(polygon=name):
-            with argument(angles=angles):
-                with tags('irregular'):
-                    return fillygon_filling()
+        name_part.update(polygon=name)
+        argument.update(angles=angles)
+        tags.append('irregular')
+
+        return fillygon_filling()
 
     if decider.get_boolean():
         sides = decider.get(range(3, 12 + 1))
@@ -159,10 +162,11 @@ def decide_file(decider: Decider):
         reversed_edges += (False,) * (sides - len(reversed_edges))
         name = 'reversed-{}'.format(''.join('.r'[i] for i in reversed_edges))
 
-        with name_part(variant_reversed=name):
-            with argument(reversed_edges=reversed_edges):
-                with tags('reversed'):
-                    return regular_fillygon(sides)
+        name_part.update(variant_reversed=name)
+        argument.update(reversed_edges=reversed_edges)
+        tags.append('reversed')
+
+        return regular_fillygon(sides)
     elif decider.get_boolean():
         # Rhombi
         acute_angle = decider.get(

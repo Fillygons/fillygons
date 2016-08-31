@@ -1,4 +1,4 @@
-import json, contextlib
+import json
 
 
 class expression(str): pass
@@ -19,49 +19,3 @@ def serialize_value(value):
         return value
     else:
         return json.dumps(value)
-
-
-def context_value(initial_value):
-    def decorator(fn):
-        @contextlib.contextmanager
-        def decorated_function(*args, **kwargs):
-            old_value = decorated_function.current_value
-            decorated_function.current_value = fn(old_value, *args, **kwargs)
-
-            try:
-                yield
-            finally:
-                decorated_function.current_value = old_value
-
-        decorated_function.current_value = initial_value
-
-        return decorated_function
-
-    return decorator
-
-
-def args_accumulator():
-    @context_value([])
-    def context_fn(value, *args):
-        return [*value, *args]
-
-    return context_fn
-
-
-def kwargs_accumulator():
-    @context_value({})
-    def context_fn(value, **kwargs):
-        return dict(**value, **kwargs)
-
-    return context_fn
-
-
-@contextlib.contextmanager
-def chained_contexts(contexts):
-    if contexts:
-        context, *rest = contexts
-
-        with context, chained_contexts(rest):
-            yield
-    else:
-        yield
