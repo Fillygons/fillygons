@@ -13,7 +13,7 @@ degrees = pi / 180
 root_path = 'src'
 
 
-def get_fillygon_file(path, expression, metadata):
+def get_file(path, expression, metadata):
     def write_content(file):
         use_path = os.path.relpath('_fillygon.scad', os.path.dirname(path))
 
@@ -24,15 +24,12 @@ def get_fillygon_file(path, expression, metadata):
 
 
 def decide_file(decider: Decider):
-    tags = []
-    metadata = {}
-
     reversed_edges = []
+    side_repetitions = 1
 
-    if decider.get_boolean():
-        side_repetitions = 1
+    regular = decider.get_boolean()
 
-        # Regular n-gons.
+    if regular:
         if decider.get_boolean():
             num_sides = decider.get_item(range(3, 12 + 1))
 
@@ -64,11 +61,9 @@ def decide_file(decider: Decider):
 
         if side_repetitions > 1:
             polygon_name += '-double'
-            tags.append('double')
 
         if reversed_edges:
             polygon_name += '-reversed-{}'.format(''.join('.r'[i] for i in reversed_edges))
-            tags.append('reversed')
     else:
         if decider.get_boolean():
             # Rhombi
@@ -105,8 +100,6 @@ def decide_file(decider: Decider):
                 ('rectangle', 180, 90, 90, 180, 90),
                 ('triamond', 60, 120, 120, 60))
 
-        tags.append('irregular')
-
     filled = decider.get_boolean()
     filled_corners = decider.get_boolean()
     gap = decider.get(.2, .25, .4)
@@ -114,8 +107,6 @@ def decide_file(decider: Decider):
     if filled_corners:
         min_convex_angle = 90
         min_concave_angle = 180
-
-        tags.append('filled-corners')
 
         if filled:
             variant_name = 'filled-corners'
@@ -130,26 +121,33 @@ def decide_file(decider: Decider):
         min_convex_angle = 38
         min_concave_angle = 38
 
-    metadata.update(angles=angles)
+    path = os.path.join(
+        'variants',
+        '{}mm'.format(gap),
+        polygon_name,
+        variant_name + '.scad')
 
-    tags.append('{}-gon'.format(len(angles)))
+    arguments = dict(
+        angles=angles[:-1],
+        reversed_edges=reversed_edges,
+        filled=filled,
+        filled_corners=filled_corners,
+        min_convex_angle=min_convex_angle,
+        min_concave_angle=min_concave_angle,
+        gap=gap)
 
-    return get_fillygon_file(
-        os.path.join(
-            'variants',
-            '{}mm'.format(gap),
-            polygon_name,
-            variant_name + '.scad'),
-        call(
-            'fillygon',
-            angles=angles[:-1],
-            reversed_edges=reversed_edges,
-            filled=filled,
-            filled_corners=filled_corners,
-            min_convex_angle=min_convex_angle,
-            min_concave_angle=min_concave_angle,
-            gap=gap),
-        dict(metadata, tags=tags))
+    metadata = dict(
+        regular=regular,
+        side_repetitions=side_repetitions,
+        angles=angles,
+        reversed_edges=reversed_edges,
+        filled=filled,
+        filled_corners=filled_corners,
+        min_convex_angle=min_convex_angle,
+        min_concave_angle=min_concave_angle,
+        gap=gap)
+
+    return get_file(path, call('fillygon', **arguments), metadata)
 
 
 def get_files():
