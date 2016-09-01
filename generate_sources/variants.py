@@ -59,23 +59,22 @@ def decide_file(decider: Decider):
     if decider.get_boolean():
         # Regular n-gons.
         if decider.get_boolean():
-            sides = decider.get(range(3, 12 + 1))
+            sides = decider.get_item(range(3, 12 + 1))
 
             if sides <= 6:
-                side_repetitions = decider.get([1, 2])
+                side_repetitions = decider.get(1, 2)
             else:
                 side_repetitions = 1
         else:
             # n-gons with reversed sides.
             sides, *reversed_edges = decider.get(
-                [
-                    (3, True),
-                    (4, True),
-                    (4, True, True),
-                    (4, True, False, True),
-                    (5, True),
-                    (5, True, True),
-                    (5, True, False, True)])
+                (3, True),
+                (4, True),
+                (4, True, True),
+                (4, True, False, True),
+                (5, True),
+                (5, True, True),
+                (5, True, False, True))
 
             reversed_edges += (False,) * (sides - len(reversed_edges))
             name = 'reversed-{}'.format(''.join('.r'[i] for i in reversed_edges))
@@ -101,23 +100,22 @@ def decide_file(decider: Decider):
         if decider.get_boolean():
             # Rhombi
             acute_angle = decider.get(
-                [
-                    2 * atan(1 / sqrt(2)) / degrees,
-                    2 * atan(1 / golden_ratio) / degrees,
-                    2 * atan(1 / golden_ratio ** 2) / degrees,
-                    2 * atan(1 / sqrt(3)) / degrees,
-                    2 * atan(1 / sqrt(15)) / degrees])
+                2 * atan(1 / sqrt(2)) / degrees,
+                2 * atan(1 / golden_ratio) / degrees,
+                2 * atan(1 / golden_ratio ** 2) / degrees,
+                2 * atan(1 / sqrt(3)) / degrees,
+                2 * atan(1 / sqrt(15)) / degrees)
 
             name = 'rhombus-{}'.format(round(acute_angle))
             angles = [acute_angle, 180 - acute_angle, acute_angle]
         elif decider.get_boolean():
             # Flat hexagons
-            opposite_angle = decider.get([
+            opposite_angle = decider.get(
                 2 * atan(golden_ratio) / degrees,
                 90,
                 2 * atan(sqrt(2)) / degrees,
                 2 * atan(1 / golden_ratio) / degrees,
-                2 * atan(1 / sqrt(2)) / degrees])
+                2 * atan(1 / sqrt(2)) / degrees)
 
             other_angle = 180 - opposite_angle / 2
 
@@ -131,9 +129,8 @@ def decide_file(decider: Decider):
                 opposite_angle]
         else:
             name, *angles = decider.get(
-                [
-                    ('rectangle', 180, 90, 90, 180, 90),
-                    ('triamond', 60, 120, 120, 60)])
+                ('rectangle', 180, 90, 90, 180, 90),
+                ('triamond', 60, 120, 120, 60))
 
         name_part.update(polygon=name)
         argument.update(angles=angles)
@@ -167,7 +164,7 @@ def decide_file(decider: Decider):
 
         tags.append('filled-corners')
 
-    gap = decider.get([.2, .25, .4])
+    gap = decider.get(.2, .25, .4)
 
     name_part.update(gap='{}mm'.format(gap))
     argument.update(gap=gap)

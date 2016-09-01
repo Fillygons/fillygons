@@ -6,7 +6,7 @@ class Decider:
         self._decisions = decisions
         self._index_iter = count(0)
 
-    def get(self, collection):
+    def get_item(self, collection):
         index = next(self._index_iter)
         count = len(collection)
 
@@ -15,8 +15,11 @@ class Decider:
 
         return collection[count - self._decisions[index] - 1]
 
+    def get(self, *items):
+        return self.get_item(items)
+
     def get_boolean(self):
-        return self.get([False, True])
+        return self.get(False, True)
 
 
 def iter_decisions(decision_fn):
