@@ -1,7 +1,7 @@
 import json
 import os
 
-from math import atan, sqrt, pi
+from sympy import atan, sqrt, pi, latex
 
 from generate_sources.decisions import iter_decisions, Decider
 from generate_sources.utils import call, serialize_value
@@ -72,7 +72,7 @@ def decide_file(decider: Decider):
                 2 * atan(1 / sqrt(3)) / degrees,
                 2 * atan(1 / sqrt(15)) / degrees)
 
-            polygon_name = 'rhombus-{}'.format(round(acute_angle))
+            polygon_name = 'rhombus-{}'.format(round(float(acute_angle)))
             angles = [acute_angle, 180 - acute_angle, acute_angle]
         elif decider.get_boolean():
             # Flat hexagons
@@ -85,7 +85,7 @@ def decide_file(decider: Decider):
 
             other_angle = 180 - opposite_angle / 2
 
-            polygon_name = '6-gon-flat-{}'.format(round(opposite_angle))
+            polygon_name = '6-gon-flat-{}'.format(round(float(opposite_angle)))
 
             angles = [
                 other_angle,
@@ -128,7 +128,7 @@ def decide_file(decider: Decider):
         variant_name + '.scad')
 
     arguments = dict(
-        angles=angles[:-1],
+        angles=list(map(float, angles[:-1])),
         reversed_edges=reversed_edges,
         filled=filled,
         filled_corners=filled_corners,
@@ -139,7 +139,7 @@ def decide_file(decider: Decider):
     metadata = dict(
         regular=regular,
         side_repetitions=side_repetitions,
-        angles=angles,
+        angles=list(map(latex, angles)),
         reversed_edges=reversed_edges,
         filled=filled,
         filled_corners=filled_corners,
