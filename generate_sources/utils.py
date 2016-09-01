@@ -6,7 +6,7 @@ class expression(str): pass
 
 def call(function, **arguments):
     args_str = [
-        '{} = {}'.format(k, serialize_value(v))
+        '{}={}'.format(k, serialize_value(v))
         for k, v in sorted(arguments.items())]
 
     return expression('{}({})'.format(function, ', '.join(args_str)))

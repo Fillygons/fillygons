@@ -12,62 +12,35 @@ degrees = pi / 180
 
 root_path = 'src'
 
-name_part_order = [
-    ['gap'],
-    ['polygon', 'variant_size', 'variant_reversed'],
-    ['variant_filled']]
 
-
-def get_path(name_part):
-    assert all(any(k in i for i in name_part_order) for k in name_part), \
-        (name_part_order, name_part.keys())
-
-    def iter_path_parts():
-        for i in name_part_order:
-            name_parts = [name_part[j] for j in i if j in name_part]
-
-            if name_parts:
-                yield '-'.join(name_parts)
-
-    path_parts = list(iter_path_parts())
-
-    path_parts[-1] += '.scad'
-
-    return os.path.join('variants', *path_parts)
-
-
-def get_fillygon_file(expression, name_part, metadata, tags):
-    path = get_path(name_part)
-
+def get_fillygon_file(path, expression, metadata):
     def write_content(file):
-        relative_path = os.path.relpath(path, os.path.dirname(path))
+        use_path = os.path.relpath('_fillygon.scad', os.path.dirname(path))
 
-        print('use <{}>'.format(relative_path), file=file)
+        print('use <{}>'.format(use_path), file=file)
         print('render() {};'.format(serialize_value(expression)), file=file)
 
-    metadata = dict(metadata, path=path, tags=tags)
-
-    return path, write_content, metadata
+    return path, write_content, dict(metadata, path=path)
 
 
 def decide_file(decider: Decider):
-    argument = {}
-    name_part = {}
     tags = []
     metadata = {}
 
+    reversed_edges = []
+
     if decider.get_boolean():
+        side_repetitions = 1
+
         # Regular n-gons.
         if decider.get_boolean():
-            sides = decider.get_item(range(3, 12 + 1))
+            num_sides = decider.get_item(range(3, 12 + 1))
 
-            if sides <= 6:
+            if num_sides <= 6:
                 side_repetitions = decider.get(1, 2)
-            else:
-                side_repetitions = 1
         else:
             # n-gons with reversed sides.
-            sides, *reversed_edges = decider.get(
+            num_sides, *reversed_edges = decider.get(
                 (3, True),
                 (4, True),
                 (4, True, True),
@@ -76,26 +49,26 @@ def decide_file(decider: Decider):
                 (5, True, True),
                 (5, True, False, True))
 
-            reversed_edges += (False,) * (sides - len(reversed_edges))
-            name = 'reversed-{}'.format(''.join('.r'[i] for i in reversed_edges))
-
-            name_part.update(variant_reversed=name)
-            argument.update(reversed_edges=reversed_edges)
-            tags.append('reversed')
-
-            side_repetitions = 1
+            reversed_edges += (False,) * (num_sides - len(reversed_edges))
 
         directions = [
-            360 / sides * i
-            for i in range(sides) for _ in range(side_repetitions)]
-        angles = [180 - b + a for a, b in zip(directions, directions[1:])]
+            360 / num_sides * i
+            for i in range(num_sides)
+            for _ in range(side_repetitions)]
 
-        name_part.update(polygon='{}-gon'.format(sides))
-        argument.update(angles=angles)
+        angles = [
+            180 - b + a
+            for a, b in zip(directions, directions[1:] + directions)]
 
-        if side_repetitions != 1:
-            name_part.update(variant_size='double')
+        polygon_name = '{}-gon'.format(num_sides)
+
+        if side_repetitions > 1:
+            polygon_name += '-double'
             tags.append('double')
+
+        if reversed_edges:
+            polygon_name += '-reversed-{}'.format(''.join('.r'[i] for i in reversed_edges))
+            tags.append('reversed')
     else:
         if decider.get_boolean():
             # Rhombi
@@ -106,7 +79,7 @@ def decide_file(decider: Decider):
                 2 * atan(1 / sqrt(3)) / degrees,
                 2 * atan(1 / sqrt(15)) / degrees)
 
-            name = 'rhombus-{}'.format(round(acute_angle))
+            polygon_name = 'rhombus-{}'.format(round(acute_angle))
             angles = [acute_angle, 180 - acute_angle, acute_angle]
         elif decider.get_boolean():
             # Flat hexagons
@@ -119,7 +92,7 @@ def decide_file(decider: Decider):
 
             other_angle = 180 - opposite_angle / 2
 
-            name = '6-gon-flat-{}'.format(round(opposite_angle))
+            polygon_name = '6-gon-flat-{}'.format(round(opposite_angle))
 
             angles = [
                 other_angle,
@@ -128,54 +101,55 @@ def decide_file(decider: Decider):
                 other_angle,
                 opposite_angle]
         else:
-            name, *angles = decider.get(
+            polygon_name, *angles = decider.get(
                 ('rectangle', 180, 90, 90, 180, 90),
                 ('triamond', 60, 120, 120, 60))
 
-        name_part.update(polygon=name)
-        argument.update(angles=angles)
         tags.append('irregular')
 
-    face = decider.get_boolean()
-    corners = decider.get_boolean()
+    filled = decider.get_boolean()
+    filled_corners = decider.get_boolean()
+    gap = decider.get(.2, .25, .4)
 
-    if face:
-        if corners:
-            variant_name_part='filled-corners'
-        else:
-            variant_name_part='filled'
-    else:
-        if corners:
-            variant_name_part='corners'
-        else:
-            variant_name_part='normal'
-
-    name_part.update(variant_filled=variant_name_part)
-
-    if face:
-        argument.update(filled=True)
-        tags.append('filled-face')
-
-    if corners:
-        argument.update(
-            filled_corners=True,
-            min_convex_angle=90,
-            min_concave_angle=180)
+    if filled_corners:
+        min_convex_angle = 90
+        min_concave_angle = 180
 
         tags.append('filled-corners')
 
-    gap = decider.get(.2, .25, .4)
+        if filled:
+            variant_name = 'filled-corners'
+        else:
+            variant_name = 'corners'
+    else:
+        if filled:
+            variant_name = 'filled'
+        else:
+            variant_name = 'normal'
 
-    name_part.update(gap='{}mm'.format(gap))
-    argument.update(gap=gap)
-
-    angles = argument['angles']
-    angles = [*angles, 180 * (len(angles) - 1) - sum(angles)]
+        min_convex_angle = 38
+        min_concave_angle = 38
 
     metadata.update(angles=angles)
+
     tags.append('{}-gon'.format(len(angles)))
 
-    return get_fillygon_file(call('fillygon', **argument), name_part, metadata, tags)
+    return get_fillygon_file(
+        os.path.join(
+            'variants',
+            '{}mm'.format(gap),
+            polygon_name,
+            variant_name + '.scad'),
+        call(
+            'fillygon',
+            angles=angles[:-1],
+            reversed_edges=reversed_edges,
+            filled=filled,
+            filled_corners=filled_corners,
+            min_convex_angle=min_convex_angle,
+            min_concave_angle=min_concave_angle,
+            gap=gap),
+        dict(metadata, tags=tags))
 
 
 def get_files():
