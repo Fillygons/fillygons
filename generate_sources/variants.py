@@ -53,9 +53,7 @@ def decide_file(decider: Decider):
             for i in range(num_sides)
             for _ in range(side_repetitions)]
 
-        angles = [
-            180 - b + a
-            for a, b in zip(directions, directions[1:] + directions)]
+        angles = [180 - b + a for a, b in zip(directions, directions[1:])]
 
         polygon_name = '{}-gon'.format(num_sides)
 
@@ -120,6 +118,8 @@ def decide_file(decider: Decider):
 
         min_convex_angle = 38
         min_concave_angle = 38
+
+    angles.append((len(angles) - 1) * 180 - sum(angles))
 
     path = os.path.join(
         'variants',
