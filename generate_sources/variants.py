@@ -139,7 +139,7 @@ def decide_file(decider: Decider):
     metadata = dict(
         regular=regular,
         side_repetitions=side_repetitions,
-        angles=list(map(latex, angles)),
+        angles=list(map(lambda s: latex(s, inv_trig_style="full"), angles)),
         reversed_edges=reversed_edges,
         filled=filled,
         filled_corners=filled_corners,
