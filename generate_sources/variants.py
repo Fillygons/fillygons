@@ -1,7 +1,7 @@
 import json
 import os
 
-from sympy import atan, sqrt, pi, latex
+from sympy import Integer, atan, sqrt, pi, latex
 
 from generate_sources.decisions import iter_decisions, Decider
 from generate_sources.utils import call, serialize_value
@@ -49,7 +49,7 @@ def decide_file(decider: Decider):
             reversed_edges += (False,) * (num_sides - len(reversed_edges))
 
         directions = [
-            360 / num_sides * i
+            Integer(360) / num_sides * i
             for i in range(num_sides)
             for _ in range(side_repetitions)]
 
