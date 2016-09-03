@@ -8,7 +8,7 @@ from generate_sources.utils import call, serialize_value
 
 
 golden_ratio = GoldenRatio
-degrees = pi / 180
+radian = 180 / pi
 
 root_path = 'src'
 
@@ -66,22 +66,22 @@ def decide_file(decider: Decider):
         if decider.get_boolean():
             # Rhombi
             acute_angle = decider.get(
-                2 * atan(1 / sqrt(2)) / degrees,
-                2 * atan(1 / golden_ratio) / degrees,
-                2 * atan(1 / golden_ratio ** 2) / degrees,
-                2 * atan(1 / sqrt(3)) / degrees,
-                2 * atan(1 / sqrt(15)) / degrees)
+                2 * atan(1 / sqrt(2)) * radian,
+                2 * atan(1 / golden_ratio) * radian,
+                2 * atan(1 / golden_ratio ** 2) * radian,
+                2 * atan(1 / sqrt(3)) * radian,
+                2 * atan(1 / sqrt(15)) * radian)
 
             polygon_name = 'rhombus-{}'.format(round(float(acute_angle)))
             angles = [acute_angle, 180 - acute_angle, acute_angle]
         elif decider.get_boolean():
             # Flat hexagons
             opposite_angle = decider.get(
-                2 * atan(golden_ratio) / degrees,
+                2 * atan(golden_ratio) * radian,
                 90,
-                2 * atan(sqrt(2)) / degrees,
-                2 * atan(1 / golden_ratio) / degrees,
-                2 * atan(1 / sqrt(2)) / degrees)
+                2 * atan(sqrt(2)) * radian,
+                2 * atan(1 / golden_ratio) * radian,
+                2 * atan(1 / sqrt(2)) * radian)
 
             other_angle = 180 - opposite_angle / 2
 
