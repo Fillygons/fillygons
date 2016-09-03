@@ -1,13 +1,13 @@
 import json
 import os
 
-from sympy import Integer, atan, sqrt, pi, latex
+from sympy import Integer, GoldenRatio, atan, sqrt, pi, latex
 
 from generate_sources.decisions import iter_decisions, Decider
 from generate_sources.utils import call, serialize_value
 
 
-golden_ratio = (sqrt(5) + 1) / 2
+golden_ratio = GoldenRatio
 degrees = pi / 180
 
 root_path = 'src'
