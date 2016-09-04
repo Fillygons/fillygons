@@ -55,6 +55,7 @@ def decide_file(decider: Decider):
 
         angles = [180 - b + a for a, b in zip(directions, directions[1:])]
 
+        name = '{}-Gon'.format(num_sides)
         polygon_name = '{}-gon'.format(num_sides)
 
         if side_repetitions > 1:
@@ -72,7 +73,9 @@ def decide_file(decider: Decider):
                 2 * atan(1 / sqrt(3)) / degrees,
                 2 * atan(1 / sqrt(15)) / degrees)
 
-            polygon_name = 'rhombus-{}'.format(round(acute_angle))
+            degrees_rounded = round(acute_angle)
+            name = 'Rhombus ({})'.format(degrees_rounded)
+            polygon_name = 'rhombus-{}'.format(degrees_rounded)
             angles = [acute_angle, 180 - acute_angle, acute_angle]
         elif decider.get_boolean():
             # Flat hexagons
@@ -85,7 +88,9 @@ def decide_file(decider: Decider):
 
             other_angle = 180 - opposite_angle / 2
 
-            polygon_name = '6-gon-flat-{}'.format(round(opposite_angle))
+            degrees_rounded = round(opposite_angle)
+            name = '6-Gon {}'.format(degrees_rounded)
+            polygon_name = '6-gon-flat-{}'.format(degrees_rounded)
 
             angles = [
                 other_angle,
@@ -94,9 +99,9 @@ def decide_file(decider: Decider):
                 other_angle,
                 opposite_angle]
         else:
-            polygon_name, *angles = decider.get(
-                ('rectangle', 180, 90, 90, 180, 90),
-                ('triamond', 60, 120, 120, 60))
+            name, polygon_name, *angles = decider.get(
+                ('Rectangle', 'rectangle', 180, 90, 90, 180, 90),
+                ('Triamond', 'triamond', 60, 120, 120, 60))
 
     filled = decider.get_boolean()
     filled_corners = decider.get_boolean()
@@ -137,6 +142,7 @@ def decide_file(decider: Decider):
         gap=gap)
 
     metadata = dict(
+        name=name,
         regular=regular,
         side_repetitions=side_repetitions,
         angles=angles,
