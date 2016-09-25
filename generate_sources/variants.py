@@ -27,6 +27,9 @@ def decide_file(decider: Decider):
     reversed_edges = []
     side_repetitions = 1
 
+    min_convex_angle = 38
+    min_concave_angle = 38
+
     regular = decider.get_boolean()
 
     if regular:
@@ -72,6 +75,10 @@ def decide_file(decider: Decider):
                 2 * atan(1 / golden_ratio ** 2) / degrees,
                 2 * atan(1 / sqrt(3)) / degrees,
                 2 * atan(1 / sqrt(15)) / degrees)
+
+            if acute_angle < 45:
+                min_convex_angle = 75
+                min_concave_angle = 75
 
             degrees_rounded = round(acute_angle)
             name = 'Rhombus ({})'.format(degrees_rounded)
@@ -120,9 +127,6 @@ def decide_file(decider: Decider):
             variant_name = 'filled'
         else:
             variant_name = 'normal'
-
-        min_convex_angle = 38
-        min_concave_angle = 38
 
     angles.append((len(angles) - 1) * 180 - sum(angles))
 
