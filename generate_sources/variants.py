@@ -71,7 +71,7 @@ def decide_file(decider: Decider):
                 2 * atan(1 / golden_ratio) / degrees,
                 2 * atan(1 / golden_ratio ** 2) / degrees,
                 2 * atan(1 / sqrt(3)) / degrees,
-                2 * atan(1 / sqrt(15)) / degrees)
+                2 * atan(sqrt(3 / 5)) / degrees)
 
             degrees_rounded = round(acute_angle)
             name = 'Rhombus ({})'.format(degrees_rounded)
