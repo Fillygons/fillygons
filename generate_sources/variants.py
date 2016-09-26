@@ -76,7 +76,7 @@ def decide_file(decider: Decider):
                 2 * atan(1 / sqrt(3)) / degrees,
                 2 * atan(1 / sqrt(15)) / degrees)
 
-            if acute_angle < 45:
+            if not (45 <= acute_angle <= 135):
                 min_convex_angle = 75
                 min_concave_angle = 75
 
