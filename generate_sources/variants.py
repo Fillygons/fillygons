@@ -103,28 +103,33 @@ def decide_file(decider: Decider):
                 ('Rectangle', 'rectangle', 180, 90, 90, 180, 90),
                 ('Triamond', 'triamond', 60, 120, 120, 60))
 
+    angles.append((len(angles) - 1) * 180 - sum(angles))
+
     filled = decider.get_boolean()
     filled_corners = decider.get_boolean()
     gap = decider.get(.2, .25, .4)
 
     if filled_corners:
-        min_convex_angle = 90
-        min_concave_angle = 180
-
         if filled:
             variant_name = 'filled-corners'
         else:
             variant_name = 'corners'
+
+        min_convex_angle = 90
+        min_concave_angle = 180
     else:
         if filled:
             variant_name = 'filled'
         else:
             variant_name = 'normal'
 
-        min_convex_angle = 38
-        min_concave_angle = 38
+        if min(angles) < 45:
+            min_edge_angle = 75
+        else:
+            min_edge_angle = 38
 
-    angles.append((len(angles) - 1) * 180 - sum(angles))
+        # Make pieces vertically symmetric.
+        min_convex_angle = min_concave_angle = min_edge_angle
 
     path = os.path.join(
         'variants',
