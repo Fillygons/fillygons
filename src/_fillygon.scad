@@ -8,7 +8,7 @@ include <_settings.scad>
 // filled_corners: Whether to cut a smaller bevel in the corners clearance region instead of using the same bevel as between the teeth.
 // min_convex_angle: Minimum dihedral angle supported in a convex configuration.
 // min_concave_angle: Minimum dihedral angle supported in a non-convex configuration.
-module fillygon(angles, reversed_edges = [], filled = false, filled_corners = false, min_convex_angle = min_angle, min_concave_angle = min_angle, gap = 0.4) {
+module fillygon(angles, reversed_edges, filled, filled_corners, min_convex_angle, min_concave_angle, gap) {
 	module reverse() {
 		translate([side_length / 2, 0, 0]) {
 			scale([$reversed_edge ? -1 : 1, 1, 1]) {

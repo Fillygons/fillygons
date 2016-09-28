@@ -163,7 +163,7 @@ class ExportEffect(inkex.Effect):
 		def write_line(format, *args):
 			print >> file, format.format(*args) + ';'
 		
-		# Scales pixels to points. Asymptote uses points by default.
+		# Scales pixels to points. Asymptote uses PostScript points (1 / 72 inch) by default.
 		unit_factor = self._unit_factors['pt']
 		
 		paths_by_layer = collections.defaultdict(list)
