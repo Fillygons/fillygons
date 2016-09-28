@@ -83,7 +83,7 @@ def decide_file(decider: Decider):
             # Flat hexagons
             opposite_angle = decider.get(
                 2 * atan(golden_ratio),
-                90,
+                pi / 2,
                 2 * atan(sqrt(2)),
                 2 * atan(1 / golden_ratio),
                 2 * atan(1 / sqrt(2)))
