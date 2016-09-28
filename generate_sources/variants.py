@@ -27,9 +27,6 @@ def decide_file(decider: Decider):
     reversed_edges = []
     side_repetitions = 1
 
-    min_convex_angle = 38
-    min_concave_angle = 38
-
     regular = decider.get_boolean()
 
     if regular:
@@ -76,10 +73,6 @@ def decide_file(decider: Decider):
                 2 * atan(1 / sqrt(3)) / degrees,
                 2 * atan(1 / sqrt(15)) / degrees)
 
-            if not (45 <= acute_angle <= 135):
-                min_convex_angle = 75
-                min_concave_angle = 75
-
             degrees_rounded = round(acute_angle)
             name = 'Rhombus ({})'.format(degrees_rounded)
             polygon_name = 'rhombus-{}'.format(degrees_rounded)
@@ -110,25 +103,33 @@ def decide_file(decider: Decider):
                 ('Rectangle', 'rectangle', 180, 90, 90, 180, 90),
                 ('Triamond', 'triamond', 60, 120, 120, 60))
 
+    angles.append((len(angles) - 1) * 180 - sum(angles))
+
     filled = decider.get_boolean()
     filled_corners = decider.get_boolean()
     gap = decider.get(.2, .25, .4)
 
     if filled_corners:
-        min_convex_angle = 90
-        min_concave_angle = 180
-
         if filled:
             variant_name = 'filled-corners'
         else:
             variant_name = 'corners'
+
+        min_convex_angle = 90
+        min_concave_angle = 180
     else:
         if filled:
             variant_name = 'filled'
         else:
             variant_name = 'normal'
 
-    angles.append((len(angles) - 1) * 180 - sum(angles))
+        if min(angles) < 45:
+            min_edge_angle = 75
+        else:
+            min_edge_angle = 38
+
+        # Make pieces vertically symmetric.
+        min_convex_angle = min_concave_angle = min_edge_angle
 
     path = os.path.join(
         'variants',
