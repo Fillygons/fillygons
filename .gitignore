@@ -6,3 +6,5 @@
 /src/**/*.gcode
 /src/**/*.pdf
 /src/**/*.d
+
+/venv/
