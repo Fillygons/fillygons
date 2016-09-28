@@ -154,8 +154,8 @@ def decide_file(decider: Decider):
         reversed_edges=reversed_edges,
         filled=filled,
         filled_corners=filled_corners,
-        min_convex_angle=min_convex_angle,
-        min_concave_angle=min_concave_angle,
+        min_convex_angle=float(min_convex_angle),
+        min_concave_angle=float(min_concave_angle),
         gap=gap)
 
     return get_file(path, call('fillygon', **arguments), metadata)
