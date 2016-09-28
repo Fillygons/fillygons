@@ -134,7 +134,7 @@ def decide_file(decider: Decider):
         variant_name + '.scad')
 
     arguments = dict(
-        angles=list(map(float, angles[:-1])),
+        angles=angles[:-1],
         reversed_edges=reversed_edges,
         filled=filled,
         filled_corners=filled_corners,

@@ -1,5 +1,7 @@
 import json
 
+from sympy import Expr
+
 
 class expression(str): pass
 
@@ -17,5 +19,7 @@ def serialize_value(value):
         return '[{}]'.format(', '.join(map(serialize_value, value)))
     elif isinstance(value, expression):
         return value
+    elif isinstance(value, Expr):
+        return str(float(value))
     else:
         return json.dumps(value)
