@@ -1,14 +1,15 @@
 import json
 import os
 
-from sympy import Integer, GoldenRatio, atan, sqrt, pi, latex
+from sympy import GoldenRatio, atan, sqrt, pi, latex
 
 from generate_sources.decisions import iter_decisions, Decider
-from generate_sources.utils import call, serialize_value
+from generate_sources.utils import call, serialize_value, to_degrees
 
 
 golden_ratio = GoldenRatio
-radian = 180 / pi
+
+degree = pi / 180
 
 root_path = 'src'
 
@@ -49,11 +50,11 @@ def decide_file(decider: Decider):
             reversed_edges += (False,) * (num_sides - len(reversed_edges))
 
         directions = [
-            Integer(360) / num_sides * i
+            2 * pi / num_sides * i
             for i in range(num_sides)
             for _ in range(side_repetitions)]
 
-        angles = [180 - b + a for a, b in zip(directions, directions[1:])]
+        angles = [pi - b + a for a, b in zip(directions, directions[1:])]
 
         name = '{}-Gon'.format(num_sides)
         polygon_name = '{}-gon'.format(num_sides)
@@ -67,29 +68,29 @@ def decide_file(decider: Decider):
         if decider.get_boolean():
             # Rhombi
             acute_angle = decider.get(
-                2 * atan(1 / sqrt(2)) * radian,
-                2 * atan(1 / golden_ratio) * radian,
-                2 * atan(1 / golden_ratio ** 2) * radian,
-                2 * atan(1 / sqrt(3)) * radian,
-                2 * atan(1 / sqrt(15)) * radian)
+                2 * atan(1 / sqrt(2)),
+                2 * atan(1 / golden_ratio),
+                2 * atan(1 / golden_ratio ** 2),
+                2 * atan(1 / sqrt(3)),
+                2 * atan(1 / sqrt(15)))
 
-            degrees_rounded = round(float(acute_angle))
+            degrees_rounded = round(float(to_degrees(acute_angle)))
             name = 'Rhombus ({})'.format(degrees_rounded)
             polygon_name = 'rhombus-{}'.format(degrees_rounded)
 
-            angles = [acute_angle, 180 - acute_angle, acute_angle]
+            angles = [acute_angle, pi - acute_angle, acute_angle]
         elif decider.get_boolean():
             # Flat hexagons
             opposite_angle = decider.get(
-                2 * atan(golden_ratio) * radian,
+                2 * atan(golden_ratio),
                 90,
-                2 * atan(sqrt(2)) * radian,
-                2 * atan(1 / golden_ratio) * radian,
-                2 * atan(1 / sqrt(2)) * radian)
+                2 * atan(sqrt(2)),
+                2 * atan(1 / golden_ratio),
+                2 * atan(1 / sqrt(2)))
 
-            other_angle = 180 - opposite_angle / 2
+            other_angle = pi - opposite_angle / 2
 
-            degrees_rounded = round(float(opposite_angle))
+            degrees_rounded = round(float(to_degrees(opposite_angle)))
             name = '6-Gon {}'.format(degrees_rounded)
             polygon_name = '6-gon-flat-{}'.format(degrees_rounded)
 
@@ -100,17 +101,19 @@ def decide_file(decider: Decider):
                 other_angle,
                 opposite_angle]
         else:
-            name, polygon_name, *angles = decider.get(
+            name, polygon_name, *angles_degree = decider.get(
                 ('Rectangle', 'rectangle', 180, 90, 90, 180, 90),
                 ('Triamond', 'triamond', 60, 120, 120, 60))
+
+            angles = [i * degree for i in angles_degree]
 
     filled = decider.get_boolean()
     filled_corners = decider.get_boolean()
     gap = decider.get(.2, .25, .4)
 
     if filled_corners:
-        min_convex_angle = 90
-        min_concave_angle = 180
+        min_convex_angle = 90 * degree
+        min_concave_angle = 180 * degree
 
         if filled:
             variant_name = 'filled-corners'
@@ -122,10 +125,10 @@ def decide_file(decider: Decider):
         else:
             variant_name = 'normal'
 
-        min_convex_angle = 38
-        min_concave_angle = 38
+        min_convex_angle = 38 * degree
+        min_concave_angle = 38 * degree
 
-    angles.append((len(angles) - 1) * 180 - sum(angles))
+    angles.append((len(angles) - 1) * pi - sum(angles))
 
     path = os.path.join(
         'variants',
@@ -134,20 +137,20 @@ def decide_file(decider: Decider):
         variant_name + '.scad')
 
     arguments = dict(
-        angles=angles[:-1],
+        angles=[to_degrees(i) for i in angles[:-1]],
         reversed_edges=reversed_edges,
         filled=filled,
         filled_corners=filled_corners,
-        min_convex_angle=min_convex_angle,
-        min_concave_angle=min_concave_angle,
+        min_convex_angle=to_degrees(min_convex_angle),
+        min_concave_angle=to_degrees(min_concave_angle),
         gap=gap)
 
     metadata = dict(
         name=name,
         regular=regular,
         side_repetitions=side_repetitions,
-        angles_formulae=list(map(lambda s: latex(s, inv_trig_style="full"), angles)),
-        angles_values=list(map(float, angles)),
+        angles_formulae=[latex(s, inv_trig_style='full') for s in angles],
+        angles_values=[float(i) for i in angles],
         reversed_edges=reversed_edges,
         filled=filled,
         filled_corners=filled_corners,

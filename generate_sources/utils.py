@@ -1,6 +1,6 @@
 import json
 
-from sympy import Expr
+from sympy import pi, Expr
 
 
 class expression(str): pass
@@ -23,3 +23,7 @@ def serialize_value(value):
         return str(float(value))
     else:
         return json.dumps(value)
+
+
+def to_degrees(value):
+    return value / pi * 180
