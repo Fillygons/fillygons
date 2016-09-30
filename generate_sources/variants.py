@@ -127,7 +127,7 @@ def decide_file(decider: Decider):
         else:
             variant_name = 'normal'
 
-        if min(angles) < 45:
+        if min(angles) < 45 * degree:
             min_edge_angle = 75 * degree
         else:
             min_edge_angle = 38 * degree
