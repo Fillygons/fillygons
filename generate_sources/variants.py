@@ -1,13 +1,11 @@
 import json
 import os
 
-from sympy import GoldenRatio, atan, sqrt, pi, latex
+from sympy import GoldenRatio, atan, sqrt, pi, latex, rad, deg
 
 from generate_sources.decisions import iter_decisions, Decider
-from generate_sources.utils import call, serialize_value, to_degrees
+from generate_sources.utils import call, serialize_value
 
-
-degree = pi / 180
 
 root_path = 'src'
 
@@ -72,7 +70,7 @@ def decide_file(decider: Decider):
                 2 * atan(1 / sqrt(3)),
                 2 * atan(sqrt(3 / 5)))
 
-            degrees_rounded = round(float(to_degrees(acute_angle)))
+            degrees_rounded = round(float(deg(acute_angle)))
             name = 'Rhombus ({})'.format(degrees_rounded)
             polygon_name = 'rhombus-{}'.format(degrees_rounded)
 
@@ -88,7 +86,7 @@ def decide_file(decider: Decider):
 
             other_angle = pi - opposite_angle / 2
 
-            degrees_rounded = round(float(to_degrees(opposite_angle)))
+            degrees_rounded = round(float(deg(opposite_angle)))
             name = '6-Gon {}'.format(degrees_rounded)
             polygon_name = '6-gon-flat-{}'.format(degrees_rounded)
 
@@ -103,7 +101,7 @@ def decide_file(decider: Decider):
                 ('Rectangle', 'rectangle', 180, 90, 90, 180, 90),
                 ('Triamond', 'triamond', 60, 120, 120, 60))
 
-            angles = [i * degree for i in angles_degree]
+            angles = [rad(i) for i in angles_degree]
 
     angles.append((len(angles) - 1) * pi - sum(angles))
 
@@ -117,18 +115,18 @@ def decide_file(decider: Decider):
         else:
             variant_name = 'corners'
 
-        min_convex_angle = 90 * degree
-        min_concave_angle = 180 * degree
+        min_convex_angle = rad(90)
+        min_concave_angle = rad(180)
     else:
         if filled:
             variant_name = 'filled'
         else:
             variant_name = 'normal'
 
-        if min(angles) < 45 * degree:
-            min_edge_angle = 75 * degree
+        if min(angles) < rad(45):
+            min_edge_angle = rad(75)
         else:
-            min_edge_angle = 38 * degree
+            min_edge_angle = rad(38)
 
         # Make pieces vertically symmetric.
         min_convex_angle = min_concave_angle = min_edge_angle
@@ -140,12 +138,12 @@ def decide_file(decider: Decider):
         variant_name + '.scad')
 
     arguments = dict(
-        angles=[to_degrees(i) for i in angles[:-1]],
+        angles=[deg(i) for i in angles[:-1]],
         reversed_edges=reversed_edges,
         filled=filled,
         filled_corners=filled_corners,
-        min_convex_angle=to_degrees(min_convex_angle),
-        min_concave_angle=to_degrees(min_concave_angle),
+        min_convex_angle=deg(min_convex_angle),
+        min_concave_angle=deg(min_concave_angle),
         gap=gap)
 
     metadata = dict(
