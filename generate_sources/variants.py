@@ -7,8 +7,6 @@ from generate_sources.decisions import iter_decisions, Decider
 from generate_sources.utils import call, serialize_value, to_degrees
 
 
-golden_ratio = GoldenRatio
-
 degree = pi / 180
 
 root_path = 'src'
@@ -69,8 +67,8 @@ def decide_file(decider: Decider):
             # Rhombi
             acute_angle = decider.get(
                 2 * atan(1 / sqrt(2)),
-                2 * atan(1 / golden_ratio),
-                2 * atan(1 / golden_ratio ** 2),
+                2 * atan(1 / GoldenRatio),
+                2 * atan(1 / GoldenRatio ** 2),
                 2 * atan(1 / sqrt(3)),
                 2 * atan(sqrt(3 / 5)))
 
@@ -82,10 +80,10 @@ def decide_file(decider: Decider):
         elif decider.get_boolean():
             # Flat hexagons
             opposite_angle = decider.get(
-                2 * atan(golden_ratio),
+                2 * atan(GoldenRatio),
                 pi / 2,
                 2 * atan(sqrt(2)),
-                2 * atan(1 / golden_ratio),
+                2 * atan(1 / GoldenRatio),
                 2 * atan(1 / sqrt(2)))
 
             other_angle = pi - opposite_angle / 2
