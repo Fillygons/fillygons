@@ -78,9 +78,9 @@ def decide_file(decider: Decider):
 
                 # Polar Zonohedron n = 5
                 (sqrt(7 - sqrt(5)), sqrt(5 + sqrt(5))),
-                (sqrt(7 + sqrt(5)), sqrt(5 - sqrt(5))),
+                (sqrt(5 - sqrt(5)), sqrt(7 + sqrt(5))),
                 # Polar Zonohedron n = 6
-                (sqrt(5), 1),
+                (1, sqrt(5)),
             )
 
             assert short_diagonal < long_diagonal
