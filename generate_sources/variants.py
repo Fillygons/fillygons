@@ -1,7 +1,7 @@
 import json
 import os
 
-from sympy import GoldenRatio, atan, sqrt, pi, latex, rad, deg
+from sympy import GoldenRatio, atan, sqrt, pi, latex, rad, deg, S
 
 from generate_sources.decisions import iter_decisions, Decider
 from generate_sources.utils import call, serialize_value
@@ -63,26 +63,29 @@ def decide_file(decider: Decider):
     else:
         if decider.get_boolean():
             # Rhombi
-            acute_angle = decider.get(
+            short_diagonal, long_diagonal = decider.get(
                 # Diamond
-                2 * atan(1 / sqrt(3)),
+                (1, sqrt(3)),
                 # Rhombic Dodecahedron
-                2 * atan(1 / sqrt(2)),
+                (1, sqrt(2)),
                 # Rhombic Triacontahedron
-                2 * atan(1 / GoldenRatio),
+                (1, GoldenRatio),
                 # Rhombic Enneacontahedron
-                2 * atan(1 / GoldenRatio ** 2),
+                (1, GoldenRatio ** 2),
 
                 # Spiral Tube n = 4 and m = 1
-                2 * atan(sqrt(15) / 5),
+                (sqrt(3), sqrt(5)),
 
                 # Polar Zonohedron n = 5
-                2 * atan(sqrt(7 - sqrt(5)) / sqrt(5 + sqrt(5))),
-                2 * atan(sqrt(7 + sqrt(5)) / sqrt(5 - sqrt(5))),
+                (sqrt(7 - sqrt(5)), sqrt(5 + sqrt(5))),
+                (sqrt(7 + sqrt(5)), sqrt(5 - sqrt(5))),
                 # Polar Zonohedron n = 6
-                2 * atan(sqrt(5))
+                (sqrt(5), 1),
             )
 
+            assert short_diagonal < long_diagonal
+
+            acute_angle = 2 * atan(S(short_diagonal) / long_diagonal)
             degrees_rounded = round(float(deg(acute_angle)))
             name = 'Rhombus ({})'.format(degrees_rounded)
             polygon_name = 'rhombus-{}'.format(degrees_rounded)
