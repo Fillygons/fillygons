@@ -64,11 +64,24 @@ def decide_file(decider: Decider):
         if decider.get_boolean():
             # Rhombi
             acute_angle = decider.get(
-                2 * atan(1 / sqrt(2)),
-                2 * atan(1 / GoldenRatio),
-                2 * atan(1 / GoldenRatio ** 2),
+                # Diamond
                 2 * atan(1 / sqrt(3)),
-                2 * atan(sqrt(15) / 5))
+                # Rhombic Dodecahedron
+                2 * atan(1 / sqrt(2)),
+                # Rhombic Triacontahedron
+                2 * atan(1 / GoldenRatio),
+                # Rhombic Enneacontahedron
+                2 * atan(1 / GoldenRatio ** 2),
+
+                # Spiral Tube n = 4 and m = 1
+                2 * atan(sqrt(15) / 5),
+
+                # Polar Zonohedron n = 5
+                2 * atan(sqrt(7 - sqrt(5)) / sqrt(5 + sqrt(5))),
+                2 * atan(sqrt(7 + sqrt(5)) / sqrt(5 - sqrt(5))),
+                # Polar Zonohedron n = 6
+                2 * atan(sqrt(5))
+            )
 
             degrees_rounded = round(float(deg(acute_angle)))
             name = 'Rhombus ({})'.format(degrees_rounded)
