@@ -8,7 +8,7 @@ loop_width = 2 * thickness;
 filling_height = 1;
 
 // Length of a pieces sides, measured along the ideal polygon's edges.
-side_length = 40;
+side_length_unit = 40;
 
 // Width of chamfers cut into the edges and resulting edges at corners to make them less sharp/pointy.
 chamfer_height = 1;

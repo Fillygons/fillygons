@@ -3,16 +3,17 @@ include <_settings.scad>
 
 // Produces a single fillygon with n edges. The piece is oriented so that the outside of the polygon is on top.
 // angles: A list of n - 1 numbers, specifying the interior angles.
+// edges: A list of n numbers, specifying the side lengths.
 // reversed_edges: A list of booleans, specifying on which edges to reverse the tenons. The passed list is padded to n elemens with the value false.
 // filled: Specifies whether to close the inside of the polygon by filling in the lower side.
 // filled_corners: Whether to cut a smaller bevel in the corners clearance region instead of using the same bevel as between the teeth.
 // min_convex_angle: Minimum dihedral angle supported in a convex configuration.
 // min_concave_angle: Minimum dihedral angle supported in a non-convex configuration.
-module fillygon(angles, reversed_edges, filled, filled_corners, min_convex_angle, min_concave_angle, gap) {
+module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_convex_angle, min_concave_angle, gap) {
 	module reverse() {
-		translate([side_length / 2, 0, 0]) {
+		translate([$side_length / 2, 0, 0]) {
 			scale([$reversed_edge ? -1 : 1, 1, 1]) {
-				translate([-side_length / 2, 0, 0]) {
+				translate([-$side_length / 2, 0, 0]) {
 					children();
 				}
 			}
@@ -22,7 +23,7 @@ module fillygon(angles, reversed_edges, filled, filled_corners, min_convex_angle
 	module trace(intersect = false) {
 		module more(i) {
 			if (i < len(angles)) {
-				translate([side_length, 0, 0]) {
+				translate([side_length_unit * edges[i], 0, 0]) {
 					rotate(180 - angles[i]) {
 						tail(i + 1) {
 							children();
@@ -36,7 +37,8 @@ module fillygon(angles, reversed_edges, filled, filled_corners, min_convex_angle
 			// Ugly hack to pass the angle of the previous corner into the child modules.
 			$corner_angle = all_angles[i];
 			$reversed_edge = i < len(reversed_edges) && reversed_edges[i];
-			
+			$side_length = side_length_unit * edges[i];
+
 			if (intersect) {
 				intersection() {
 					reverse() {
@@ -88,16 +90,16 @@ module fillygon(angles, reversed_edges, filled, filled_corners, min_convex_angle
 		small_teeth_gap,
 		small_teeth_width,
 		large_teeth_width]);
-	
-	// Length on each end of an edge where no teeth are placed.
-	corner_clearance = (side_length - positions[len(positions) - 1]) / 2;
-	
-	// List which specifies, for each entry in the positions list, in which direction gap /  2 should be added, if at all.
+
+	// List which specifies, for each entry in the positions list, in which direction gap / 2 should be added, if at all.
 	gaps = [1, -1, 1, -1, 1, 0, 0, -1, 1];
-	
+
+	// Length on each end of an edge where no teeth are placed.
+	function corner_clearance(l) = (l - positions[len(positions) - 1]) / 2;
+
 	function dir(pos) = 1 - pos % 2 * 2;
-	function pos(pos) = corner_clearance + positions[pos] + gaps[pos] * gap / 2;
-	
+	function pos(pos, l) = corner_clearance(l) + positions[pos] + gaps[pos] * gap / 2;
+
 	// The infintely extruded region of the polygon with an optional offset.
 	module edge(offset = 0) {
 		sector_3d(ymin = offset);
@@ -105,7 +107,7 @@ module fillygon(angles, reversed_edges, filled, filled_corners, min_convex_angle
 	
 	// Translate and possibly mirror an object to position it at the specified position.
 	module at_position(pos) {
-		translate([pos(pos), 0, 0]) {
+		translate([pos(pos, $side_length), 0, 0]) {
 			scale([dir(pos), 1, 1]) {
 				children();
 			}
@@ -122,13 +124,13 @@ module fillygon(angles, reversed_edges, filled, filled_corners, min_convex_angle
 	}
 	
 	module clearance_region() {
-		sector_3d(xmax = pos(0));
-		sector_3d(xmin = pos(len(positions) - 1));
+		sector_3d(xmax = pos(0, $side_length));
+		sector_3d(xmin = pos(len(positions) - 1, $side_length));
 	}
 	
 	// The region spanning the whole ideal edge.
 	module edge_region() {
-		sector_3d(xmin = 0, xmax = side_length);
+		sector_3d(xmin = 0, xmax = $side_length);
 	}
 	
 	// The part that needs to be removed to support acute angles.
@@ -237,7 +239,7 @@ module fillygon(angles, reversed_edges, filled, filled_corners, min_convex_angle
 	module teeth_region() {
 		difference() {
 			for (j = [0:(len(positions) - 1) / 2]) {
-				sector_3d(xmin = pos(2 * j), xmax = pos(2 * j + 1));
+				sector_3d(xmin = pos(2 * j, $side_length), xmax = pos(2 * j + 1, $side_length));
 			}
 			
 			dedent_hole(1);
@@ -260,8 +262,8 @@ module fillygon(angles, reversed_edges, filled, filled_corners, min_convex_angle
 			intersection() {
 				// A thick plane with the thickness of the part.
 				sector_3d(zmin = -thickness / 2, zmax = thickness / 2);
-				
-				// The frame with beveled edges and cuttings. 
+
+				// The frame with beveled edges and cuttings.
 				trace(true) difference() {
 					edge();
 					
