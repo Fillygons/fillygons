@@ -3,7 +3,7 @@ include <_settings.scad>
 
 // Produces a single fillygon with n edges. The piece is oriented so that the outside of the polygon is on top.
 // angles: A list of n - 1 numbers, specifying the interior angles.
-// edges: A list of n numbers, specifying the side lengths.
+// edges: A list of n - 1 numbers, specifying the side lengths.
 // reversed_edges: A list of booleans, specifying on which edges to reverse the tenons. The passed list is padded to n elemens with the value false.
 // filled: Specifies whether to close the inside of the polygon by filling in the lower side.
 // filled_corners: Whether to cut a smaller bevel in the corners clearance region instead of using the same bevel as between the teeth.
@@ -23,7 +23,7 @@ module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_conve
 	module trace(intersect = false) {
 		module more(i) {
 			if (i < len(angles)) {
-				translate([side_length_unit * edges[i], 0, 0]) {
+				translate([side_length_unit * all_edges[i], 0, 0]) {
 					rotate(180 - angles[i]) {
 						tail(i + 1) {
 							children();
@@ -37,7 +37,7 @@ module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_conve
 			// Ugly hack to pass the angle of the previous corner into the child modules.
 			$corner_angle = all_angles[i];
 			$reversed_edge = i < len(reversed_edges) && reversed_edges[i];
-			$side_length = side_length_unit * edges[i];
+			$side_length = side_length_unit * all_edges[i];
 
 			if (intersect) {
 				intersection() {
@@ -78,7 +78,16 @@ module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_conve
 	// Used for cutting a chamfer into the corners.
 	num_corners = len(angles) + 1;
 	all_angles = concat([180 * (num_corners - 2) - sum_list(angles)], angles);
-	
+
+	// Calculates unit vectors pointing along each edge.
+	function edge_vectors(angles) =
+		let(outer_angles = accumulate_list([for (a = angles) 180 - a]),
+		    edge_directions = [for (a = outer_angles) [cos(a), sin(a)]])
+		concat([[1,0]], edge_directions);
+
+	// Calculates the length of the last edge.
+	all_edges = concat(edges, [norm(linear_combination(edges, edge_vectors(angles)))]);
+
 	// These are, in order, the left and right edges of the first and second instance of the large and small teeth. The last element is the right end of the cutting which complements the first tooth. All elements are relative to the end of the left clearance region.
 	positions = accumulate_list([
 		0,

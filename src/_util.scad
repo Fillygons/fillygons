@@ -32,3 +32,6 @@ function sum_list(v, i = 0) = i < len(v) ? v[i] + sum_list(v, i + 1) : 0;
 
 // Return a new list, where each element is the sum of the element up to the element at the same position in list v.
 function accumulate_list(v) = [for (i = range(len(v))) sum_list(slice(v, 0, i + 1))];
+
+// Compute the linear combination of the vectors in v with the scalars from s.
+function linear_combination(s, v) = sum_list([for (i = range(len(s))) s[i] * v[i]], iv = [0,0]);
