@@ -3,8 +3,8 @@ import os
 
 from sympy import GoldenRatio, acos, atan, sqrt, cbrt, pi, latex, rad, deg, S
 
-from generate_sources.decisions import iter_decisions, Decider
-from generate_sources.utils import call, serialize_value
+from fillygons.generate_sources.decisions import iter_decisions, Decider
+from fillygons.generate_sources.utils import call, serialize_value
 
 
 root_path = 'src'

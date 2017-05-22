@@ -8,3 +8,5 @@
 /src/**/*.d
 
 /venv/
+/*.egg-info
+*.pyc

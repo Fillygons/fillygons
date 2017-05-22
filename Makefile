@@ -123,7 +123,7 @@ $(ASY_PDF_FILES): %.pdf: %.asy $(GLOBAL_DEPS) | $(ASY_DEPS)
 	echo [asymptote] $@
 	$(ASYMPTOTE_CMD) $< $@
 
-GENERATED_FILES_DEPS := $(shell find generate_sources -name *.py)
+GENERATED_FILES_DEPS := $(shell find fillygons/generate_sources -name *.py)
 
 # Rule for automatically generated source files.
 $(GENERATED_FILES): generate_sources.sh $(GLOBAL_DEPS) $(GENERATED_FILES_DEPS)
