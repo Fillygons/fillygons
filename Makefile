@@ -83,7 +83,7 @@ all: generated $(SCAD_DXF_FILES) $(SCAD_STL_FILES) $(ASY_PDF_FILES) $(STL_GCODE_
 
 # Everything^-1.
 clean:
-	echo [clean] $(EXISTING_TARGETS)
+	echo [clean] $(words $(EXISTING_TARGETS)) files
 	rm -rf $(EXISTING_TARGETS)
 
 # Goals to build the project up to a specific step.
@@ -131,7 +131,7 @@ GENERATED_FILES_DEPS := $(shell find fillygons/generate_sources -name *.py)
 
 # Target which is used to create all generated files and on which all generated files depen.
 __generate_sources__: $(GLOBAL_DEPS) $(GENERATED_FILES_DEPS)
-	echo [generate_sources]
+	echo [generate_sources] $(words $(GENERATED_FILES)) files
 	generate_sources
 
 # Make all generated files depend on the target which actually creates them.
