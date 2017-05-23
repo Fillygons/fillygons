@@ -38,8 +38,9 @@ filter_compiled = $(foreach i,$(patsubst %$1,%$2,$(filter %$1,$3)),$(if $(filter
 # All considered source and target files currently existing.
 EXISTING_FILES := $(shell find src -not \( \( -name '.*' -or -name '* *' \) -prune \) -type f)
 
+# FIXME: Re-building the Makefile's prerequisites creates files which are also cleaned by the `clean` target.
 # Run generate_scad.sh to get the names of all files that should be generated using that same script.
-GENERATED_FILES := $(shell ./generate_sources.sh)
+GENERATED_FILES := $(shell generate_sources --list-files)
 
 # All visible files in the src directory that either exist or can be generated. Ignore files whose names contain spaces.
 SRC_FILES := $(sort $(GENERATED_FILES) $(EXISTING_FILES))
@@ -125,11 +126,16 @@ $(ASY_PDF_FILES): %.pdf: %.asy $(GLOBAL_DEPS) | $(ASY_DEPS)
 
 GENERATED_FILES_DEPS := $(shell find fillygons/generate_sources -name *.py)
 
-# Rule for automatically generated source files.
-$(GENERATED_FILES): generate_sources.sh $(GLOBAL_DEPS) $(GENERATED_FILES_DEPS)
-	echo [generate] $@
-	mkdir -p $(@D)
-	./generate_sources.sh $@
+# Mark the target which creates generated files as intermediate so that its non-existence doesn't result in it being called even if all generated files are up-to-date.
+.INTERMEDIATE: __generate_sources__
+
+# Target which is used to create all generated files and on which all generated files depen.
+__generate_sources__: $(GLOBAL_DEPS) $(GENERATED_FILES_DEPS)
+	echo [generate_sources]
+	generate_sources
+
+# Make all generated files depend on the target which actually creates them.
+$(GENERATED_FILES): __generate_sources__
 
 # Include dependency files produced by an earlier build.
 -include $(DEPENDENCY_FILES)
