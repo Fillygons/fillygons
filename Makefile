@@ -124,7 +124,7 @@ $(ASY_PDF_FILES): %.pdf: %.asy $(GLOBAL_DEPS) | $(ASY_DEPS)
 	echo [asymptote] $@
 	$(ASYMPTOTE_CMD) $< $@
 
-GENERATED_FILES_DEPS := $(shell find fillygons/generate_sources -name *.py)
+GENERATED_FILES_DEPS := $(shell find fillygons/generate_sources -name '*.py')
 
 # Mark the target which creates generated files as intermediate so that its non-existence doesn't result in it being called even if all generated files are up-to-date.
 .INTERMEDIATE: __generate_sources__
