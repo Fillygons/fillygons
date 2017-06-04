@@ -10,7 +10,7 @@ DXF_FLATNESS := 0.1
 FLAT_SCAD_FILES :=
 
 # Non-file goals.
-.PHONY: all clean generated dxf stl asy pdf
+.PHONY: all clean generated dxf stl asy pdf gcode
 
 # Remove targets whose command failed.
 .DELETE_ON_ERROR:
@@ -26,7 +26,7 @@ FLAT_SCAD_FILES :=
 
 # Command to run the Python scripts.
 PYTHON_CMD := PYTHONPATH="support" $(PYTHON)
-INKSCAPE_CMD := INKSCAPE=$(INKSCAPE) DXF_FLATNESS=$(DXF_FLATNESS) $(PYTHON_CMD) -m inkscape  
+INKSCAPE_CMD := INKSCAPE=$(INKSCAPE) DXF_FLATNESS=$(DXF_FLATNESS) $(PYTHON_CMD) -m inkscape
 OPENSCAD_CMD := OPENSCAD=$(OPENSCAD) $(PYTHON_CMD) -m openscad
 ASYMPTOTE_CMD := ASYMPTOTE=$(ASYMPTOTE) $(PYTHON_CMD) -m asymptote
 CURA_CMD := CURA=$(CURA) $(PYTHON_CMD) -m cura
