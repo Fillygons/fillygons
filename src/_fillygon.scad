@@ -4,7 +4,7 @@ include <_settings.scad>
 // Produces a single fillygon with n edges. The piece is oriented so that the outside of the polygon is on top.
 // angles: A list of n numbers, specifying the interior angles.
 // edges: A list of n numbers, specifying the side lengths.
-// reversed_edges: A list of booleans, specifying on which edges to reverse the tenons. The passed list is padded to n elemens with the value false.
+// reversed_edges: A list of booleans, specifying on which edges to reverse the tenons. The passed list is padded to n elements with the value false.
 // filled: Specifies whether to close the inside of the polygon by filling in the lower side.
 // filled_corners: Whether to cut a smaller bevel in the corners clearance region instead of using the same bevel as between the teeth.
 // min_convex_angle: Minimum dihedral angle supported in a convex configuration.
@@ -69,7 +69,7 @@ module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_conve
 		}
 	}
 	
-	// Calculates the x-position of the chamfer for an edge produced by 2 planes with distance d from the origin and anges a1 and a2.
+	// Calculates the x-position of the chamfer for an edge produced by 2 planes with distance d from the origin and angles a1 and a2.
 	function chamfer_pos(d, a1, a2) = abs(a1 - 90) * PI / 180 < 1 / 1000 && abs(a2 - 90) * PI / 180 < 1 / 1000 ? d : (chamfer_height * (cos(a1 - a2) + cos(a1 + a2)) / 2 + d * (cos(a1) + cos(a2))) / sin(a1 + a2);
 	
 	// Calculates the x-position of the chamfer for a corner produced by 2 planes with distances d from the origin and internal angle a.
@@ -96,7 +96,7 @@ module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_conve
 	function dir(pos) = 1 - pos % 2 * 2;
 	function pos(pos, side_length) = corner_clearance(side_length) + positions[pos] + gaps[pos] * gap / 2;
 
-	// The infintely extruded region of the polygon with an optional offset.
+	// The infinitely extruded region of the polygon with an optional offset.
 	module edge(offset = 0) {
 		sector_3d(ymin = offset);
 	}
@@ -197,8 +197,8 @@ module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_conve
 	
 	// The volume of a dedent ball placed on a tooth at the specified position.
 	module dedent_ball(pos) {
-		// Actial diameter used for the sphere, accounting for the gap.
-		diameter = dedent_sphere_dimeter - gap;
+		// Actual diameter used for the sphere, accounting for the gap.
+		diameter = dedent_sphere_diameter - gap;
 		
 		// Offset of the sphere's center relative to the tooth surface it is placed on.
 		ball_offset = diameter / 2 - dedent_sphere_offset;
@@ -311,7 +311,7 @@ module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_conve
 				// Do not trim any parts that are part of a tooth an this edge (obviously).
 				teeth_region();
 				
-				// Do not trim the teeth from adjacent edges outside of the region of the teeth end corrensponding gaps.
+				// Do not trim the teeth from adjacent edges outside of the region of the teeth end corresponding gaps.
 				clearance_region();
 			}
 			

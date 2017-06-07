@@ -4,7 +4,7 @@ thickness = 4;
 // Width of the rim along the edges of the piece connecting the teeth.
 loop_width = 2 * thickness;
 
-// Heigth up to which to fill the inside of the loop.
+// Height up to which to fill the inside of the loop.
 filling_height = 1;
 
 // Length of a pieces sides, measured along the ideal polygon's edges.
@@ -17,7 +17,7 @@ chamfer_height = 1;
 dedent_sphere_offset = 0.6;
 
 // Diameter of the ball dedent spheres.
-dedent_sphere_dimeter = 3;
+dedent_sphere_diameter = 3;
 
 // Diameter of the holes which accept the ball dedent spheres.
 dedent_hole_diameter = 1.7;
