@@ -1,15 +1,80 @@
 include <_util.scad>
-include <_settings.scad>
 
-// Produces a single fillygon with n edges. The piece is oriented so that the outside of the polygon is on top.
-// angles: A list of n numbers, specifying the interior angles.
-// edges: A list of n numbers, specifying the side lengths.
-// reversed_edges: A list of booleans, specifying on which edges to reverse the tenons. The passed list is padded to n elements with the value false.
-// filled: Specifies whether to close the inside of the polygon by filling in the lower side.
-// filled_corners: Whether to cut a smaller bevel in the corners clearance region instead of using the same bevel as between the teeth.
-// min_convex_angle: Minimum dihedral angle supported in a convex configuration.
-// min_concave_angle: Minimum dihedral angle supported in a non-convex configuration.
-module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_convex_angle, min_concave_angle, gap) {
+/**
+Produces a single fillygon with n edges. The piece is oriented so that the outside of the polygon is on top.
+
+Properties which change the overall shape without changing features necessary for compatibility between pieces:
+    angles:
+        A list of n numbers, specifying the interior angles.
+
+    edges:
+        A list of n numbers, specifying the side lengths.
+
+    reversed_edges:
+        A list of booleans, specifying on which edges to reverse the tenons. The passed list is padded to n elements with the value false.
+
+    filled:
+        Specifies whether to close the inside of the polygon by filling in the lower side.
+
+    filled_corners:
+        Whether to cut a smaller bevel in the corners clearance region instead of using the same bevel as between the teeth.
+
+    min_convex_angle:
+        Minimum dihedral angle supported in a convex configuration.
+
+    min_concave_angle:
+        Minimum dihedral angle supported in a non-convex configuration.
+
+    gap:
+        Gap to insert between parts touching between assembled pieces to make them fit well.
+
+Properties which change non-functional parts of the piece:
+    filling_height:
+        Height up to which to fill the inside of the loop.
+
+    loop_width:
+        Width of the rim along the edges of the piece connecting the teeth.
+
+    chamfer_height:
+        Width of chamfers cut into the edges and resulting edges at corners to make them less sharp/pointy.
+
+    fn:
+        Number of sides per revolution used for rounded parts.
+
+Properties which create incompatible pieces:
+    thickness:
+        Thickness of the pieces.
+
+    side_length:
+        Length of a pieces sides, measured along the ideal polygon's edges.
+
+    dedent_sphere_offset:
+        Overhang of the ball dedents relative to the teeth surface.
+
+    dedent_sphere_diameter:
+        Diameter of the ball dedent spheres.
+
+    dedent_hole_diameter:
+        Diameter of the holes which accept the ball dedent spheres.
+
+    large_teeth_width:
+        Width of the large teeth.
+
+    small_teeth_width:
+        Width of the small teeth.
+
+    small_teeth_gap:
+        Gap between the small, flexible teeth.
+
+    small_teeth_cutting_depth:
+        Depth to which to cut around the small, flexible teeth.
+
+    small_teeth_cutting_width:
+        Width to cut around the small, flexible teeth.
+*/
+module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_convex_angle, min_concave_angle, gap, filling_height, loop_width, chamfer_height, fn, thickness, side_length, dedent_sphere_offset, dedent_sphere_diameter, dedent_hole_diameter, large_teeth_width, small_teeth_width, small_teeth_gap, small_teeth_cutting_depth, small_teeth_cutting_width) {
+    $fn = fn;
+
 	module reverse() {
 		translate([$side_length / 2, 0, 0]) {
 			scale([$reversed_edge ? -1 : 1, 1, 1]) {

@@ -10,12 +10,46 @@ from fillygons.generate_sources.utils import call, serialize_value
 root_path = 'src'
 
 
-def get_file(path, expression, metadata):
+def get_default_settings():
+    thickness = 4
+
+    # Look at src/_fillygon.scad for a description of all these settings:
+    return dict(
+        thickness=thickness,
+        loop_width=2 * thickness,
+        filling_height=1,
+        side_length_unit=40,
+        chamfer_height=1,
+        fn=32,
+        dedent_sphere_offset=0.6,
+        dedent_sphere_diameter=3,
+        dedent_hole_diameter=1.7,
+        large_teeth_width=3.9,
+        small_teeth_width=1.6,
+        small_teeth_gap=1,
+        small_teeth_cutting_depth=5.5,
+        small_teeth_cutting_width=0.6)
+
+
+def get_fillygon_file(path, arguments, metadata):
     def write_content(file):
+        all_arguments = dict(get_default_settings(), **arguments)
+
+        excepted_arguments = (
+            'angles edges reversed_edges filled filled_corners '
+            'min_convex_angle min_concave_angle gap filling_height loop_width '
+            'chamfer_height thickness side_length_unit dedent_sphere_offset '
+            'dedent_sphere_diameter dedent_hole_diameter large_teeth_width '
+            'small_teeth_width small_teeth_gap small_teeth_cutting_depth '
+            'small_teeth_cutting_width fn')
+
+        assert all_arguments.keys() == set(excepted_arguments.split())
+
         use_path = os.path.relpath('_fillygon.scad', os.path.dirname(path))
+        fillygon_call = call('fillygon', **all_arguments)
 
         print('use <{}>'.format(use_path), file=file)
-        print('render() {};'.format(serialize_value(expression)), file=file)
+        print('render() {};'.format(serialize_value(fillygon_call)), file=file)
 
     return path, write_content, dict(metadata, path=path)
 
@@ -255,7 +289,7 @@ def decide_file(decider: Decider):
         min_concave_angle=float(min_concave_angle),
         gap=gap)
 
-    return get_file(path, call('fillygon', **arguments), metadata)
+    return get_fillygon_file(path, arguments, metadata)
 
 
 def get_files():
