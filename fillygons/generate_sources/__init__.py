@@ -11,11 +11,11 @@ def main(list_files):
         for i in sorted(variants):
             print(i)
     else:
-        for path, write_fn in variants.items():
+        for path, content_thunk in variants.items():
             os.makedirs(os.path.dirname(path), exist_ok=True)
 
             with open(path, 'w', encoding='utf-8') as file:
-                write_fn(file)
+                file.write(content_thunk())
 
 
 def parse_args():

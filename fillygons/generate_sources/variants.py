@@ -1,5 +1,6 @@
 import json
 import os
+from textwrap import dedent
 
 from sympy import GoldenRatio, acos, atan, sqrt, cbrt, pi, latex, rad, deg, S
 
@@ -31,27 +32,34 @@ def get_default_settings():
         small_teeth_cutting_width=0.6)
 
 
+def get_fillygon_call(arguments):
+    all_arguments = dict(get_default_settings(), **arguments)
+
+    excepted_arguments = (
+        'angles edges reversed_edges filled filled_corners '
+        'min_convex_angle min_concave_angle gap filling_height loop_width '
+        'chamfer_height thickness side_length_unit dedent_sphere_offset '
+        'dedent_sphere_diameter dedent_hole_diameter large_teeth_width '
+        'small_teeth_width small_teeth_gap small_teeth_cutting_depth '
+        'small_teeth_cutting_width fn')
+
+    assert all_arguments.keys() == set(excepted_arguments.split())
+
+    return serialize_value(call('fillygon', **all_arguments))
+
+
 def get_fillygon_file(path, arguments, metadata):
-    def write_content(file):
-        all_arguments = dict(get_default_settings(), **arguments)
+    def content_thunk():
+        template = dedent('''\
+            use <{use_path}>
+            render() {fillygon_call};
+            ''')
 
-        excepted_arguments = (
-            'angles edges reversed_edges filled filled_corners '
-            'min_convex_angle min_concave_angle gap filling_height loop_width '
-            'chamfer_height thickness side_length_unit dedent_sphere_offset '
-            'dedent_sphere_diameter dedent_hole_diameter large_teeth_width '
-            'small_teeth_width small_teeth_gap small_teeth_cutting_depth '
-            'small_teeth_cutting_width fn')
+        return template.format(
+            use_path=os.path.relpath('_fillygon.scad', os.path.dirname(path)),
+            fillygon_call=get_fillygon_call(arguments))
 
-        assert all_arguments.keys() == set(excepted_arguments.split())
-
-        use_path = os.path.relpath('_fillygon.scad', os.path.dirname(path))
-        fillygon_call = call('fillygon', **all_arguments)
-
-        print('use <{}>'.format(use_path), file=file)
-        print('render() {};'.format(serialize_value(fillygon_call)), file=file)
-
-    return path, write_content, dict(metadata, path=path)
+    return path, content_thunk, dict(metadata, path=path)
 
 
 def decide_file(decider: Decider):
@@ -294,8 +302,8 @@ def decide_file(decider: Decider):
 
 def get_files():
     """
-    Return a dict from filenames to file contents represented as a function
-    taking a file object which writes the file's content to the file object.
+    Return a dict from filenames to functions which return the contents of
+    each file.
     """
     files = {}
     metadata_entries = []
@@ -307,13 +315,13 @@ def get_files():
 
         files[full_path] = write_content_fn
 
-    for path, write_content_fn, metadata in iter_decisions(decide_file):
-        add_file(path, write_content_fn)
+    for path, content_thunk, metadata in iter_decisions(decide_file):
+        add_file(path, content_thunk)
         metadata_entries.append(metadata)
 
-    def write_metadata(file):
-        json.dump(metadata_entries, file, indent=4, sort_keys=True)
+    def metadata_thunk():
+        return json.dumps(metadata_entries, indent=4, sort_keys=True)
 
-    add_file('variants.json', write_metadata)
+    add_file('variants.json', metadata_thunk)
 
     return files
