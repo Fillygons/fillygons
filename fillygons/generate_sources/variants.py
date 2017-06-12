@@ -5,7 +5,7 @@ from textwrap import dedent
 from sympy import GoldenRatio, acos, atan, sqrt, cbrt, pi, latex, rad, deg, S
 
 from fillygons.generate_sources.decisions import iter_decisions, Decider
-from fillygons.generate_sources.utils import call, serialize_value
+from fillygons.generate_sources.utils import call
 
 
 root_path = 'src'
@@ -45,7 +45,7 @@ def get_fillygon_call(arguments):
 
     assert all_arguments.keys() == set(excepted_arguments.split())
 
-    return serialize_value(call('fillygon', **all_arguments))
+    return call('fillygon', **all_arguments)
 
 
 def get_fillygon_file(path, arguments, metadata):
