@@ -1,7 +1,7 @@
 import json
 import os
 
-from sympy import GoldenRatio, acos, atan, sqrt, pi, latex, rad, deg, S
+from sympy import GoldenRatio, acos, atan, sqrt, cbrt, pi, latex, rad, deg, S
 
 from generate_sources.decisions import iter_decisions, Decider
 from generate_sources.utils import call, serialize_value
@@ -145,7 +145,16 @@ def decide_file(decider: Decider):
             ('DeltoidalHexecontahedron',
              'deltoidal-hexecontahedron',
              [deg(acos(-(5 + 2*sqrt(5))/20)), deg(acos((5 - 2*sqrt(5))/10)), deg(acos((9*sqrt(5) - 5)/40)), deg(acos((5 - 2*sqrt(5))/10))],
-             [1, 1, (7 + sqrt(5))/6, (7 + sqrt(5))/6])
+             [1, 1, (7 + sqrt(5))/6, (7 + sqrt(5))/6]),
+
+            ('PentagonalIcositetrahedron',
+             'pentagonal-icositetrahedron',
+             [deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
+              deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
+              deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
+              deg(acos((5 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/3)),
+              deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6))],
+             [1, 1, 1, (cbrt(-3*sqrt(33) + 19) + cbrt(3*sqrt(33) + 19) + 4)/6, (cbrt(-3*sqrt(33) + 19) + cbrt(3*sqrt(33) + 19) + 4)/6])
         )
 
         angles = [rad(a) for a in angles_degree]
