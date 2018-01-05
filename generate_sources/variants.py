@@ -140,7 +140,12 @@ def decide_file(decider: Decider):
             ('DeltoidalIcositetrahedron',
              'deltoidal-icositetrahedron',
              [deg(acos(-(2 + sqrt(2))/8)), deg(acos((2 - sqrt(2))/4)), deg(acos((2 - sqrt(2))/4)), deg(acos((2 - sqrt(2))/4))],
-             [1, 1, 2 - 1/sqrt(2), 2 - 1/sqrt(2)])
+             [1, 1, 2 - 1/sqrt(2), 2 - 1/sqrt(2)]),
+
+            ('DeltoidalHexecontahedron',
+             'deltoidal-hexecontahedron',
+             [deg(acos(-(5 + 2*sqrt(5))/20)), deg(acos((5 - 2*sqrt(5))/10)), deg(acos((9*sqrt(5) - 5)/40)), deg(acos((5 - 2*sqrt(5))/10))],
+             [1, 1, (7 + sqrt(5))/6, (7 + sqrt(5))/6])
         )
 
         angles = [rad(a) for a in angles_degree]
