@@ -1,7 +1,7 @@
 import json
 import os
 
-from sympy import GoldenRatio, atan, sqrt, pi, latex, rad, deg, S
+from sympy import GoldenRatio, acos, atan, sqrt, pi, latex, rad, deg, S
 
 from generate_sources.decisions import iter_decisions, Decider
 from generate_sources.utils import call, serialize_value
@@ -127,17 +127,24 @@ def decide_file(decider: Decider):
         # Constant edge length for all equilateral polygons
         edges = len(angles) * [1]
 
+        # Compute the last angle
+        angles.append((len(angles) - 1) * pi - sum(angles))
+
     else:
         # Non-equilateral polygons
         regular = False
 
         name, polygon_name, angles_degree, edges = decider.get(
-            ('RightIsosceleTriangle', 'right-isoscele-triangle', [90, 45], [1, 1, sqrt(2)]))
+            ('RightIsosceleTriangle', 'right-isoscele-triangle', [90, 45, 45], [1, 1, sqrt(2)]),
+
+            ('DeltoidalIcositetrahedron',
+             'deltoidal-icositetrahedron',
+             [deg(acos(-(2 + sqrt(2))/8)), deg(acos((2 - sqrt(2))/4)), deg(acos((2 - sqrt(2))/4)), deg(acos((2 - sqrt(2))/4))],
+             [1, 1, 2 - 1/sqrt(2), 2 - 1/sqrt(2)])
+        )
 
         angles = [rad(a) for a in angles_degree]
 
-
-    angles.append((len(angles) - 1) * pi - sum(angles))
 
     filled = decider.get_boolean()
     filled_corners = decider.get_boolean()
