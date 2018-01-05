@@ -117,7 +117,9 @@ def decide_file(decider: Decider):
                 ('Rectangle', 'rectangle', 180, 90, 90, 180, 90),
                 ('Triamond', 'triamond', 60, 120, 120, 60))
 
-            angles = [rad(i) for i in angles_degree]
+            angles = [rad(a) for a in angles_degree]
+
+    edges = len(angles) * [1]
 
     angles.append((len(angles) - 1) * pi - sum(angles))
 
@@ -154,7 +156,8 @@ def decide_file(decider: Decider):
         variant_name + '.scad')
 
     arguments = dict(
-        angles=[deg(i) for i in angles[:-1]],
+        angles=[deg(a) for a in angles[:-1]],
+        edges=[float(e) for e in edges[:-1]],
         reversed_edges=reversed_edges,
         filled=filled,
         filled_corners=filled_corners,
@@ -166,8 +169,11 @@ def decide_file(decider: Decider):
         name=name,
         regular=regular,
         side_repetitions=side_repetitions,
-        angles_formulae=[latex(s, inv_trig_style='full') for s in angles],
-        angles_values=[float(i) for i in angles],
+        angles_formulae=[latex(a, inv_trig_style='full') for a in angles],
+        angles_values=[float(a) for a in angles],
+        edges_formulae=[latex(e, inv_trig_style='full') for e in edges],
+        edges_values=[float(e) for e in edges],
+        edges=edges,
         reversed_edges=reversed_edges,
         filled=filled,
         filled_corners=filled_corners,
