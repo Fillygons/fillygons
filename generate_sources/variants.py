@@ -154,7 +154,18 @@ def decide_file(decider: Decider):
               deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
               deg(acos((5 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/3)),
               deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6))],
-             [1, 1, 1, (cbrt(-3*sqrt(33) + 19) + cbrt(3*sqrt(33) + 19) + 4)/6, (cbrt(-3*sqrt(33) + 19) + cbrt(3*sqrt(33) + 19) + 4)/6])
+             [1, 1, 1, (cbrt(-3*sqrt(33) + 19) + cbrt(3*sqrt(33) + 19) + 4)/6, (cbrt(-3*sqrt(33) + 19) + cbrt(3*sqrt(33) + 19) + 4)/6]),
+
+            ('Pentagonal hexecontahedron',
+             'pentagonal-hexecontahedron',
+             [deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
+              deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
+              deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
+              deg(acos(1 - 2*(1 - 2*((-4 + cbrt(12*GoldenRatio*(-sqrt(-15 + 81*GoldenRatio) + 9) + 44) + cbrt(44 + 12*GoldenRatio*(9 + sqrt(-15 + 81*GoldenRatio))))/12)**2)**2)),
+              deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12))],
+             [1, 1, 1,
+              6*(2 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio)))) / (-(-4 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))))**2 + 72),
+              6*(2 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio)))) / (-(-4 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))))**2 + 72)])
         )
 
         angles = [rad(a) for a in angles_degree]
