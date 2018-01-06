@@ -132,41 +132,50 @@ def decide_file(decider: Decider):
 
     else:
         # Non-equilateral polygons
-        regular = False
+        regular = decider.get_boolean()
 
-        name, polygon_name, angles_degree, edges = decider.get(
-            ('RightIsosceleTriangle', 'right-isoscele-triangle', [90, 45, 45], [1, 1, sqrt(2)]),
+        if regular:
 
-            ('DeltoidalIcositetrahedron',
-             'deltoidal-icositetrahedron',
-             [deg(acos(-(2 + sqrt(2))/8)), deg(acos((2 - sqrt(2))/4)), deg(acos((2 - sqrt(2))/4)), deg(acos((2 - sqrt(2))/4))],
-             [1, 1, 2 - 1/sqrt(2), 2 - 1/sqrt(2)]),
+            name, polygon_name, angles_degree, edges = decider.get(
+                ('3-Gon-sqrt2', '3-gon-sqrt2', [60, 60, 60], [sqrt(2), sqrt(2), sqrt(2)]),
+                ('4-Gon-sqrt2', '4-gon-sqrt2', [90, 90, 90, 90], [sqrt(2), sqrt(2), sqrt(2), sqrt(2)]),
+            )
 
-            ('DeltoidalHexecontahedron',
-             'deltoidal-hexecontahedron',
-             [deg(acos(-(5 + 2*sqrt(5))/20)), deg(acos((5 - 2*sqrt(5))/10)), deg(acos((9*sqrt(5) - 5)/40)), deg(acos((5 - 2*sqrt(5))/10))],
-             [1, 1, (7 + sqrt(5))/6, (7 + sqrt(5))/6]),
+        else:
 
-            ('PentagonalIcositetrahedron',
-             'pentagonal-icositetrahedron',
-             [deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
-              deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
-              deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
-              deg(acos((5 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/3)),
-              deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6))],
-             [1, 1, 1, (cbrt(-3*sqrt(33) + 19) + cbrt(3*sqrt(33) + 19) + 4)/6, (cbrt(-3*sqrt(33) + 19) + cbrt(3*sqrt(33) + 19) + 4)/6]),
+            name, polygon_name, angles_degree, edges = decider.get(
+                ('RightIsosceleTriangle', 'right-isoscele-triangle', [90, 45, 45], [1, 1, sqrt(2)]),
 
-            ('Pentagonal hexecontahedron',
-             'pentagonal-hexecontahedron',
-             [deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
-              deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
-              deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
-              deg(acos(1 - 2*(1 - 2*((-4 + cbrt(12*GoldenRatio*(-sqrt(-15 + 81*GoldenRatio) + 9) + 44) + cbrt(44 + 12*GoldenRatio*(9 + sqrt(-15 + 81*GoldenRatio))))/12)**2)**2)),
-              deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12))],
-             [1, 1, 1,
-              6*(2 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio)))) / (-(-4 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))))**2 + 72),
-              6*(2 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio)))) / (-(-4 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))))**2 + 72)])
-        )
+                ('DeltoidalIcositetrahedron',
+                 'deltoidal-icositetrahedron',
+                 [deg(acos(-(2 + sqrt(2))/8)), deg(acos((2 - sqrt(2))/4)), deg(acos((2 - sqrt(2))/4)), deg(acos((2 - sqrt(2))/4))],
+                 [1, 1, 2 - 1/sqrt(2), 2 - 1/sqrt(2)]),
+
+                ('DeltoidalHexecontahedron',
+                 'deltoidal-hexecontahedron',
+                 [deg(acos(-(5 + 2*sqrt(5))/20)), deg(acos((5 - 2*sqrt(5))/10)), deg(acos((9*sqrt(5) - 5)/40)), deg(acos((5 - 2*sqrt(5))/10))],
+                 [1, 1, (7 + sqrt(5))/6, (7 + sqrt(5))/6]),
+
+                ('PentagonalIcositetrahedron',
+                 'pentagonal-icositetrahedron',
+                 [deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
+                  deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
+                  deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
+                  deg(acos((5 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/3)),
+                  deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6))],
+                 [1, 1, 1, (cbrt(-3*sqrt(33) + 19) + cbrt(3*sqrt(33) + 19) + 4)/6, (cbrt(-3*sqrt(33) + 19) + cbrt(3*sqrt(33) + 19) + 4)/6]),
+
+                ('Pentagonal hexecontahedron',
+                 'pentagonal-hexecontahedron',
+                 [deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
+                  deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
+                  deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
+                  deg(acos(1 - 2*(1 - 2*((-4 + cbrt(12*GoldenRatio*(-sqrt(-15 + 81*GoldenRatio) + 9) + 44) + cbrt(44 + 12*GoldenRatio*(9 + sqrt(-15 + 81*GoldenRatio))))/12)**2)**2)),
+                  deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12))],
+                 [1, 1, 1,
+                  6*(2 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio)))) / (-(-4 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))))**2 + 72),
+                  6*(2 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio)))) / (-(-4 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))))**2 + 72)])
+            )
 
         angles = [rad(a) for a in angles_degree]
 
