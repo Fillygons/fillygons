@@ -139,12 +139,18 @@ def decide_file(decider: Decider):
             name, polygon_name, angles_degree, edges = decider.get(
                 ('3-Gon-sqrt2', '3-gon-sqrt2', [60, 60, 60], [sqrt(2), sqrt(2), sqrt(2)]),
                 ('4-Gon-sqrt2', '4-gon-sqrt2', [90, 90, 90, 90], [sqrt(2), sqrt(2), sqrt(2), sqrt(2)]),
+
+                ('3-Gon-2', '3-gon-2', [60, 60, 60], [2, 2, 2]),
+                ('4-Gon-2', '4-gon-2', [90, 90, 90, 90], [2, 2, 2, 2])
             )
 
         else:
 
             name, polygon_name, angles_degree, edges = decider.get(
                 ('RightIsosceleTriangle', 'right-isoscele-triangle', [90, 45, 45], [1, 1, sqrt(2)]),
+                ('RightIsosceleTriangle-sqrt2', 'right-isoscele-triangle-sqrt2', [90, 45, 45], [sqrt(2), sqrt(2), 2]),
+
+                ('RightIsosceleTriangle-sqrt2-double', 'right-isoscele-triangle-sqrt2-double', [90, 45, 180, 45], [sqrt(2), sqrt(2), 1, 1]),
 
                 ('DeltoidalIcositetrahedron',
                  'deltoidal-icositetrahedron',
