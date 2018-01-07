@@ -147,19 +147,19 @@ def decide_file(decider: Decider):
         else:
 
             name, polygon_name, angles_degree, edges = decider.get(
-                ('RightIsosceleTriangle', 'right-isoscele-triangle', [90, 45, 45], [1, 1, sqrt(2)]),
-                ('RightIsosceleTriangle-sqrt2', 'right-isoscele-triangle-sqrt2', [90, 45, 45], [sqrt(2), sqrt(2), 2]),
+                ('RightIsosceleTriangle', 'right-isoscele-triangle', [45, 90, 45], [1, 1, sqrt(2)]),
+                ('RightIsosceleTriangle-sqrt2', 'right-isoscele-triangle-sqrt2', [45, 90, 45], [sqrt(2), sqrt(2), 2]),
 
-                ('RightIsosceleTriangle-sqrt2-double', 'right-isoscele-triangle-sqrt2-double', [90, 45, 180, 45], [sqrt(2), sqrt(2), 1, 1]),
+                ('RightIsosceleTriangle-sqrt2-double', 'right-isoscele-triangle-sqrt2-double', [45, 90, 45, 180], [sqrt(2), sqrt(2), 1, 1]),
 
                 ('DeltoidalIcositetrahedron',
                  'deltoidal-icositetrahedron',
-                 [deg(acos(-(2 + sqrt(2))/8)), deg(acos((2 - sqrt(2))/4)), deg(acos((2 - sqrt(2))/4)), deg(acos((2 - sqrt(2))/4))],
+                 [deg(acos((2 - sqrt(2))/4)), deg(acos(-(2 + sqrt(2))/8)), deg(acos((2 - sqrt(2))/4)), deg(acos((2 - sqrt(2))/4))],
                  [1, 1, 2 - 1/sqrt(2), 2 - 1/sqrt(2)]),
 
                 ('DeltoidalHexecontahedron',
                  'deltoidal-hexecontahedron',
-                 [deg(acos(-(5 + 2*sqrt(5))/20)), deg(acos((5 - 2*sqrt(5))/10)), deg(acos((9*sqrt(5) - 5)/40)), deg(acos((5 - 2*sqrt(5))/10))],
+                 [deg(acos((5 - 2*sqrt(5))/10)), deg(acos(-(5 + 2*sqrt(5))/20)), deg(acos((5 - 2*sqrt(5))/10)), deg(acos((9*sqrt(5) - 5)/40))],
                  [1, 1, (7 + sqrt(5))/6, (7 + sqrt(5))/6]),
 
                 ('PentagonalIcositetrahedron',
@@ -167,8 +167,8 @@ def decide_file(decider: Decider):
                  [deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
                   deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
                   deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
-                  deg(acos((5 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/3)),
-                  deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6))],
+                  deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
+                  deg(acos((5 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/3))],
                  [1, 1, 1, (cbrt(-3*sqrt(33) + 19) + cbrt(3*sqrt(33) + 19) + 4)/6, (cbrt(-3*sqrt(33) + 19) + cbrt(3*sqrt(33) + 19) + 4)/6]),
 
                 ('Pentagonal hexecontahedron',
@@ -176,15 +176,14 @@ def decide_file(decider: Decider):
                  [deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
                   deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
                   deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
-                  deg(acos(1 - 2*(1 - 2*((-4 + cbrt(12*GoldenRatio*(-sqrt(-15 + 81*GoldenRatio) + 9) + 44) + cbrt(44 + 12*GoldenRatio*(9 + sqrt(-15 + 81*GoldenRatio))))/12)**2)**2)),
-                  deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12))],
+                  deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
+                  deg(acos(1 - 2*(1 - 2*((-4 + cbrt(12*GoldenRatio*(-sqrt(-15 + 81*GoldenRatio) + 9) + 44) + cbrt(44 + 12*GoldenRatio*(9 + sqrt(-15 + 81*GoldenRatio))))/12)**2)**2))],
                  [1, 1, 1,
                   6*(2 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio)))) / (-(-4 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))))**2 + 72),
                   6*(2 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio)))) / (-(-4 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))))**2 + 72)])
             )
 
         angles = [rad(a) for a in angles_degree]
-        angles.insert(0, angles.pop())
 
 
     filled = decider.get_boolean()
