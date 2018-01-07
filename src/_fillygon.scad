@@ -79,14 +79,8 @@ module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_conve
 	num_corners = len(angles) + 1;
 	all_angles = concat([180 * (num_corners - 2) - sum_list(angles)], angles);
 
-	// Calculates unit vectors pointing along each edge.
-	function edge_vectors(angles) =
-		let(outer_angles = accumulate_list([for (a = angles) 180 - a]),
-		    edge_directions = [for (a = outer_angles) [cos(a), sin(a)]])
-		concat([[1,0]], edge_directions);
-
 	// Calculates the length of the last edge.
-	all_edges = concat(edges, [norm(linear_combination(edges, edge_vectors(angles)))]);
+	all_edges = edges;
 
 	// These are, in order, the left and right edges of the first and second instance of the large and small teeth. The last element is the right end of the cutting which complements the first tooth. All elements are relative to the end of the left clearance region.
 	positions = accumulate_list([

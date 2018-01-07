@@ -220,7 +220,7 @@ def decide_file(decider: Decider):
 
     arguments = dict(
         angles=[deg(a) for a in angles[:-1]],
-        edges=[float(e) for e in edges[:-1]],
+        edges=[float(e) for e in edges],
         reversed_edges=reversed_edges,
         filled=filled,
         filled_corners=filled_corners,
