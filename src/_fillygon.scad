@@ -22,9 +22,9 @@ module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_conve
 	
 	module trace(intersect = false) {
 		module more(i) {
-			if (i < len(angles)) {
+			if (i < len(angles) - 1) {
 				translate([side_length_unit * all_edges[i], 0, 0]) {
-					rotate(180 - angles[i]) {
+					rotate(180 - angles[i + 1]) {
 						tail(i + 1) {
 							children();
 						}
@@ -76,8 +76,7 @@ module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_conve
 	function corner_chamfer_pos(d, a) = chamfer_pos(d, a / 2, a / 2);
 	
 	// Used for cutting a chamfer into the corners.
-	num_corners = len(angles) + 1;
-	all_angles = concat([180 * (num_corners - 2) - sum_list(angles)], angles);
+	all_angles = angles;
 
 	// Calculates the length of the last edge.
 	all_edges = edges;

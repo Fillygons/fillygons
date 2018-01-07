@@ -124,11 +124,11 @@ def decide_file(decider: Decider):
 
                 angles = [rad(a) for a in angles_degree]
 
+        # Compute the last angle
+        angles.insert(0, (len(angles) - 1) * pi - sum(angles))
+
         # Constant edge length for all equilateral polygons
         edges = len(angles) * [1]
-
-        # Compute the last angle
-        angles.append((len(angles) - 1) * pi - sum(angles))
 
     else:
         # Non-equilateral polygons
@@ -184,6 +184,7 @@ def decide_file(decider: Decider):
             )
 
         angles = [rad(a) for a in angles_degree]
+        angles.insert(0, angles.pop())
 
 
     filled = decider.get_boolean()
@@ -219,7 +220,7 @@ def decide_file(decider: Decider):
         variant_name + '.scad')
 
     arguments = dict(
-        angles=[deg(a) for a in angles[:-1]],
+        angles=[deg(a) for a in angles],
         edges=[float(e) for e in edges],
         reversed_edges=reversed_edges,
         filled=filled,
