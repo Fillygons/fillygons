@@ -91,10 +91,10 @@ module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_conve
 	gaps = [1, -1, 1, -1, 1, 0, 0, -1, 1];
 
 	// Length on each end of an edge where no teeth are placed.
-	function corner_clearance(l) = (l - positions[len(positions) - 1]) / 2;
+	function corner_clearance(side_length) = (side_length - positions[len(positions) - 1]) / 2;
 
 	function dir(pos) = 1 - pos % 2 * 2;
-	function pos(pos, l) = corner_clearance(l) + positions[pos] + gaps[pos] * gap / 2;
+	function pos(pos, side_length) = corner_clearance(side_length) + positions[pos] + gaps[pos] * gap / 2;
 
 	// The infintely extruded region of the polygon with an optional offset.
 	module edge(offset = 0) {
