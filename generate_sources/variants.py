@@ -138,54 +138,65 @@ def decide_file(decider: Decider):
         if regular:
 
             name, polygon_name, angles_degree, edges = decider.get(
-                ('3-Gon-sqrt2', '3-gon-sqrt2', [60, 60, 60], [sqrt(2), sqrt(2), sqrt(2)]),
-                ('4-Gon-sqrt2', '4-gon-sqrt2', [90, 90, 90, 90], [sqrt(2), sqrt(2), sqrt(2), sqrt(2)]),
+                ('3-Gon (sqrt2)', '3-gon-sqrt2', [60, 60, 60], [sqrt(2), sqrt(2), sqrt(2)]),
+                ('4-Gon (sqrt2)', '4-gon-sqrt2', [90, 90, 90, 90], [sqrt(2), sqrt(2), sqrt(2), sqrt(2)]),
 
-                ('3-Gon-2', '3-gon-2', [60, 60, 60], [2, 2, 2]),
-                ('4-Gon-2', '4-gon-2', [90, 90, 90, 90], [2, 2, 2, 2])
+                ('3-Gon (2)', '3-gon-2', [60, 60, 60], [2, 2, 2]),
+                ('4-Gon (2)', '4-gon-2', [90, 90, 90, 90], [2, 2, 2, 2])
             )
 
+        elif decider.get_boolean():
+            name = 'Deltoidal icositetrahedron'
+            polygon_name = 'deltoidal-icositetrahedron'
+
+            α = deg(acos((2 - sqrt(2)) / 4))
+            β = deg(acos(-(2 + sqrt(2)) / 8))
+            a = 2 - 1 / sqrt(2)
+
+            angles_degree = [α, β, α, α]
+            edges = [1, 1, a, a]
+        elif decider.get_boolean():
+            name = 'Deltoidal hexecontahedron'
+            polygon_name = 'deltoidal-hexecontahedron'
+
+            α = deg(acos((5 - 2 * sqrt(5)) / 10))
+            β = deg(acos((9 * sqrt(5) - 5) / 40))
+            γ = deg(acos(-(5 + 2 * sqrt(5)) / 20))
+            a = (7 + sqrt(5)) / 6
+
+            angles_degree = [α, γ, α, β]
+            edges = [1, 1, a, a]
+        elif decider.get_boolean():
+            name = 'Pentagonal icositetrahedron'
+            polygon_name = 'pentagonal-icositetrahedron'
+
+            t = (cbrt(19 + 3*sqrt(33)) + cbrt(19 - 3*sqrt(33)) - 2) / 6
+
+            α = deg(acos(-t))
+            β = deg(acos(1 - 2 * t))
+            a = 1 + t
+
+            angles_degree = [α, α, α, α, β]
+            edges = [1, 1, 1, a, a]
+        elif decider.get_boolean():
+            name = 'Pentagonal hexecontahedron'
+            polygon_name = 'pentagonal-hexecontahedron'
+
+            t = (cbrt(44 + 12*GoldenRatio*(9 + sqrt(81*GoldenRatio - 15)))
+               + cbrt(44 + 12*GoldenRatio*(9 - sqrt(81*GoldenRatio - 15))) - 4) / 12
+            α = deg(acos(-t))
+            β = deg(acos(1 - 2 * (1 - 2 * t**2)**2))
+            a = (1 + 2 * t) / (2 * (1 - 2 * t ** 2))
+
+            angles_degree = [α, α, α, α, β]
+            edges = [1, 1, 1, a, a]
         else:
-
             name, polygon_name, angles_degree, edges = decider.get(
-                ('RightIsosceleTriangle', 'right-isoscele-triangle', [45, 90, 45], [1, 1, sqrt(2)]),
-                ('RightIsosceleTriangle-sqrt2', 'right-isoscele-triangle-sqrt2', [45, 90, 45], [sqrt(2), sqrt(2), 2]),
-
-                ('RightIsosceleTriangle-sqrt2-double', 'right-isoscele-triangle-sqrt2-double', [45, 90, 45, 180], [sqrt(2), sqrt(2), 1, 1]),
-
-                ('DeltoidalIcositetrahedron',
-                 'deltoidal-icositetrahedron',
-                 [deg(acos((2 - sqrt(2))/4)), deg(acos(-(2 + sqrt(2))/8)), deg(acos((2 - sqrt(2))/4)), deg(acos((2 - sqrt(2))/4))],
-                 [1, 1, 2 - 1/sqrt(2), 2 - 1/sqrt(2)]),
-
-                ('DeltoidalHexecontahedron',
-                 'deltoidal-hexecontahedron',
-                 [deg(acos((5 - 2*sqrt(5))/10)), deg(acos(-(5 + 2*sqrt(5))/20)), deg(acos((5 - 2*sqrt(5))/10)), deg(acos((9*sqrt(5) - 5)/40))],
-                 [1, 1, (7 + sqrt(5))/6, (7 + sqrt(5))/6]),
-
-                ('PentagonalIcositetrahedron',
-                 'pentagonal-icositetrahedron',
-                 [deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
-                  deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
-                  deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
-                  deg(acos((2 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/6)),
-                  deg(acos((5 - cbrt(3*sqrt(33) + 19) - cbrt(-3*sqrt(33) + 19))/3))],
-                 [1, 1, 1, (cbrt(-3*sqrt(33) + 19) + cbrt(3*sqrt(33) + 19) + 4)/6, (cbrt(-3*sqrt(33) + 19) + cbrt(3*sqrt(33) + 19) + 4)/6]),
-
-                ('Pentagonal hexecontahedron',
-                 'pentagonal-hexecontahedron',
-                 [deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
-                  deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
-                  deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
-                  deg(acos((-2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))) - 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 4)/12)),
-                  deg(acos(1 - 2*(1 - 2*((-4 + cbrt(12*GoldenRatio*(-sqrt(-15 + 81*GoldenRatio) + 9) + 44) + cbrt(44 + 12*GoldenRatio*(9 + sqrt(-15 + 81*GoldenRatio))))/12)**2)**2))],
-                 [1, 1, 1,
-                  6*(2 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio)))) / (-(-4 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))))**2 + 72),
-                  6*(2 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio)))) / (-(-4 + 2**(2/3)*cbrt(3*GoldenRatio*(-sqrt(3)*sqrt(-5 + 27*GoldenRatio) + 9) + 11) + 2**(2/3)*cbrt(11 + 3*GoldenRatio*(9 + sqrt(3)*sqrt(-5 + 27*GoldenRatio))))**2 + 72)])
-            )
+                ('Right isoscele triangle', 'right-isoscele-triangle', [45, 90, 45], [1, 1, sqrt(2)]),
+                ('Right isoscele triangle (sqrt2)', 'right-isoscele-triangle-sqrt2', [45, 90, 45], [sqrt(2), sqrt(2), 2]),
+                ('Right isoscele triangle (sqrt2, double)', 'right-isoscele-triangle-sqrt2-double', [45, 90, 45, 180], [sqrt(2), sqrt(2), 1, 1]))
 
         angles = [rad(a) for a in angles_degree]
-
 
     filled = decider.get_boolean()
     filled_corners = decider.get_boolean()
