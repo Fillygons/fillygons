@@ -61,6 +61,7 @@ def decide_file(decider: Decider):
 
             if side_repetitions > 1:
                 polygon_name += '-double'
+                name += ' (double)'
 
             if reversed_edges:
                 polygon_name += '-reversed-{}'.format(''.join('.r'[i] for i in reversed_edges))
