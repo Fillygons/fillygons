@@ -212,6 +212,7 @@ def decide_file(decider: Decider):
             name = 'Pentagonal icositetrahedron'
             polygon_name = 'pentagonal-icositetrahedron'
 
+            # Note: 2*t + 1 approx. 1.8393 equals the tribonacci constant
             t = (cbrt(19 + 3*sqrt(33)) + cbrt(19 - 3*sqrt(33)) - 2) / 6
 
             α = deg(acos(-t))
@@ -224,8 +225,10 @@ def decide_file(decider: Decider):
             name = 'Pentagonal hexecontahedron'
             polygon_name = 'pentagonal-hexecontahedron'
 
+            # Note: real solution of the cubic equation: 8*t^3 + 8*t^2 - GoldenRatio^2 = 0
             t = (cbrt(44 + 12*GoldenRatio*(9 + sqrt(81*GoldenRatio - 15)))
                + cbrt(44 + 12*GoldenRatio*(9 - sqrt(81*GoldenRatio - 15))) - 4) / 12
+
             α = deg(acos(-t))
             β = deg(acos(1 - 2 * (1 - 2 * t**2)**2))
             a = (1 + 2 * t) / (2 * (1 - 2 * t ** 2))
