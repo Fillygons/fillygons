@@ -161,11 +161,9 @@ def decide_file(decider: Decider):
                     opposite_angle]
             else:
                 # Special tiles
-                name, polygon_name, *angles_degree = decider.get(
-                    ('Rectangle', 'rectangle', 180, 90, 90, 180, 90),
-                    ('Triamond', 'triamond', 60, 120, 120, 60))
-
-                angles = [rad(a) for a in angles_degree]
+                name, polygon_name, *angles = decider.get(
+                    ('Rectangle', 'rectangle', pi, pi/2, pi/2, pi, pi/2),
+                    ('Triamond', 'triamond', pi/3, 2*pi/3, 2*pi/3, pi/3))
 
         # Compute the last angle
         angles.insert(0, (len(angles) - 1) * pi - sum(angles))
@@ -179,34 +177,34 @@ def decide_file(decider: Decider):
 
         if regular:
 
-            name, polygon_name, angles_degree, edges = decider.get(
-                ('3-Gon (sqrt2)', '3-gon-sqrt2', [60, 60, 60], [sqrt(2), sqrt(2), sqrt(2)]),
-                ('4-Gon (sqrt2)', '4-gon-sqrt2', [90, 90, 90, 90], [sqrt(2), sqrt(2), sqrt(2), sqrt(2)]),
+            name, polygon_name, angles, edges = decider.get(
+                ('3-Gon (sqrt2)', '3-gon-sqrt2', [pi/3, pi/3, pi/3], [sqrt(2), sqrt(2), sqrt(2)]),
+                ('4-Gon (sqrt2)', '4-gon-sqrt2', [pi/2, pi/2, pi/2, pi/2], [sqrt(2), sqrt(2), sqrt(2), sqrt(2)]),
 
-                ('3-Gon (2)', '3-gon-2', [60, 60, 60], [2, 2, 2]),
-                ('4-Gon (2)', '4-gon-2', [90, 90, 90, 90], [2, 2, 2, 2])
+                ('3-Gon (2)', '3-gon-2', [pi/3, pi/3, pi/3], [2, 2, 2]),
+                ('4-Gon (2)', '4-gon-2', [pi/2, pi/2, pi/2, pi/2], [2, 2, 2, 2])
             )
 
         elif decider.get_boolean():
             name = 'Deltoidal icositetrahedron'
             polygon_name = 'deltoidal-icositetrahedron'
 
-            α = deg(acos((2 - sqrt(2)) / 4))
-            β = deg(acos(-(2 + sqrt(2)) / 8))
+            α = acos((2 - sqrt(2)) / 4)
+            β = acos(-(2 + sqrt(2)) / 8)
             a = 2 - 1 / sqrt(2)
 
-            angles_degree = [α, β, α, α]
+            angles = [α, β, α, α]
             edges = [1, 1, a, a]
         elif decider.get_boolean():
             name = 'Deltoidal hexecontahedron'
             polygon_name = 'deltoidal-hexecontahedron'
 
-            α = deg(acos((5 - 2 * sqrt(5)) / 10))
-            β = deg(acos((9 * sqrt(5) - 5) / 40))
-            γ = deg(acos(-(5 + 2 * sqrt(5)) / 20))
+            α = acos((5 - 2 * sqrt(5)) / 10)
+            β = acos((9 * sqrt(5) - 5) / 40)
+            γ = acos(-(5 + 2 * sqrt(5)) / 20)
             a = (7 + sqrt(5)) / 6
 
-            angles_degree = [α, γ, α, β]
+            angles = [α, γ, α, β]
             edges = [1, 1, a, a]
         elif decider.get_boolean():
             name = 'Pentagonal icositetrahedron'
@@ -215,11 +213,11 @@ def decide_file(decider: Decider):
             # Note: 2*t + 1 approx. 1.8393 equals the tribonacci constant
             t = (cbrt(19 + 3*sqrt(33)) + cbrt(19 - 3*sqrt(33)) - 2) / 6
 
-            α = deg(acos(-t))
-            β = deg(acos(1 - 2 * t))
+            α = acos(-t)
+            β = acos(1 - 2 * t)
             a = 1 + t
 
-            angles_degree = [α, α, α, α, β]
+            angles = [α, α, α, α, β]
             edges = [1, 1, 1, a, a]
         elif decider.get_boolean():
             name = 'Pentagonal hexecontahedron'
@@ -229,19 +227,17 @@ def decide_file(decider: Decider):
             t = (cbrt(44 + 12*GoldenRatio*(9 + sqrt(81*GoldenRatio - 15)))
                + cbrt(44 + 12*GoldenRatio*(9 - sqrt(81*GoldenRatio - 15))) - 4) / 12
 
-            α = deg(acos(-t))
-            β = deg(acos(1 - 2 * (1 - 2 * t**2)**2))
+            α = acos(-t)
+            β = acos(1 - 2 * (1 - 2 * t**2)**2)
             a = (1 + 2 * t) / (2 * (1 - 2 * t ** 2))
 
-            angles_degree = [α, α, α, α, β]
+            angles = [α, α, α, α, β]
             edges = [1, 1, 1, a, a]
         else:
-            name, polygon_name, angles_degree, edges = decider.get(
-                ('Right isoscele triangle', 'right-isoscele-triangle', [45, 90, 45], [1, 1, sqrt(2)]),
-                ('Right isoscele triangle (sqrt2)', 'right-isoscele-triangle-sqrt2', [45, 90, 45], [sqrt(2), sqrt(2), 2]),
-                ('Right isoscele triangle (sqrt2, double)', 'right-isoscele-triangle-sqrt2-double', [45, 90, 45, 180], [sqrt(2), sqrt(2), 1, 1]))
-
-        angles = [rad(a) for a in angles_degree]
+            name, polygon_name, angles, edges = decider.get(
+                ('Right isoscele triangle', 'right-isoscele-triangle', [pi/4, pi/2, pi/4], [1, 1, sqrt(2)]),
+                ('Right isoscele triangle (sqrt2)', 'right-isoscele-triangle-sqrt2', [pi/4, pi/2, pi/4], [sqrt(2), sqrt(2), 2]),
+                ('Right isoscele triangle (sqrt2, double)', 'right-isoscele-triangle-sqrt2-double', [pi/4, pi/2, pi/4, pi], [sqrt(2), sqrt(2), 1, 1]))
 
     filled = decider.get_boolean()
     filled_corners = decider.get_boolean()
@@ -253,15 +249,15 @@ def decide_file(decider: Decider):
         else:
             variant_name = 'corners'
 
-        min_convex_angle = rad(90)
-        min_concave_angle = rad(180)
+        min_convex_angle = pi/2
+        min_concave_angle = pi
     else:
         if filled:
             variant_name = 'filled'
         else:
             variant_name = 'normal'
 
-        if min(angles) < rad(45):
+        if min(angles) < pi/4:
             min_edge_angle = rad(75)
         else:
             min_edge_angle = rad(38)
