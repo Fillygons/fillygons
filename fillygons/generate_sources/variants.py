@@ -176,11 +176,9 @@ def decide_file(decider: Decider):
         regular = decider.get_boolean()
 
         if regular:
-
             name, polygon_name, angles, edges = decider.get(
                 ('3-Gon (sqrt2)', '3-gon-sqrt2', [pi/3, pi/3, pi/3], [sqrt(2), sqrt(2), sqrt(2)]),
                 ('4-Gon (sqrt2)', '4-gon-sqrt2', [pi/2, pi/2, pi/2, pi/2], [sqrt(2), sqrt(2), sqrt(2), sqrt(2)]),
-
                 ('3-Gon (2)', '3-gon-2', [pi/3, pi/3, pi/3], [2, 2, 2]),
                 ('4-Gon (2)', '4-gon-2', [pi/2, pi/2, pi/2, pi/2], [2, 2, 2, 2])
             )
@@ -227,6 +225,7 @@ def decide_file(decider: Decider):
 
             angles = [α, β, α, α]
             edges = [1, 1, a, a]
+
         elif decider.get_boolean():
             name = 'Deltoidal hexecontahedron'
             polygon_name = 'deltoidal-hexecontahedron'
@@ -238,6 +237,7 @@ def decide_file(decider: Decider):
 
             angles = [α, γ, α, β]
             edges = [1, 1, a, a]
+
         elif decider.get_boolean():
             name = 'Pentagonal icositetrahedron'
             polygon_name = 'pentagonal-icositetrahedron'
@@ -251,6 +251,7 @@ def decide_file(decider: Decider):
 
             angles = [α, α, α, α, β]
             edges = [1, 1, 1, a, a]
+
         elif decider.get_boolean():
             name = 'Pentagonal hexecontahedron'
             polygon_name = 'pentagonal-hexecontahedron'
@@ -265,6 +266,7 @@ def decide_file(decider: Decider):
 
             angles = [α, α, α, α, β]
             edges = [1, 1, 1, a, a]
+
         else:
             name, polygon_name, angles, edges = decider.get(
                 ('Right isoscele triangle', 'right-isoscele-triangle', [pi/4, pi/2, pi/4], [1, 1, sqrt(2)]),
