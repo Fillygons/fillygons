@@ -2,7 +2,7 @@ import json
 import os
 from textwrap import dedent
 
-from sympy import GoldenRatio, acos, atan, sqrt, cbrt, pi, latex, rad, deg, S
+from sympy import Rational, GoldenRatio, acos, atan, sqrt, cbrt, pi, latex, rad, deg, S
 
 from fillygons.generate_sources.decisions import iter_decisions, Decider
 from fillygons.generate_sources.utils import call
@@ -184,6 +184,38 @@ def decide_file(decider: Decider):
                 ('3-Gon (2)', '3-gon-2', [pi/3, pi/3, pi/3], [2, 2, 2]),
                 ('4-Gon (2)', '4-gon-2', [pi/2, pi/2, pi/2, pi/2], [2, 2, 2, 2])
             )
+
+        elif decider.get_boolean():
+            name, polygon_name, long_side = decider.get(
+                ('Triakis tetrahedron', 'triakis-tetrahedron', Rational(5, 3)),
+                ('Triakis octahedron', 'triakis-octahedron', 1 + sqrt(2) / 2),
+                ('Triakis icosahedron', 'triakis-icosahedron', 22 / (15 - sqrt(5))),
+                ('Tetrakis hexahedron', 'tetrakis-hexahedron', Rational(4, 3)),
+                ('Pentakis dodecahedron', 'pentakis-dodecahedron', 38 / (3 * (9 + sqrt(5))))
+            )
+
+            β = acos(long_side / 2)
+            α = pi - 2*β
+
+            angles = [β, β, α]
+            edges = [long_side, 1, 1]
+
+        elif decider.get_boolean():
+            name, polygon_name, a, b = decider.get(
+                ('Disdyakis dodecahedron', 'disdyakis-dodecahedron',
+                sqrt(2*sqrt(2) + 20) / sqrt(10 - sqrt(2)),
+                3*sqrt(2*sqrt(2) + 4) / (2*sqrt(10 - sqrt(2)))),
+                ('Disdyakis triacontahedron', 'disdyakis-triacontahedron',
+                22*sqrt(-sqrt(5) + 5)/(5*sqrt(-31*sqrt(5) + 85)),
+                3*sqrt(19*sqrt(5) + 65)/(5*sqrt(-31*sqrt(5) + 85)))
+            )
+
+            α = acos((b**2 + 1 - a**2) / (2*b))
+            β = acos((a**2 + 1 - b**2) / (2*a))
+            γ = acos((a**2 + b**2 - 1) / (2*a*b))
+
+            angles = [β, γ, α]
+            edges = [a, b, 1]
 
         elif decider.get_boolean():
             name = 'Deltoidal icositetrahedron'
