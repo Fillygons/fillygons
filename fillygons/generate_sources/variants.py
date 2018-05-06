@@ -67,6 +67,9 @@ def decide_file(decider: Decider):
     side_repetitions = 1
 
     equilateral = decider.get_boolean()
+    rhombus = False
+    short_diagonal = 0
+    long_diagonal = 1
 
     if equilateral:
 
@@ -91,6 +94,11 @@ def decide_file(decider: Decider):
 
                 reversed_edges += (False,) * (num_sides - len(reversed_edges))
 
+            rhombus = num_sides == 4
+            if rhombus:
+                short_diagonal = side_repetitions * sqrt(2)
+                long_diagonal = side_repetitions * sqrt(2)
+
             directions = [
                 2 * pi / num_sides * i
                 for i in range(num_sides)
@@ -110,6 +118,8 @@ def decide_file(decider: Decider):
         else:
             if decider.get_boolean():
                 # Rhombi
+                rhombus = True
+
                 short_diagonal, long_diagonal = decider.get(
                     # Diamond
                     (1, sqrt(3)),
@@ -182,6 +192,12 @@ def decide_file(decider: Decider):
                 ('3-Gon (2)', '3-gon-2', [pi/3, pi/3, pi/3], [2, 2, 2]),
                 ('4-Gon (2)', '4-gon-2', [pi/2, pi/2, pi/2, pi/2], [2, 2, 2, 2])
             )
+
+            num_sides = len(edges)
+            rhombus = num_sides == 4
+            if rhombus:
+                short_diagonal = edges[0] * sqrt(2)
+                long_diagonal = edges[0] * sqrt(2)
 
         elif decider.get_boolean():
             name, polygon_name, long_side = decider.get(
@@ -273,6 +289,8 @@ def decide_file(decider: Decider):
                 ('Right isoscele triangle (sqrt2)', 'right-isoscele-triangle-sqrt2', [pi/4, pi/2, pi/4], [sqrt(2), sqrt(2), 2]),
                 ('Right isoscele triangle (sqrt2, double)', 'right-isoscele-triangle-sqrt2-double', [pi/4, pi/2, pi/4, pi], [sqrt(2), sqrt(2), 1, 1]))
 
+    diagonal_ratio = short_diagonal / long_diagonal
+
     filled = decider.get_boolean()
     filled_corners = decider.get_boolean()
     gap = decider.get(.2, .25, .4)
@@ -318,11 +336,18 @@ def decide_file(decider: Decider):
     metadata = dict(
         name=name,
         regular=regular,
+        rhombus=rhombus,
         side_repetitions=side_repetitions,
         angles_formulae=[latex(a, inv_trig_style='full') for a in angles],
         angles_values=[float(a) for a in angles],
         edges_formulae=[latex(e, inv_trig_style='full') for e in edges],
         edges_values=[float(e) for e in edges],
+        short_diagonal_value=float(short_diagonal),
+        short_diagonal_formula=latex(short_diagonal, inv_trig_style='full'),
+        long_diagonal_value=float(long_diagonal),
+        long_diagonal_formula=latex(long_diagonal, inv_trig_style='full'),
+        diagonal_ratio_value=float(diagonal_ratio),
+        diagonal_ratio_formula=latex(diagonal_ratio, inv_trig_style='full'),
         reversed_edges=reversed_edges,
         filled=filled,
         filled_corners=filled_corners,
