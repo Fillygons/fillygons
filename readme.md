@@ -1,6 +1,6 @@
 # Fillygons
 
-Small, hinged polygons to assemble polyhedrons and play with. For more information, see the [fillygons](http://fillygons.feuermurmel.ch/) website.
+Small, hinged polygons to assemble polyhedrons and play with. For more information, see the [fillygons](https://fillygons.ch/) website.
 
 
 ## Setup
