@@ -120,7 +120,7 @@ def decide_file(decider: Decider):
                 # Rhombi
                 rhombus = True
 
-                short_diagonal, long_diagonal = decider.get(
+                diagonal_ratio_num, diagonal_ratio_denom = decider.get(
                     # Diamond
                     (1, sqrt(3)),
                     # Rhombic Dodecahedron
@@ -140,9 +140,11 @@ def decide_file(decider: Decider):
                     (1, sqrt(5)),
                 )
 
-                assert short_diagonal < long_diagonal
+                assert diagonal_ratio_num < diagonal_ratio_denom
 
-                acute_angle = 2 * atan(S(short_diagonal) / long_diagonal)
+                acute_angle = 2 * atan(S(diagonal_ratio_num) / diagonal_ratio_denom)
+                short_diagonal = 2 * diagonal_ratio_num / sqrt(diagonal_ratio_num**2 + diagonal_ratio_denom**2)
+                long_diagonal = 2 * diagonal_ratio_denom / sqrt(diagonal_ratio_num**2 + diagonal_ratio_denom**2)
                 degrees_rounded = round(float(deg(acute_angle)))
                 name = 'Rhombus ({})'.format(degrees_rounded)
                 polygon_name = 'rhombus-{}'.format(degrees_rounded)
