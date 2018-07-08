@@ -2,7 +2,7 @@ import json
 import os
 from textwrap import dedent
 
-from sympy import Rational, GoldenRatio, acos, atan, sqrt, cbrt, pi, latex, rad, deg, S
+from sympy import Rational, GoldenRatio, TribonacciConstant, acos, atan, sqrt, cbrt, pi, latex, rad, deg, S
 
 from fillygons.generate_sources.decisions import iter_decisions, Decider
 from fillygons.generate_sources.utils import call
@@ -261,7 +261,7 @@ def decide_file(decider: Decider):
             polygon_name = 'pentagonal-icositetrahedron'
 
             # Note: 2*t + 1 approx. 1.8393 equals the tribonacci constant
-            t = (cbrt(19 + 3*sqrt(33)) + cbrt(19 - 3*sqrt(33)) - 2) / 6
+            t = (TribonacciConstant - 1) / 2
 
             α = acos(-t)
             β = acos(1 - 2 * t)
