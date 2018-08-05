@@ -11,8 +11,8 @@ To run, the Python project in the repository needs to be installed into a virtua
 
     $ python3 -m venv venv
     $ . venv/bin/activate
-    (venv) michi ~/.../Fillygons/fillygons$ python3 -m pip install -e .
-    Obtaining file:///Users/michi/Desktop/3D/Designs/Fillygons/fillygons
+    (venv) $ python3 -m pip install -e .
+    Obtaining file:///[...]/fillygons
     Requirement already satisfied: sympy in ./venv/lib/python3.5/site-packages (from fillygons==0.0.0)
     Requirement already satisfied: mpmath>=0.19 in ./venv/lib/python3.5/site-packages (from sympy->fillygons==0.0.0)
     Installing collected packages: fillygons
@@ -21,7 +21,7 @@ To run, the Python project in the repository needs to be installed into a virtua
           Successfully uninstalled fillygons-0.0.0
       Running setup.py develop for fillygons
     Successfully installed fillygons
-    $ make
+    (venv) $ make
     [generate_sources] 433 files
     [openscad] src/variants/0.2mm/3-gon/filled.stl
     [...]
