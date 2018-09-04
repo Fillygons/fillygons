@@ -191,8 +191,13 @@ def decide_file(decider: Decider):
             name, polygon_name, angles, edges = decider.get(
                 ('3-Gon (sqrt2)', '3-gon-sqrt2', [pi/3, pi/3, pi/3], [sqrt(2), sqrt(2), sqrt(2)]),
                 ('4-Gon (sqrt2)', '4-gon-sqrt2', [pi/2, pi/2, pi/2, pi/2], [sqrt(2), sqrt(2), sqrt(2), sqrt(2)]),
+                ('5-Gon (sqrt2)', '5-gon-sqrt2', [3*pi/5, 3*pi/5, 3*pi/5, 3*pi/5, 3*pi/5], [sqrt(2), sqrt(2), sqrt(2), sqrt(2), sqrt(2)]),
+                ('6-Gon (sqrt2)', '6-gon-sqrt2', [2*pi/3, 2*pi/3, 2*pi/3, 2*pi/3, 2*pi/3, 2*pi/3], [sqrt(2), sqrt(2), sqrt(2), sqrt(2), sqrt(2), sqrt(2)]),
+
                 ('3-Gon (2)', '3-gon-2', [pi/3, pi/3, pi/3], [2, 2, 2]),
-                ('4-Gon (2)', '4-gon-2', [pi/2, pi/2, pi/2, pi/2], [2, 2, 2, 2])
+                ('4-Gon (2)', '4-gon-2', [pi/2, pi/2, pi/2, pi/2], [2, 2, 2, 2]),
+                ('5-Gon (2)', '5-gon-2', [3*pi/5, 3*pi/5, 3*pi/5, 3*pi/5, 3*pi/5], [2, 2, 2, 2, 2]),
+                ('6-Gon (2)', '6-gon-2', [2*pi/3, 2*pi/3, 2*pi/3, 2*pi/3, 2*pi/3, 2*pi/3], [2, 2, 2, 2, 2, 2])
             )
 
             num_sides = len(edges)
