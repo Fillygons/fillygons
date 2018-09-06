@@ -268,19 +268,20 @@ def decide_fillygon_file(decider: Decider):
 
         elif decider.get_boolean():
             # General triangles
-            name, polygon_name, angles, edges = decider.get(
-                ('Right isosceles triangle', 'right-isosceles-triangle', [pi/4, pi/2, pi/4], [1, 1, sqrt(2)]),
-                ('Right isosceles triangle (sqrt2)', 'right-isosceles-triangle-sqrt2', [pi/4, pi/2, pi/4], [sqrt(2), sqrt(2), 2]),
-                ('Right isosceles triangle (sqrt2, double)', 'right-isosceles-triangle-sqrt2-double', [pi/4, pi/2, pi/4, pi], [sqrt(2), sqrt(2), 1, 1]),
+            name, polygon_name, angles, edges, min_convex_angle, min_concave_angle = decider.get(
+                ('Right isosceles triangle', 'right-isosceles-triangle', [pi/4, pi/2, pi/4], [1, 1, sqrt(2)], None, None),
+                ('Right isosceles triangle (sqrt2)', 'right-isosceles-triangle-sqrt2', [pi/4, pi/2, pi/4], [sqrt(2), sqrt(2), 2], None, None),
+                ('Right isosceles triangle (sqrt2, double)', 'right-isosceles-triangle-sqrt2-double', [pi/4, pi/2, pi/4, pi], [sqrt(2), sqrt(2), 1, 1], None, None),
 
-                ('Isosceles triangle (1, sqrt2, sqrt2)', 'isosceles-triangle-1-sqrt2-sqrt2', [acos(sqrt(2)/4), acos(sqrt(2)/4), pi-2*acos(sqrt(2)/4)], [1, sqrt(2), sqrt(2)]),
-                ('Isosceles triangle (sqrt2, 2, 2)', 'isosceles-triangle-sqrt2-2-2', [acos(sqrt(2)/4), acos(sqrt(2)/4), pi-2*acos(sqrt(2)/4)], [sqrt(2), 2, 2]),
-                ('Isosceles triangle (sqrt2, double, double)', 'isosceles-triangle-sqrt2-double-double', [acos(sqrt(2)/4), acos(sqrt(2)/4), pi, pi-2*acos(sqrt(2)/4), pi], [sqrt(2), 1, 1, 1, 1]),
+                ('Isosceles triangle (1, sqrt2, sqrt2)', 'isosceles-triangle-1-sqrt2-sqrt2', [acos(sqrt(2)/4), acos(sqrt(2)/4), pi-2*acos(sqrt(2)/4)], [1, sqrt(2), sqrt(2)], rad(38), rad(38)),
+                ('Isosceles triangle (sqrt2, 2, 2)', 'isosceles-triangle-sqrt2-2-2', [acos(sqrt(2)/4), acos(sqrt(2)/4), pi-2*acos(sqrt(2)/4)], [sqrt(2), 2, 2], rad(38), rad(38)),
+                ('Isosceles triangle (sqrt2, double, double)', 'isosceles-triangle-sqrt2-double-double', [acos(sqrt(2)/4), acos(sqrt(2)/4), pi, pi-2*acos(sqrt(2)/4), pi], [sqrt(2), 1, 1, 1, 1], rad(38), rad(38)),
 
-                ('Isosceles triangle (1, Phi, Phi)', 'isosceles-triangle-1-phi-phi', [2*pi/5, 2*pi/5, pi/5], [1, GoldenRatio, GoldenRatio]),
+                ('Isosceles triangle (1, Phi, Phi)', 'isosceles-triangle-1-phi-phi', [2*pi/5, 2*pi/5, pi/5], [1, GoldenRatio, GoldenRatio], rad(38), rad(38)),
+                ('Isosceles triangle (Phi, Phi2, Phi2)', 'isosceles-triangle-phi-phi2-phi2', [2*pi/5, 2*pi/5, pi/5], [GoldenRatio, GoldenRatio**2, GoldenRatio**2], rad(38), rad(38)),
 
-                ('Isosceles triangle (1, 2, 2)', 'isosceles-triangle-1-2-2', [acos(Rational(1,4)), acos(Rational(1,4)), pi-2*acos(Rational(1,4))], [1, 2, 2]),
-                ('Isosceles triangle (1, double, double)', 'isosceles-triangle-1-double-double', [acos(Rational(1,4)), acos(Rational(1,4)), pi, pi-2*acos(Rational(1,4)), pi], [1, 1, 1, 1, 1])
+                ('Isosceles triangle (1, 2, 2)', 'isosceles-triangle-1-2-2', [acos(Rational(1,4)), acos(Rational(1,4)), pi-2*acos(Rational(1,4))], [1, 2, 2], None, None),
+                ('Isosceles triangle (1, double, double)', 'isosceles-triangle-1-double-double', [acos(Rational(1,4)), acos(Rational(1,4)), pi, pi-2*acos(Rational(1,4)), pi], [1, 1, 1, 1, 1], None, None)
             )
 
         else:
