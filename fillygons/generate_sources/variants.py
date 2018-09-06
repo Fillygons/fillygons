@@ -19,6 +19,9 @@ def decide_fillygon_file(decider: Decider):
     short_diagonal = 0
     long_diagonal = 1
 
+    min_convex_angle = None
+    min_concave_angle = None
+
     if equilateral:
         regular = decider.get_boolean()
 
@@ -310,8 +313,8 @@ def decide_fillygon_file(decider: Decider):
         else:
             variant_name = 'corners'
 
-        min_convex_angle = pi/2
-        min_concave_angle = pi
+        min_edge_angle = pi/2
+        max_edge_angle = pi
     else:
         if filled:
             variant_name = 'filled'
@@ -324,7 +327,12 @@ def decide_fillygon_file(decider: Decider):
             min_edge_angle = rad(38)
 
         # Make pieces vertically symmetric.
-        min_convex_angle = min_concave_angle = min_edge_angle
+        max_edge_angle = min_edge_angle
+
+    if not min_convex_angle:
+        min_convex_angle = min_edge_angle
+    if not min_concave_angle:
+        min_concave_angle = max_edge_angle
 
     path = os.path.join(
         'src/variants',
