@@ -288,8 +288,8 @@ def decide_file(decider: Decider):
         elif decider.get_boolean():
             enantiomorph = decider.get('laevo', 'dextro')
 
-            name = 'Pentagon Star Half ({})'.format(enantiomorph)
-            polygon_name = 'pentagon-star-half-{}'.format(enantiomorph)
+            name = 'Concave dodecahedron halfface ({})'.format(enantiomorph)
+            polygon_name = 'concave-dodecahedron-halfface-{}'.format(enantiomorph)
 
             a = 2 / (sqrt(4*GoldenRatio**2 - 1) - 2*sqrt(4 - GoldenRatio**2))
 
