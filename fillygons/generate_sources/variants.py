@@ -291,8 +291,8 @@ def decide_file(decider: Decider):
         elif decider.get_boolean():
             enantiomorph = decider.get('laevo', 'dextro')
 
-            name = 'Pentagon Star Half ({})'.format(enantiomorph)
-            polygon_name = 'pentagon-star-half-{}'.format(enantiomorph)
+            name = 'Concave dodecahedron halfface ({})'.format(enantiomorph)
+            polygon_name = 'concave-dodecahedron-halfface-{}'.format(enantiomorph)
 
             a = 2 / (sqrt(4*GoldenRatio**2 - 1) - 2*sqrt(4 - GoldenRatio**2))
 
@@ -305,9 +305,9 @@ def decide_file(decider: Decider):
 
         else:
             name, polygon_name, angles, edges, min_convex_angle, min_concave_angle = decider.get(
-                ('Right isoscele triangle', 'right-isoscele-triangle', [pi/4, pi/2, pi/4], [1, 1, sqrt(2)], None, None),
-                ('Right isoscele triangle (sqrt2)', 'right-isoscele-triangle-sqrt2', [pi/4, pi/2, pi/4], [sqrt(2), sqrt(2), 2], None, None),
-                ('Right isoscele triangle (sqrt2, double)', 'right-isoscele-triangle-sqrt2-double', [pi/4, pi/2, pi/4, pi], [sqrt(2), sqrt(2), 1, 1], None, None),
+                ('Right isosceles triangle', 'right-isosceles-triangle', [pi/4, pi/2, pi/4], [1, 1, sqrt(2)], None, None),
+                ('Right isosceles triangle (sqrt2)', 'right-isosceles-triangle-sqrt2', [pi/4, pi/2, pi/4], [sqrt(2), sqrt(2), 2], None, None),
+                ('Right isosceles triangle (sqrt2, double)', 'right-isosceles-triangle-sqrt2-double', [pi/4, pi/2, pi/4, pi], [sqrt(2), sqrt(2), 1, 1], None, None),
 
                 ('Isosceles triangle (1, sqrt2, sqrt2)', 'isosceles-triangle-1-sqrt2-sqrt2', [acos(sqrt(2)/4), acos(sqrt(2)/4), pi-2*acos(sqrt(2)/4)], [1, sqrt(2), sqrt(2)], rad(38), rad(38)),
                 ('Isosceles triangle (sqrt2, 2, 2)', 'isosceles-triangle-sqrt2-2-2', [acos(sqrt(2)/4), acos(sqrt(2)/4), pi-2*acos(sqrt(2)/4)], [sqrt(2), 2, 2], rad(38), rad(38)),
