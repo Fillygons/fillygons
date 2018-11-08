@@ -300,11 +300,30 @@ def decide_file(decider: Decider):
                 angles = [pi/2, 3*pi/5, pi/5, 7*pi/10]
                 edges = [a/2, a, a, 1]
 
-        else:
+        elif decider.get_boolean():
+            # General triangles
             name, polygon_name, angles, edges = decider.get(
                 ('Right isoscele triangle', 'right-isoscele-triangle', [pi/4, pi/2, pi/4], [1, 1, sqrt(2)]),
                 ('Right isoscele triangle (sqrt2)', 'right-isoscele-triangle-sqrt2', [pi/4, pi/2, pi/4], [sqrt(2), sqrt(2), 2]),
                 ('Right isoscele triangle (sqrt2, double)', 'right-isoscele-triangle-sqrt2-double', [pi/4, pi/2, pi/4, pi], [sqrt(2), sqrt(2), 1, 1]))
+
+        else:
+            # General rectangles
+            name, polygon_name, angles, edges = decider.get(
+                ('Rectangle (1, sqrt2)', 'rectangle-1-sqrt2', [pi/2, pi/2, pi/2, pi/2], [sqrt(2), 1, sqrt(2), 1]),
+                ('Rectangle (1, Phi)', 'rectangle-1-phi', [pi/2, pi/2, pi/2, pi/2], [GoldenRatio, 1, GoldenRatio, 1]),
+                ('Rectangle (1, 2)', 'rectangle-1-2', [pi/2, pi/2, pi/2, pi/2], [2, 1, 2, 1]),
+                #('Rectangle (1, double)', 'rectangle-1-double', [pi, pi/2, pi/2, pi, pi/2, pi/2], [1, 1, 1, 1, 1, 1]),
+
+                ('Rectangle (sqrt2, Phi)', 'rectangle-sqrt2-phi', [pi/2, pi/2, pi/2, pi/2], [GoldenRatio, sqrt(2), GoldenRatio, sqrt(2)]),
+                ('Rectangle (sqrt2, 2)', 'rectangle-sqrt2-2', [pi/2, pi/2, pi/2, pi/2], [2, sqrt(2), 2, sqrt(2)]),
+                ('Rectangle (sqrt2, double)', 'rectangle-sqrt2-double', [pi, pi/2, pi/2, pi, pi/2, pi/2], [1, sqrt(2), 1, 1, sqrt(2), 1]),
+
+                ('Rectangle (Phi, 2)', 'rectangle-phi-2', [pi/2, pi/2, pi/2, pi/2], [2, GoldenRatio, 2, GoldenRatio]),
+                ('Rectangle (Phi, double)', 'rectangle-phi-double', [pi, pi/2, pi/2, pi, pi/2, pi/2], [1, GoldenRatio, 1, 1, GoldenRatio, 1]),
+
+                ('Rectangle (2, double)', 'rectangle-2-double', [pi, pi/2, pi/2, pi, pi/2, pi/2], [1, 2, 1, 1, 2, 1])
+            )
 
     diagonal_ratio = short_diagonal / long_diagonal
 
