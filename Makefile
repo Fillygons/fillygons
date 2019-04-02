@@ -96,7 +96,10 @@ stl: $(SCAD_STL_FILES)
 asy: $(SVG_ASY_FILES)
 pdf: $(ASY_PDF_FILES)
 gcode: $(STL_GCODE_FILES)
+
+# Goal which will fail if there are failing test cases.
 test: $(RENDERED_TEST_PNG_FILES)
+	check_test_cases $^
 
 # Rule to convert an SVG file to a DXF file.
 $(SVG_DXF_FILES): %.dxf: %.svg $(GLOBAL_DEPS)

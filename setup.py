@@ -10,4 +10,5 @@ setup(
     entry_points=dict(
         console_scripts=[
             'generate_sources = fillygons.generate_sources:script_main',
-            'render_stl = fillygons.testing.render_stl:script_main']))
+            'render_stl = fillygons.testing.render_stl:script_main',
+            'check_test_cases = fillygons.testing.check_test_cases:script_main']))
