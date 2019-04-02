@@ -3,7 +3,8 @@ from lib import util, make
 
 
 def _openscad(in_path, out_path, deps_path):
-	util.command([os.environ['OPENSCAD'], '-o', out_path, '-d', deps_path, in_path])
+	# Use -q to suppress annoying CGAL cache messages.
+	util.command([os.environ['OPENSCAD'], '-q', '-o', out_path, '-d', deps_path, in_path])
 
 
 @util.main
