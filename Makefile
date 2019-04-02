@@ -10,7 +10,7 @@ DXF_FLATNESS := 0.1
 FLAT_SCAD_FILES :=
 
 # Non-file goals.
-.PHONY: all clean generated dxf stl asy pdf gcode
+.PHONY: all clean generated dxf stl asy pdf gcode test
 
 # Remove targets whose command failed.
 .DELETE_ON_ERROR:
@@ -63,6 +63,9 @@ SVG_ASY_FILES := $(call filter_compiled,.svg,.asy,$(SRC_FILES))
 # PDF files which can be generated from Asymptote files. We exclude SVG_ASY_FILES because they don't contain any drawing primitives and thus won't produce a PDF.
 ASY_PDF_FILES := $(call filter_compiled,.asy,.pdf,$(filter-out $(SVG_ASY_FILES),$(SRC_FILES)))
 
+# Files provided together with test generated test cases to compare with actual results.
+RENDERED_TEST_PNG_FILES := $(patsubst src/tests/%.stl,src/tests/%.png,$(filter src/tests/%.stl,$(SCAD_STL_FILES)))
+
 # Makefiles which are generated while compiling to record dependencies.
 DEPENDENCY_FILES := $(patsubst %,%.d,$(SCAD_STL_FILES) $(SCAD_DXF_FILES) $(ASY_PDF_FILES))
 
@@ -76,10 +79,10 @@ ASY_DEPS := $(filter %.asy,$(SRC_FILES)) $(SVG_ASY_FILES)
 GLOBAL_DEPS := Makefile $(wildcard config.mk settings.mk)
 
 # All existing target files.
-EXISTING_TARGETS := $(filter $(SVG_DXF_FILES) $(SCAD_DXF_FILES) $(SCAD_STL_FILES) $(SVG_ASY_FILES) $(ASY_PDF_FILES) $(STL_GCODE_FILES) $(GENERATED_FILES) $(DEPENDENCY_FILES),$(EXISTING_FILES))
+EXISTING_TARGETS := $(filter $(SVG_DXF_FILES) $(SCAD_DXF_FILES) $(SCAD_STL_FILES) $(SVG_ASY_FILES) $(ASY_PDF_FILES) $(STL_GCODE_FILES) $(GENERATED_FILES) $(DEPENDENCY_FILES) $(RENDERED_TEST_PNG_FILES),$(EXISTING_FILES))
 
 # Goal to build Everything. Also generates files which aren't compiled to anything else. Deined here to make it the default goal.
-all: generated $(SCAD_DXF_FILES) $(SCAD_STL_FILES) $(ASY_PDF_FILES) $(STL_GCODE_FILES)
+all: generated dxf stl asy pdf gcode test
 
 # Everything^-1.
 clean:
@@ -93,6 +96,7 @@ stl: $(SCAD_STL_FILES)
 asy: $(SVG_ASY_FILES)
 pdf: $(ASY_PDF_FILES)
 gcode: $(STL_GCODE_FILES)
+test: $(RENDERED_TEST_PNG_FILES)
 
 # Rule to convert an SVG file to a DXF file.
 $(SVG_DXF_FILES): %.dxf: %.svg $(GLOBAL_DEPS)
@@ -124,7 +128,12 @@ $(ASY_PDF_FILES): %.pdf: %.asy $(GLOBAL_DEPS) | $(ASY_DEPS)
 	echo [asymptote] $@
 	$(ASYMPTOTE_CMD) $< $@
 
-GENERATED_FILES_DEPS := $(shell find fillygons/generate_sources -name '*.py')
+GENERATED_FILES_DEPS := $(shell find fillygons -name '*.py')
+
+# Images rendered from compiled STL files.
+$(RENDERED_TEST_PNG_FILES): src/tests/%.png: src/tests/%.stl $(GENERATED_FILES_DEPS)
+	echo [render_stl] $@
+	render_stl $< $@
 
 # Mark the target which creates generated files as intermediate so that its non-existence doesn't result in it being called even if all generated files are up-to-date.
 .INTERMEDIATE: __generate_sources__
