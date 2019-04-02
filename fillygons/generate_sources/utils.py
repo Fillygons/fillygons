@@ -1,29 +1,58 @@
-import json
 import os
+from textwrap import dedent
 
-from sympy import Expr
-
-
-class expression(str): pass
+from fillygons.utils.openscad import call
 
 
-def call(function, **arguments):
-    args_str = [
-        '{}={}'.format(k, serialize_value(v))
-        for k, v in sorted(arguments.items())]
+def default_settings():
+    thickness = 4
 
-    return expression('{}({})'.format(function, ', '.join(args_str)))
+    # Look at src/_fillygon.scad for a description of all these settings.
+    return dict(
+        thickness=thickness,
+        loop_width=2 * thickness,
+        filling_height=1,
+        side_length_unit=40,
+        chamfer_height=1,
+        fn=32,
+        dedent_sphere_offset=0.6,
+        dedent_sphere_diameter=3,
+        dedent_hole_diameter=1.7,
+        large_teeth_width=3.9,
+        small_teeth_width=1.6,
+        small_teeth_gap=1,
+        small_teeth_cutting_depth=5.5,
+        small_teeth_cutting_width=0.6)
 
 
-def serialize_value(value):
-    if isinstance(value, list):
-        return '[{}]'.format(', '.join(map(serialize_value, value)))
-    elif isinstance(value, expression):
-        return value
-    elif isinstance(value, Expr):
-        return str(float(value))
-    else:
-        return json.dumps(value)
+def fillygon_call(arguments):
+    all_arguments = dict(default_settings(), **arguments)
+
+    expected_arguments = (
+        'angles edges reversed_edges filled filled_corners '
+        'min_convex_angle min_concave_angle gap filling_height loop_width '
+        'chamfer_height thickness side_length_unit dedent_sphere_offset '
+        'dedent_sphere_diameter dedent_hole_diameter large_teeth_width '
+        'small_teeth_width small_teeth_gap small_teeth_cutting_depth '
+        'small_teeth_cutting_width fn')
+
+    assert all_arguments.keys() == set(expected_arguments.split())
+
+    return call('fillygon', **all_arguments)
+
+
+def fillygon_file(path, arguments, metadata):
+    def content_thunk():
+        template = dedent('''\
+            use <{use_path}>
+            render() {fillygon_call};
+            ''')
+
+        return template.format(
+            use_path=os.path.relpath('_fillygon.scad', os.path.dirname(path)),
+            fillygon_call=fillygon_call(arguments))
+
+    return path, content_thunk, dict(metadata, path=path)
 
 
 def write_text_file(path: str, content: str):
