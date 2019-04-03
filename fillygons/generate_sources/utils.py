@@ -28,7 +28,7 @@ def default_settings():
 def fillygon_call(arguments):
     all_arguments = dict(default_settings(), **arguments)
 
-    expected_arguments = (
+    expected_arguments_str = (
         'angles edges reversed_edges filled filled_corners '
         'min_convex_angle min_concave_angle gap filling_height loop_width '
         'chamfer_height thickness side_length_unit dedent_sphere_offset '
@@ -36,7 +36,18 @@ def fillygon_call(arguments):
         'small_teeth_width small_teeth_gap small_teeth_cutting_depth '
         'small_teeth_cutting_width fn')
 
-    assert all_arguments.keys() == set(expected_arguments.split())
+    expected_arguments = set(expected_arguments_str.split())
+    actual_arguments = all_arguments.keys()
+
+    if expected_arguments - actual_arguments:
+        raise Exception(
+            'Missing arguments: {}'.format(
+                expected_arguments - actual_arguments))
+
+    if actual_arguments - expected_arguments:
+        raise Exception(
+            'Unknown arguments: {}'.format(
+                actual_arguments - expected_arguments))
 
     return call('fillygon', **all_arguments)
 
