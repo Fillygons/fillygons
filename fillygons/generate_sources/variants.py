@@ -1,10 +1,11 @@
+import itertools
 import json
 import os
 
 from sympy import Rational, GoldenRatio, TribonacciConstant, acos, atan, sqrt, \
     cbrt, pi, latex, rad, deg, S
 
-from fillygons.generate_sources.utils import fillygon_file
+from fillygons.generate_sources.utils import fillygon_file, GeneratedFile
 from fillygons.utils.deciders import Decider, iter_decisions
 
 
@@ -322,24 +323,23 @@ def decide_file(decider: Decider):
 
 def get_files():
     """
-    Return a dict from filenames to functions which return the contents of
-    each file.
+    Return a list of File instances.
     """
-    files = {}
-    metadata_entries = []
+    files = list(iter_decisions(decide_file))
+    metadata_entries = [i.metadata for i in files if i.metadata is not None]
+    metadata_content = json.dumps(metadata_entries, indent=4, sort_keys=True)
 
-    def add_file(path, write_content_fn):
-        assert path not in files
+    files.append(GeneratedFile('src/variants.json', metadata_content))
 
-        files[path] = write_content_fn
+    used_paths = [i.path for i in files]
 
-    for path, content_thunk, metadata in iter_decisions(decide_file):
-        add_file(path, content_thunk)
-        metadata_entries.append(metadata)
+    duplicate_paths = [
+        i
+        for i in [list(v) for (k, v) in itertools.groupby(sorted(used_paths))]
+        if len(i) > 1]
 
-    def metadata_thunk():
-        return json.dumps(metadata_entries, indent=4, sort_keys=True)
-
-    add_file('variants.json', metadata_thunk)
+    if duplicate_paths:
+        raise Exception(
+            "Generated files have duplicate paths: {}".format(duplicate_paths))
 
     return files

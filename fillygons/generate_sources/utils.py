@@ -4,6 +4,17 @@ from textwrap import dedent
 from fillygons.utils.openscad import call, use_statement
 
 
+class GeneratedFile:
+    """
+    Represent a source file generated when running the Makefile.
+    """
+
+    def __init__(self, path: str, content: str, metadata=None):
+        self.path = path
+        self.content = content
+        self.metadata = metadata
+
+
 def default_settings():
     thickness = 4
 
@@ -53,17 +64,17 @@ def fillygon_call(arguments):
 
 
 def fillygon_file(path, arguments, metadata):
-    def content_thunk():
-        template = dedent('''\
-            use <{use_path}>
-            render() {fillygon_call};
-            ''')
+    template = dedent('''\
+        {use_statement}
+        
+        render() {fillygon_call};
+        ''')
 
-        return template.format(
-            use_statement=use_statement(path, 'src/_fillygon.scad'),
-            fillygon_call=fillygon_call(arguments))
+    content = template.format(
+        use_statement=use_statement(path, 'src/_fillygon.scad'),
+        fillygon_call=fillygon_call(arguments))
 
-    return path, content_thunk, dict(metadata, path=path)
+    return GeneratedFile(path, content, dict(metadata, path=path))
 
 
 def write_text_file(path: str, content: str):
