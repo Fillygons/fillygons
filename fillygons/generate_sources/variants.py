@@ -8,9 +8,6 @@ from fillygons.generate_sources.utils import fillygon_file
 from fillygons.utils.deciders import Decider, iter_decisions
 
 
-root_path = 'src'
-
-
 def decide_file(decider: Decider):
     reversed_edges = []
     side_repetitions = 1
@@ -283,7 +280,7 @@ def decide_file(decider: Decider):
         min_convex_angle = min_concave_angle = min_edge_angle
 
     path = os.path.join(
-        'variants',
+        'src/variants',
         '{}mm'.format(gap),
         polygon_name,
         variant_name + '.scad')
@@ -332,11 +329,9 @@ def get_files():
     metadata_entries = []
 
     def add_file(path, write_content_fn):
-        full_path = os.path.join(root_path, path)
+        assert path not in files
 
-        assert full_path not in files
-
-        files[full_path] = write_content_fn
+        files[path] = write_content_fn
 
     for path, content_thunk, metadata in iter_decisions(decide_file):
         add_file(path, content_thunk)
