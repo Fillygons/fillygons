@@ -1,7 +1,7 @@
 import os
 from textwrap import dedent
 
-from fillygons.utils.openscad import call
+from fillygons.utils.openscad import call, use_statement
 
 
 def default_settings():
@@ -60,7 +60,7 @@ def fillygon_file(path, arguments, metadata):
             ''')
 
         return template.format(
-            use_path=os.path.relpath('_fillygon.scad', os.path.dirname(path)),
+            use_statement=use_statement(path, 'src/_fillygon.scad'),
             fillygon_call=fillygon_call(arguments))
 
     return path, content_thunk, dict(metadata, path=path)

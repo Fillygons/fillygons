@@ -1,4 +1,5 @@
 import json
+import os
 
 from sympy import Expr
 
@@ -24,3 +25,8 @@ def serialize_value(value):
         return str(float(value))
     else:
         return json.dumps(value)
+
+
+def use_statement(using_path, used_path):
+    return 'use <{}>'.format(
+        os.path.relpath(used_path, os.path.dirname(using_path)))
