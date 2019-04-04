@@ -285,6 +285,21 @@ def decide_file(decider: Decider):
             angles = [α, α, α, α, β]
             edges = [1, 1, 1, a, a]
 
+        elif decider.get_boolean():
+            enantiomorph = decider.get('laevo', 'dextro')
+
+            name = 'Pentagon Star Half ({})'.format(enantiomorph)
+            polygon_name = 'pentagon-star-half-{}'.format(enantiomorph)
+
+            a = 2 / (sqrt(4*GoldenRatio**2 - 1) - 2*sqrt(4 - GoldenRatio**2))
+
+            if enantiomorph == 'laevo':
+                angles = [pi/2, 7*pi/10, pi/5, 3*pi/5]
+                edges = [1, a, a, a/2]
+            else:
+                angles = [pi/2, 3*pi/5, pi/5, 7*pi/10]
+                edges = [a/2, a, a, 1]
+
         else:
             name, polygon_name, angles, edges = decider.get(
                 ('Right isoscele triangle', 'right-isoscele-triangle', [pi/4, pi/2, pi/4], [1, 1, sqrt(2)]),
