@@ -194,6 +194,11 @@ def decide_file(decider: Decider):
                 ('5-Gon (sqrt2)', '5-gon-sqrt2', [3*pi/5, 3*pi/5, 3*pi/5, 3*pi/5, 3*pi/5], [sqrt(2), sqrt(2), sqrt(2), sqrt(2), sqrt(2)]),
                 ('6-Gon (sqrt2)', '6-gon-sqrt2', [2*pi/3, 2*pi/3, 2*pi/3, 2*pi/3, 2*pi/3, 2*pi/3], [sqrt(2), sqrt(2), sqrt(2), sqrt(2), sqrt(2), sqrt(2)]),
 
+                ('3-Gon (Phi)', '3-gon-phi', [pi/3, pi/3, pi/3], [GoldenRatio, GoldenRatio, GoldenRatio]),
+                ('4-Gon (Phi)', '4-gon-phi', [pi/2, pi/2, pi/2, pi/2], [GoldenRatio, GoldenRatio, GoldenRatio, GoldenRatio]),
+                ('5-Gon (Phi)', '5-gon-phi', [3*pi/5, 3*pi/5, 3*pi/5, 3*pi/5, 3*pi/5], [GoldenRatio, GoldenRatio, GoldenRatio, GoldenRatio, GoldenRatio]),
+                ('6-Gon (Phi)', '6-gon-phi', [2*pi/3, 2*pi/3, 2*pi/3, 2*pi/3, 2*pi/3, 2*pi/3], [GoldenRatio, GoldenRatio, GoldenRatio, GoldenRatio, GoldenRatio, GoldenRatio]),
+
                 ('3-Gon (2)', '3-gon-2', [pi/3, pi/3, pi/3], [2, 2, 2]),
                 ('4-Gon (2)', '4-gon-2', [pi/2, pi/2, pi/2, pi/2], [2, 2, 2, 2]),
                 ('5-Gon (2)', '5-gon-2', [3*pi/5, 3*pi/5, 3*pi/5, 3*pi/5, 3*pi/5], [2, 2, 2, 2, 2]),
