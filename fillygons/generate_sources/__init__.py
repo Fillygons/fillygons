@@ -1,7 +1,7 @@
-import os
 from argparse import ArgumentParser
 
 from fillygons.generate_sources.variants import get_files
+from fillygons.generate_sources.utils import write_text_file
 
 
 def main(list_files):
@@ -12,10 +12,7 @@ def main(list_files):
             print(i)
     else:
         for path, content_thunk in variants.items():
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-
-            with open(path, 'w', encoding='utf-8') as file:
-                file.write(content_thunk())
+            write_text_file(path, content_thunk())
 
 
 def parse_args():
