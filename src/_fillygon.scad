@@ -8,7 +8,7 @@ Properties which change the overall shape without changing features necessary fo
         A list of n numbers, specifying the interior angles.
 
     edges:
-        A list of n numbers, specifying the side lengths.
+        A list of n numbers, specifying the side lengths in units of side_length_unit.
 
     reversed_edges:
         A list of booleans, specifying on which edges to reverse the tenons. The passed list is padded to n elements with the value false.
@@ -45,8 +45,8 @@ Properties which create incompatible pieces:
     thickness:
         Thickness of the pieces.
 
-    side_length:
-        Length of a pieces sides, measured along the ideal polygon's edges.
+    side_length_unit:
+        Unit length of sides in mm, measured along the ideal polygon's edges. Used by default when an element of edges is set to 1.
 
     dedent_sphere_offset:
         Overhang of the ball dedents relative to the teeth surface.
@@ -72,7 +72,7 @@ Properties which create incompatible pieces:
     small_teeth_cutting_width:
         Width to cut around the small, flexible teeth.
 */
-module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_convex_angle, min_concave_angle, gap, filling_height, loop_width, chamfer_height, fn, thickness, side_length, dedent_sphere_offset, dedent_sphere_diameter, dedent_hole_diameter, large_teeth_width, small_teeth_width, small_teeth_gap, small_teeth_cutting_depth, small_teeth_cutting_width) {
+module fillygon(angles, edges, reversed_edges, filled, filled_corners, min_convex_angle, min_concave_angle, gap, filling_height, loop_width, chamfer_height, fn, thickness, side_length_unit, dedent_sphere_offset, dedent_sphere_diameter, dedent_hole_diameter, large_teeth_width, small_teeth_width, small_teeth_gap, small_teeth_cutting_depth, small_teeth_cutting_width) {
     $fn = fn;
 
 	module reverse() {
