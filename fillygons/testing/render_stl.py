@@ -73,7 +73,13 @@ def main(input_path, output_path):
         projection = reduce(numpy.dot, reversed(list(i)))
 
         def project(vector):
-            return tuple(numpy.dot(projection, numpy.concatenate([vector, [1]]))[:2])
+            x, y, _, _ = numpy.dot(projection, numpy.concatenate([vector, [1]]))
+
+            # The fractional parts of coordinates have an influence on the
+            # exact set of pixels being covered by a line. This tries to make
+            # it less probable that small changes lead to differences in the
+            # output image.
+            return round(x), round(y)
 
         for edge_view in polyhedron.edges:
             angle = math.pi - dihedral_angle(edge_view, edge_view.opposite)
