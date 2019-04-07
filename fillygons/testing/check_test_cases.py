@@ -15,51 +15,60 @@ def get_overlay(name):
 
 
 def paste_with_transparency(image, overlay):
+    # Use the image itself as the mask.
     image.paste(overlay, None, overlay)
 
 
-def main(rendered_image_paths):
-    failed_cases = []
+def main(actual_image_paths):
+    num_test_cases = len(actual_image_paths)
+    num_failures = 0
 
-    for rendered_image_path in rendered_image_paths:
-        base_path, suffix = os.path.splitext(rendered_image_path)
-
+    for actual_image_path in actual_image_paths:
+        base_path, suffix = os.path.splitext(actual_image_path)
         expected_image_path = base_path + '-expected' + suffix
         failure_image_path = base_path + '-failure' + suffix
 
-        rendered_image = Image.open(rendered_image_path).convert('L')
+        if not os.path.exists(expected_image_path):
+            print('Error: Image with expected output not found: {}'.format(expected_image_path))
+            num_failures += 1
+
+            continue
+
+        actual_image = Image.open(actual_image_path).convert('L')
         expected_image = Image.open(expected_image_path).convert('L')
 
-        images_match = list(rendered_image.getdata()) == list(expected_image.getdata())
+        images_match = list(actual_image.getdata()) == list(expected_image.getdata())
 
         if images_match:
             if os.path.exists(failure_image_path):
                 os.unlink(failure_image_path)
         else:
             paste_with_transparency(expected_image, get_overlay('expected'))
-            paste_with_transparency(rendered_image, get_overlay('actual'))
+            paste_with_transparency(actual_image, get_overlay('actual'))
 
-            failure_image = Image.merge('RGB', [expected_image, rendered_image, expected_image])
+            failure_image = Image.merge('RGB', [expected_image, actual_image, expected_image])
 
             os.makedirs(os.path.dirname(failure_image_path), exist_ok=True)
             failure_image.save(failure_image_path, 'PNG')
 
-            failed_cases.append(base_path)
+            print('Error: Test case failed: {}'.format(failure_image_path))
+            num_failures += 1
 
-    if failed_cases:
-        for i in failed_cases:
-            print('Test case failed: {}'.format(i))
-
-        print('{} of {} test cases failed.'.format(len(failed_cases), len(rendered_image_paths)))
+    if num_failures:
+        print('\x1b[1;31m{} of {} test cases failed.\x1b[m'.format(num_failures, num_test_cases))
 
         sys.exit(1)
     else:
-        print('All {} test cases succeeded.'.format(len(rendered_image_paths)))
+        print('\x1b[1;32m{} test cases succeeded.\x1b[m'.format(num_test_cases))
 
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument('rendered_image_paths', nargs=REMAINDER)
+
+    parser.add_argument(
+        'actual_image_paths',
+        nargs=REMAINDER,
+        help='Paths to the images containing the actual, rendered output.')
 
     return parser.parse_args()
 
