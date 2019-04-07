@@ -134,12 +134,16 @@ def decide_file(decider: Decider):
         regular = decider.get_boolean()
 
         if regular:
-            name, polygon_name, angles, edges = decider.get(
-                ('3-Gon (sqrt2)', '3-gon-sqrt2', [pi/3, pi/3, pi/3], [sqrt(2), sqrt(2), sqrt(2)]),
-                ('4-Gon (sqrt2)', '4-gon-sqrt2', [pi/2, pi/2, pi/2, pi/2], [sqrt(2), sqrt(2), sqrt(2), sqrt(2)]),
-                ('3-Gon (2)', '3-gon-2', [pi/3, pi/3, pi/3], [2, 2, 2]),
-                ('4-Gon (2)', '4-gon-2', [pi/2, pi/2, pi/2, pi/2], [2, 2, 2, 2])
-            )
+            scale, scale_desc = decider.get((sqrt(2), 'sqrt2'), (GoldenRatio, 'Phi'), (2, '2'))
+
+            name_part, polygon_name_part, angles, edges = decider.get(
+                ('3-Gon', '3-gon', [pi/3] * 3, [scale] * 3),
+                ('4-Gon', '4-gon', [pi/2] * 4, [scale] * 4),
+                ('5-Gon', '5-gon', [3*pi/5] * 5, [scale] * 5),
+                ('6-Gon', '6-gon', [2*pi/3] * 6, [scale] * 6))
+
+            name = '{} ({})'.format(name_part, scale_desc)
+            polygon_name = '{}-{}'.format(polygon_name_part, scale_desc.lower())
 
             num_sides = len(edges)
             rhombus = num_sides == 4
