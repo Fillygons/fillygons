@@ -5,14 +5,14 @@ from fillygons.generate_sources.utils import write_text_file
 
 
 def main(list_files):
-    variants = get_files()
+    files = get_files()
 
     if list_files:
-        for i in sorted(variants):
-            print(i)
+        for i in files:
+            print(i.path)
     else:
-        for path, content_thunk in variants.items():
-            write_text_file(path, content_thunk())
+        for i in files:
+            write_text_file(i.path, i.content)
 
 
 def parse_args():

@@ -1,65 +1,12 @@
+import itertools
 import json
 import os
-from textwrap import dedent
 
-from sympy import Rational, GoldenRatio, TribonacciConstant, acos, atan, sqrt, cbrt, pi, latex, rad, deg, S
+from sympy import Rational, GoldenRatio, TribonacciConstant, acos, atan, sqrt, \
+    cbrt, pi, latex, rad, deg, S
 
-from fillygons.generate_sources.decisions import iter_decisions, Decider
-from fillygons.generate_sources.utils import call
-
-
-root_path = 'src'
-
-
-def get_default_settings():
-    thickness = 4
-
-    # Look at src/_fillygon.scad for a description of all these settings:
-    return dict(
-        thickness=thickness,
-        loop_width=2 * thickness,
-        filling_height=1,
-        side_length_unit=40,
-        chamfer_height=1,
-        fn=32,
-        dedent_sphere_offset=0.6,
-        dedent_sphere_diameter=3,
-        dedent_hole_diameter=1.7,
-        large_teeth_width=3.9,
-        small_teeth_width=1.6,
-        small_teeth_gap=1,
-        small_teeth_cutting_depth=5.5,
-        small_teeth_cutting_width=0.6)
-
-
-def get_fillygon_call(arguments):
-    all_arguments = dict(get_default_settings(), **arguments)
-
-    excepted_arguments = (
-        'angles edges reversed_edges filled filled_corners '
-        'min_convex_angle min_concave_angle gap filling_height loop_width '
-        'chamfer_height thickness side_length_unit dedent_sphere_offset '
-        'dedent_sphere_diameter dedent_hole_diameter large_teeth_width '
-        'small_teeth_width small_teeth_gap small_teeth_cutting_depth '
-        'small_teeth_cutting_width fn')
-
-    assert all_arguments.keys() == set(excepted_arguments.split())
-
-    return call('fillygon', **all_arguments)
-
-
-def get_fillygon_file(path, arguments, metadata):
-    def content_thunk():
-        template = dedent('''\
-            use <{use_path}>
-            render() {fillygon_call};
-            ''')
-
-        return template.format(
-            use_path=os.path.relpath('_fillygon.scad', os.path.dirname(path)),
-            fillygon_call=get_fillygon_call(arguments))
-
-    return path, content_thunk, dict(metadata, path=path)
+from fillygons.generate_sources.utils import fillygon_file, GeneratedFile
+from fillygons.utils.deciders import Decider, iter_decisions
 
 
 def decide_file(decider: Decider):
@@ -72,7 +19,6 @@ def decide_file(decider: Decider):
     long_diagonal = 1
 
     if equilateral:
-
         regular = decider.get_boolean()
 
         if regular:
@@ -335,7 +281,7 @@ def decide_file(decider: Decider):
         min_convex_angle = min_concave_angle = min_edge_angle
 
     path = os.path.join(
-        'variants',
+        'src/variants',
         '{}mm'.format(gap),
         polygon_name,
         variant_name + '.scad')
@@ -372,31 +318,28 @@ def decide_file(decider: Decider):
         min_concave_angle=float(min_concave_angle),
         gap=gap)
 
-    return get_fillygon_file(path, arguments, metadata)
+    return fillygon_file(path, arguments, metadata)
 
 
 def get_files():
     """
-    Return a dict from filenames to functions which return the contents of
-    each file.
+    Return a list of File instances.
     """
-    files = {}
-    metadata_entries = []
+    files = list(iter_decisions(decide_file))
+    metadata_entries = [i.metadata for i in files if i.metadata is not None]
+    metadata_content = json.dumps(metadata_entries, indent=4, sort_keys=True)
 
-    def add_file(path, write_content_fn):
-        full_path = os.path.join(root_path, path)
+    files.append(GeneratedFile('src/variants.json', metadata_content))
 
-        assert full_path not in files
+    used_paths = [i.path for i in files]
 
-        files[full_path] = write_content_fn
+    duplicate_paths = [
+        i
+        for i in [list(v) for (k, v) in itertools.groupby(sorted(used_paths))]
+        if len(i) > 1]
 
-    for path, content_thunk, metadata in iter_decisions(decide_file):
-        add_file(path, content_thunk)
-        metadata_entries.append(metadata)
-
-    def metadata_thunk():
-        return json.dumps(metadata_entries, indent=4, sort_keys=True)
-
-    add_file('variants.json', metadata_thunk)
+    if duplicate_paths:
+        raise Exception(
+            "Generated files have duplicate paths: {}".format(duplicate_paths))
 
     return files
