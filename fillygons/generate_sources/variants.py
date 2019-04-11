@@ -189,16 +189,16 @@ def decide_file(decider: Decider):
 
         if regular:
             name, polygon_name, angles, edges = decider.get(
-                ('3-Gon (sqrt2)', '3-gon-sqrt2', [pi/3, pi/3, pi/3], [sqrt(2), sqrt(2), sqrt(2)]),
-                ('4-Gon (sqrt2)', '4-gon-sqrt2', [pi/2, pi/2, pi/2, pi/2], [sqrt(2), sqrt(2), sqrt(2), sqrt(2)]),
-                ('3-Gon (2)', '3-gon-2', [pi/3, pi/3, pi/3], [2, 2, 2]),
-                ('4-Gon (2)', '4-gon-2', [pi/2, pi/2, pi/2, pi/2], [2, 2, 2, 2]),
+                ('3-Gon (sqrt2)', '3-gon-sqrt2', [pi/3] * 3, [sqrt(2)] * 3),
+                ('4-Gon (sqrt2)', '4-gon-sqrt2', [pi/2] * 4, [sqrt(2)] * 4),
+                ('3-Gon (2)', '3-gon-2', [pi/3] * 3, [2] * 3),
+                ('4-Gon (2)', '4-gon-2', [pi/2] * 4, [2] * 4),
 
                 # Truncated hexahedron with diagonal trigonal tunnels
-                ('4-Gon (0.7812)', '4-gon-0.7812', [pi/2, pi/2, pi/2, pi/2], [1 + sqrt(2) - 2*sqrt(6)/3, 1 + sqrt(2) - 2*sqrt(6)/3, 1 + sqrt(2) - 2*sqrt(6)/3, 1 + sqrt(2) - 2*sqrt(6)/3]),
+                ('4-Gon (0.7812)', '4-gon-0.7812', [pi/2] * 4, [1 + sqrt(2) - 2*sqrt(6)/3] * 4),
 
                 # Initial version of fillygon above, result of wrong math.
-                ('4-Gon (0.8906)', '4-gon-0.8906', [pi/2, pi/2, pi/2, pi/2], [1 + sqrt(2)/2 - sqrt(6)/3, 1 + sqrt(2)/2 - sqrt(6)/3, 1 + sqrt(2)/2 - sqrt(6)/3, 1 + sqrt(2)/2 - sqrt(6)/3]),
+                ('4-Gon (0.8906)', '4-gon-0.8906', [pi/2] * 4, [1 + sqrt(2)/2 - sqrt(6)/3] * 4),
             )
 
             num_sides = len(edges)
