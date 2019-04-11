@@ -134,16 +134,28 @@ def decide_file(decider: Decider):
         regular = decider.get_boolean()
 
         if regular:
-            scale, scale_desc = decider.get((sqrt(2), 'sqrt2'), (GoldenRatio, 'Phi'), (2, '2'))
+            # Generic scales of edge lengths
+            if decider.get_boolean():
+                scale, scale_desc = decider.get((sqrt(2), 'sqrt2'), (GoldenRatio, 'Phi'), (2, '2'))
 
-            name_part, polygon_name_part, angles, edges = decider.get(
-                ('3-Gon', '3-gon', [pi/3] * 3, [scale] * 3),
-                ('4-Gon', '4-gon', [pi/2] * 4, [scale] * 4),
-                ('5-Gon', '5-gon', [3*pi/5] * 5, [scale] * 5),
-                ('6-Gon', '6-gon', [2*pi/3] * 6, [scale] * 6))
+                name_part, polygon_name_part, angles, edges = decider.get(
+                    ('3-Gon', '3-gon', [pi/3] * 3, [scale] * 3),
+                    ('4-Gon', '4-gon', [pi/2] * 4, [scale] * 4),
+                    ('5-Gon', '5-gon', [3*pi/5] * 5, [scale] * 5),
+                    ('6-Gon', '6-gon', [2*pi/3] * 6, [scale] * 6))
 
-            name = '{} ({})'.format(name_part, scale_desc)
-            polygon_name = '{}-{}'.format(polygon_name_part, scale_desc.lower())
+                name = '{} ({})'.format(name_part, scale_desc)
+                polygon_name = '{}-{}'.format(polygon_name_part, scale_desc.lower())
+
+            # Special scales for specific constructions
+            else:
+                name, polygon_name, angles, edges = decider.get(
+                    # Truncated hexahedron with diagonal trigonal tunnels
+                    ('4-Gon (0.7812)', '4-gon-0.7812', [pi/2] * 4, [1 + sqrt(2) - 2*sqrt(6)/3] * 4),
+
+                    # Initial version of fillygon above, result of wrong math.
+                    ('4-Gon (0.8906)', '4-gon-0.8906', [pi/2] * 4, [1 + sqrt(2)/2 - sqrt(6)/3] * 4),
+                )
 
             num_sides = len(edges)
             rhombus = num_sides == 4
