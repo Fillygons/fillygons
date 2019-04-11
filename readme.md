@@ -11,7 +11,7 @@ To run, the Python project in the repository needs to be installed into a virtua
 
     $ python3 -m venv venv
     $ . venv/bin/activate
-    (venv) $ python3 -m pip install -e .
+    (venv) $ pip install -e .
     Obtaining file:///[...]/fillygons
     Requirement already satisfied: sympy in ./venv/lib/python3.5/site-packages (from fillygons==0.0.0)
     Requirement already satisfied: mpmath>=0.19 in ./venv/lib/python3.5/site-packages (from sympy->fillygons==0.0.0)
@@ -21,10 +21,6 @@ To run, the Python project in the repository needs to be installed into a virtua
           Successfully uninstalled fillygons-0.0.0
       Running setup.py develop for fillygons
     Successfully installed fillygons
-    (venv) $ make
-    [generate_sources] 433 files
-    [openscad] src/variants/0.2mm/3-gon/filled.stl
-    [...]
 
 
 ## Compiling
@@ -34,7 +30,18 @@ Type `make -j 10 generated` to generate OpenSCAD source files for all variants. 
 You can either open up the `.scad` files on OpenSCAD or compile them directly to _STL_ files using e.g. `make src/variants/0.2mm/4-gon/normal.scad`.
 
 To build all _STL_ files, run `make stl`. But this will take a very long time, up to several hours.
-Therefore [this repository](https://github.com/Fillygons/fillygons-stl) contains precompiled _STL_ files.
+Therefore [this repository](https://github.com/Fillygons/fillygons-stl) contains precompiled _STL_ files:
+
+    (venv) $ make
+    [generate_sources] 433 files
+    [openscad] src/variants/0.2mm/3-gon/filled.stl
+    [...]
+
+
+## Unit tests
+
+Some unit tests are included in the form images being rendered from of specifically generated test STL files. The rendered images are compared with expected images. Run `make test` to compare the rendered to the expected images and report any differences
+
 
 
 ## Contributing

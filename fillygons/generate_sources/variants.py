@@ -5,11 +5,12 @@ import os
 from sympy import Rational, GoldenRatio, TribonacciConstant, acos, atan, sqrt, \
     cbrt, pi, latex, rad, deg, S
 
+from fillygons.generate_sources.tests import decide_test_file
 from fillygons.generate_sources.utils import fillygon_file, GeneratedFile
 from fillygons.utils.deciders import Decider, iter_decisions
 
 
-def decide_file(decider: Decider):
+def decide_fillygon_file(decider: Decider):
     reversed_edges = []
     side_repetitions = 1
 
@@ -364,6 +365,14 @@ def decide_file(decider: Decider):
         gap=gap)
 
     return fillygon_file(path, arguments, metadata)
+
+
+def decide_file(decider: Decider):
+    # Aggregate normal fillygon models and test models.
+    if decider.get_boolean():
+        return decide_fillygon_file(decider)
+    else:
+        return decide_test_file(decider)
 
 
 def get_files():
