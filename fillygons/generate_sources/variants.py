@@ -195,8 +195,10 @@ def decide_file(decider: Decider):
                 ('4-Gon (2)', '4-gon-2', [pi/2, pi/2, pi/2, pi/2], [2, 2, 2, 2]),
 
                 # Truncated hexahedron with diagonal trigonal tunnels
-                #('4-Gon (0.8906)', '4-gon-0.8906', [pi/2, pi/2, pi/2, pi/2], [1 + sqrt(2)/2 - sqrt(6)/3, 1 + sqrt(2)/2 - sqrt(6)/3, 1 + sqrt(2)/2 - sqrt(6)/3, 1 + sqrt(2)/2 - sqrt(6)/3]),
-                ('4-Gon (0.7812)', '4-gon-0.7812', [pi/2, pi/2, pi/2, pi/2], [1 + sqrt(2) - 2*sqrt(6)/3, 1 + sqrt(2) - 2*sqrt(6)/3, 1 + sqrt(2) - 2*sqrt(6)/3, 1 + sqrt(2) - 2*sqrt(6)/3])
+                ('4-Gon (0.7812)', '4-gon-0.7812', [pi/2, pi/2, pi/2, pi/2], [1 + sqrt(2) - 2*sqrt(6)/3, 1 + sqrt(2) - 2*sqrt(6)/3, 1 + sqrt(2) - 2*sqrt(6)/3, 1 + sqrt(2) - 2*sqrt(6)/3]),
+
+                # Initial version of fillygon above, result of wrong math.
+                ('4-Gon (0.8906)', '4-gon-0.8906', [pi/2, pi/2, pi/2, pi/2], [1 + sqrt(2)/2 - sqrt(6)/3, 1 + sqrt(2)/2 - sqrt(6)/3, 1 + sqrt(2)/2 - sqrt(6)/3, 1 + sqrt(2)/2 - sqrt(6)/3]),
             )
 
             num_sides = len(edges)
