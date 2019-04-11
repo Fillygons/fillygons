@@ -35,3 +35,8 @@ You can either open up the `.scad` files on OpenSCAD or compile them directly to
 
 To build all _STL_ files, run `make stl`. But this will take a very long time, up to several hours.
 Therefore [this repository](https://github.com/Fillygons/fillygons-stl) contains precompiled _STL_ files.
+
+
+## Contributing
+
+To add new fillygon models, edit the file `fillygons/generate_sources/variants.py`.
